@@ -1,6 +1,6 @@
-<p align="center"><img src="agent/PhoneBox.Agent/phonebox.ico" width="72" alt="PhoneBox icon"></p>
+<p align="center"><img src="agent/PhoneBox.Agent/phonebox.ico" width="72" alt="PhoneMon icon"></p>
 
-<h1 align="center">PhoneBox</h1>
+<h1 align="center">PhoneMon</h1>
 
 <p align="center">
   <b>English</b> ·
@@ -30,7 +30,7 @@
 
 <p align="center"><b>Turn an old Android phone into a desk panel for your computer.</b><br>
 PC stats, AI coding sessions, music and touch controls over USB or Wi-Fi.<br>
-Windows, Linux and macOS. No root, PhoneBox account or cloud service required.</p>
+Windows, Linux and macOS. No root, PhoneMon account or cloud service required.</p>
 
 <p align="center">
   <a href="https://sarveshsivasankaran.github.io/PhoneMon/"><b>Try the live demo</b></a> ·
@@ -46,10 +46,10 @@ Windows, Linux and macOS. No root, PhoneBox account or cloud service required.</
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="MIT license"></a>
 </p>
 
-<p align="center"><img src="docs/hero-0.6.png" width="900" alt="PhoneBox on three phones showing automation, home and planner pages"><br>
+<p align="center"><img src="docs/hero-0.6.png" width="900" alt="PhoneMon on three phones showing automation, home and planner pages"><br>
 <sub>Example layouts with demo data.</sub></p>
 
-PhoneBox pairs a full-screen **Android app** with a small **desktop agent**. Build your panel in a browser-based
+PhoneMon pairs a full-screen **Android app** with a small **desktop agent**. Build your panel in a browser-based
 visual editor: **128 widgets**, **30 templates**, multiple pages and a live preview. Connect several phones with
 their own layouts, or switch one phone between paired computers.
 
@@ -67,7 +67,7 @@ Tap an AI session for its model, timing and token details. Opt in to Codex, Clau
 to answer **Allow**, **Deny** (and **Always allow** for OpenCode) from the phone. Optional
 [CodexBar integration](docs/GUIDE.md#widgets) adds quota providers and a cost overview.
 
-<p align="center"><a href="docs/tour-0.6.mp4"><img src="docs/tour-0.6.gif" width="780" alt="PhoneBox tour showing notifications, a Claude Code permission prompt and automatic page switching"></a><br>
+<p align="center"><a href="docs/tour-0.6.mp4"><img src="docs/tour-0.6.gif" width="780" alt="PhoneMon tour showing notifications, a Claude Code permission prompt and automatic page switching"></a><br>
 <sub>A tour with demo data: notifications, permission prompts and automatic page switching. <a href="docs/tour-0.6.mp4">Watch the MP4</a></sub></p>
 
 ## Quick start
@@ -93,7 +93,7 @@ Setup downloads the latest release, checks its SHA-256 checksum, offers missing 
 and opens the settings at <http://127.0.0.1:8765>. It can also install the Android app over USB.
 Run setup again to update or repair the installation while keeping settings and pairings.
 
-> **Windows signing:** release agents are still unsigned: SignPath Foundation accepted PhoneBox and test signing works, and releases are signed once its release certificate is issued.
+> **Windows signing:** release agents are still unsigned: SignPath Foundation accepted PhoneMon and test signing works, and releases are signed once its release certificate is issued.
 > SmartScreen or antivirus software may warn or block them. See the [code signing policy](#code-signing-policy)
 > and [installation warnings](docs/SETUP.md#quick-start). USB debugging should be authorized only on computers you trust.
 
@@ -183,8 +183,8 @@ The [UMIDIGI BISON extras](extras/umidigi-bison) contain the reversible, no-root
 
 ## Community add-ons
 
-Add-ons are written and maintained by their authors. PhoneBox doesn't review or ship them. They run with your own
-rights on the computer and can change PhoneBox settings through `PUT /api/settings`, so read what an add-on does
+Add-ons are written and maintained by their authors. PhoneMon doesn't review or ship them. They run with your own
+rights on the computer and can change PhoneMon settings through `PUT /api/settings`, so read what an add-on does
 before you install it.
 
 | Add-on | What it does | What it sends outside the PC |
@@ -199,7 +199,7 @@ port of its own, over TLS pinned like Wi-Fi, with a key the phone app makes and 
 Optional Wi-Fi uses HTTPS on port 8766 with a pinned certificate and a paired key. Settings and pairing endpoints
 stay local. The phone requests configured actions by ID; commands and integration credentials stay on the computer.
 
-PhoneBox has no telemetry, analytics or accounts of its own. Optional widgets and integrations contact external
+PhoneMon has no telemetry, analytics or accounts of its own. Optional widgets and integrations contact external
 services for weather, quotas, GitHub and other data, and the agent checks GitHub for updates.
 Supported public feeds can fall back through the agent over USB when the phone has no internet.
 The [privacy policy](PRIVACY.md) lists outbound connections and how to disable them.
@@ -237,7 +237,7 @@ Free code signing provided by [SignPath.io](https://about.signpath.io/), certifi
 
 ## Thanks
 
-People who tested PhoneBox on their own hardware:
+People who tested PhoneMon on their own hardware:
 
 - [anandyakshit](https://github.com/anandyakshit): Android 7 support, on an Android 7.1.1 phone ([#73](https://github.com/ersinkoc/phonebox/issues/73)).
 
@@ -259,11 +259,11 @@ People who tested PhoneBox on their own hardware:
 
 ## Star History
 
-<a href="https://www.star-history.com/#ersinkoc/phonebox&Date">
+<a href="https://www.star-history.com/#Sarveshsivasankaran/PhoneMon&Date">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=ersinkoc/phonebox&type=Date&theme=dark">
-    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=ersinkoc/phonebox&type=Date">
-    <img alt="Star history of ersinkoc/phonebox" src="https://api.star-history.com/svg?repos=ersinkoc/phonebox&type=Date">
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=Sarveshsivasankaran/PhoneMon&type=Date&theme=dark">
+    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=Sarveshsivasankaran/PhoneMon&type=Date">
+    <img alt="Star history of Sarveshsivasankaran/PhoneMon" src="https://api.star-history.com/svg?repos=Sarveshsivasankaran/PhoneMon&type=Date">
   </picture>
 </a>
 
