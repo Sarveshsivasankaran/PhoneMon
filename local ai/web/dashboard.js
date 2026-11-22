@@ -144,3 +144,4 @@ document.addEventListener('DOMContentLoaded', () => {
   fetchStatus();
   setInterval(fetchStatus, 4000);
 });
+
