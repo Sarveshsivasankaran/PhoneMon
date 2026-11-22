@@ -551,15 +551,17 @@ class AgentLink(private val context: Context) {
             }
 
             /**
-             * Reads https://ersinkoc.github.io/phonebox/pair/#v=1&... (the QR code; the data is in the fragment so it
-             * never reaches a web server) or phonebox://pair?v=1&... (the "Open in PhoneBox" button on that page).
+             * Reads https://Sarveshsivasankaran.github.io/PhoneMon/pair/#v=1&... or https://ersinkoc.github.io/phonebox/pair/#v=1&...
+             * (the QR code; the data is in the fragment so it never reaches a web server) or
+             * phonemon://pair?v=1&... / phonebox://pair?v=1&... (the "Open in PhoneMon" button on that page).
              * Anything malformed returns null.
              */
             fun parse(uri: Uri?): PairLink? {
                 if (uri == null) return null
                 val raw = when {
-                    uri.scheme == "https" && uri.host == "ersinkoc.github.io" && uri.path?.startsWith("/phonebox/pair") == true -> uri.encodedFragment
-                    uri.scheme == "phonebox" && uri.host == "pair" -> uri.encodedQuery
+                    uri.scheme == "https" && (uri.host == "Sarveshsivasankaran.github.io" || uri.host == "ersinkoc.github.io") &&
+                        (uri.path?.startsWith("/PhoneMon/pair", ignoreCase = true) == true || uri.path?.startsWith("/phonebox/pair", ignoreCase = true) == true) -> uri.encodedFragment
+                    (uri.scheme == "phonemon" || uri.scheme == "phonebox") && uri.host == "pair" -> uri.encodedQuery
                     else -> null
                 } ?: return null
                 val q = raw.split('&').mapNotNull { part ->

@@ -9,10 +9,10 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <AssemblyName>PhoneBoxAgent</AssemblyName>
-    <RootNamespace>PhoneBox.Agent</RootNamespace>
-    <Product>PhoneBox</Product>
-    <Company>PhoneBox</Company>
-    <Description>PhoneBox desktop agent: feeds the PhoneBox Android desk panel over USB or Wi-Fi.</Description>
+    <RootNamespace>PhoneMon.Agent</RootNamespace>
+    <Product>PhoneMon</Product>
+    <Company>PhoneMon</Company>
+    <Description>PhoneMon desktop agent: feeds the PhoneMon Android desk panel over USB or Wi-Fi.</Description>
     <Version>1.0.0</Version>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
   </PropertyGroup>

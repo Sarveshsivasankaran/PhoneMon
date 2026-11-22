@@ -14,7 +14,15 @@ public sealed class Tray : IHostedService
     private readonly IHostApplicationLifetime _life;
     private readonly AdbReverse _adb;
     private readonly ConfigStore _config;
-    private static readonly ResourceManager Strings = new("PhoneBox.Agent.TrayStrings", typeof(Tray).Assembly);
+    private static readonly ResourceManager Strings = CreateResourceManager();
+    private static ResourceManager CreateResourceManager()
+    {
+        var asm = typeof(Tray).Assembly;
+        var names = asm.GetManifestResourceNames();
+        if (names.Any(n => n.StartsWith("PhoneMon.Agent.TrayStrings")))
+            return new ResourceManager("PhoneMon.Agent.TrayStrings", asm);
+        return new ResourceManager("PhoneBox.Agent.TrayStrings", asm);
+    }
     private Thread? _thread;
     private ApplicationContext? _ctx;
     private Control? _invoker;

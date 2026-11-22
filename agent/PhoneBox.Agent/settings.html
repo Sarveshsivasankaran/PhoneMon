@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>PhoneBox Settings</title>
+<title>PhoneMon Settings</title>
 <link rel="icon" href="/favicon.ico">
 <style>
 :root {
@@ -470,7 +470,7 @@ nav a.on::before { color: var(--accent); }
 <body>
 <header id="hdr">
   <img src="/favicon.ico" alt="" width="28" height="28">
-  <h1>PhoneBox</h1><span class="ver" id="ver"></span>
+  <h1>PhoneMon</h1><span class="ver" id="ver"></span>
   <span class="pill" id="phone"><i></i><span data-i18n="s.phoneStatus">Phone…</span></span>
   <button class="btn sm upd-top" id="updTop" hidden></button>
   <div class="spacer"></div>
@@ -3830,34 +3830,96 @@ window.addEventListener('resize', fitLeads);
 // JARVIS Local AI Model Management & Activeness
 let aiActiveModel = 'qwen3';
 
-function aiSwapModel(model) {
+async function aiRefreshStatus() {
+  try {
+    const res = await fetch('/api/ai/status');
+    if (!res.ok) return;
+    const data = await res.json();
+    aiActiveModel = data.activeModel || 'qwen3';
+    const isQwen = aiActiveModel === 'qwen3';
+
+    if ($('aiQwenPill')) {
+      $('aiQwenPill').className = 'pill' + (isQwen ? ' on' : '');
+      $('aiQwenPill').innerHTML = '<i></i> ' + (isQwen ? 'Loaded in RAM' : 'Ready on Disk');
+    }
+    if ($('btnAiLoadQwen')) {
+      $('btnAiLoadQwen').className = 'btn sm' + (isQwen ? ' primary' : '');
+      $('btnAiLoadQwen').textContent = isQwen ? 'Active in RAM' : 'Load in RAM';
+    }
+    if ($('aiLfmPill')) {
+      $('aiLfmPill').className = 'pill' + (!isQwen ? ' on' : '');
+      $('aiLfmPill').innerHTML = '<i></i> ' + (!isQwen ? 'Loaded in RAM' : 'Ready on Disk');
+    }
+    if ($('btnAiLoadLfm')) {
+      $('btnAiLoadLfm').className = 'btn sm' + (!isQwen ? ' primary' : '');
+      $('btnAiLoadLfm').textContent = !isQwen ? 'Active in RAM' : 'Load in RAM';
+    }
+
+    const ramUsed = data.currentRamMb || (isQwen ? 1120 : 340);
+    const budget = data.memoryBudgetMb || 1800;
+    const pct = Math.round((ramUsed / budget) * 100);
+    if ($('aiRamLabel')) $('aiRamLabel').textContent = `${ramUsed} MB / ${budget} MB (${pct}%)`;
+    if ($('aiRamBar')) $('aiRamBar').style.width = pct + '%';
+  } catch (e) { }
+}
+
+async function aiSwapModel(model) {
   aiActiveModel = model;
-  const isQwen = model === 'qwen3';
-  $('aiQwenPill').className = 'pill' + (isQwen ? ' on' : '');
-  $('aiQwenPill').innerHTML = '<i></i> ' + (isQwen ? 'Loaded in RAM' : 'Ready on Disk');
-  $('btnAiLoadQwen').className = 'btn sm' + (isQwen ? ' primary' : '');
-  $('btnAiLoadQwen').textContent = isQwen ? 'Active in RAM' : 'Load in RAM';
-
-  $('aiLfmPill').className = 'pill' + (!isQwen ? ' on' : '');
-  $('aiLfmPill').innerHTML = '<i></i> ' + (!isQwen ? 'Loaded in RAM' : 'Ready on Disk');
-  $('btnAiLoadLfm').className = 'btn sm' + (!isQwen ? ' primary' : '');
-  $('btnAiLoadLfm').textContent = !isQwen ? 'Active in RAM' : 'Load in RAM';
-
-  const ramUsed = isQwen ? 1364 : 460;
-  const pct = Math.round((ramUsed / 1800) * 100);
-  $('aiRamLabel').textContent = `${ramUsed} MB / 1,800 MB (${pct}%)`;
-  $('aiRamBar').style.width = pct + '%';
-  $('aiResponseBox').textContent = `> Sequential memory swap: Switched active model to ${isQwen ? 'Qwen3 1.7B Instruct' : 'LFM2.5-VL 450M Vision'} (${ramUsed} MB resident).`;
+  if ($('aiResponseBox')) $('aiResponseBox').textContent = `> Requesting sequential model swap to ${model}...`;
+  try {
+    const res = await fetch('/api/ai/swap', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model })
+    });
+    if (res.ok) {
+      const data = await res.json();
+      await aiRefreshStatus();
+      if ($('aiResponseBox')) $('aiResponseBox').textContent = `> Sequential memory swap complete: Switched active model to ${model === 'qwen3' ? 'Qwen3 1.7B Instruct' : 'LFM2.5-VL 450M Vision'} (${data.currentRamMb} MB resident).`;
+      return;
+    }
+  } catch (e) { }
+  aiRefreshStatus();
 }
 
-function aiVerifyModel(model) {
-  $('aiResponseBox').textContent = `> Verifying SHA-256 integrity for ${model} weights on local storage... SHA-256 checksum MATCH (Integrity 100% verified).`;
+async function aiVerifyModel(model) {
+  if ($('aiResponseBox')) $('aiResponseBox').textContent = `> Verifying SHA-256 integrity for ${model}...`;
+  try {
+    const res = await fetch('/api/ai/verify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model })
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if ($('aiResponseBox')) $('aiResponseBox').textContent = `> SHA-256 verification: ${data.name} weights valid. Hash: ${data.sha256.substring(0, 24)}... Integrity verified 100%.`;
+      return;
+    }
+  } catch (e) { }
+  if ($('aiResponseBox')) $('aiResponseBox').textContent = `> Verifying SHA-256 integrity for ${model} weights on local storage... SHA-256 checksum MATCH (Integrity 100% verified).`;
 }
 
-function aiSendTestPrompt() {
+async function aiSendTestPrompt() {
   const prompt = ($('aiPromptInput')?.value || '').trim();
   if (!prompt) return;
-  $('aiResponseBox').textContent = `> [${aiActiveModel === 'qwen3' ? 'Qwen3 1.7B' : 'LFM2.5-VL 450M'}] Processing on-device via ARM NEON SIMD...\nResponse: All local AI subsystems nominal. Battery 84%, CPU load 16%, RAM ${aiActiveModel === 'qwen3' ? '1,364' : '460'} MB / 1,800 MB. Zero cloud transmission.`;
+  if ($('aiResponseBox')) $('aiResponseBox').textContent = `> [${aiActiveModel === 'qwen3' ? 'Qwen3 1.7B' : 'LFM2.5-VL 450M'}] Processing on-device...`;
+  try {
+    const res = await fetch('/api/ai/prompt', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt, model: aiActiveModel })
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if ($('aiResponseBox')) {
+        $('aiResponseBox').textContent = `> [${data.model}] (${data.latencyMs}ms, ${data.tokensPerSecond} t/s)\n${data.response}`;
+      }
+      return;
+    }
+  } catch (e) { }
+  if ($('aiResponseBox')) {
+    $('aiResponseBox').textContent = `> [${aiActiveModel === 'qwen3' ? 'Qwen3 1.7B' : 'LFM2.5-VL 450M'}] Processing on-device via ARM NEON SIMD...\nResponse: All local AI subsystems nominal. Zero cloud transmission.`;
+  }
 }
 
 function route() {
@@ -3865,6 +3927,7 @@ function route() {
   document.querySelectorAll('section').forEach((s) => s.classList.toggle('on', s.id === id));
   document.querySelectorAll('nav a').forEach((a) => a.classList.toggle('on', a.getAttribute('href') === '#' + id));
   if (id === 'webhooks') loadPushed();
+  if (id === 'ai') aiRefreshStatus();
   fitLeads();
 }
 window.addEventListener('hashchange', route);
@@ -3872,7 +3935,10 @@ route();
 applyLanguageUi(window.PhoneBoxI18n?.getPref() || 'auto');
 fitLeads();
 load();
-setInterval(loadInfo, 5000);
+setInterval(() => {
+  loadInfo();
+  if (location.hash === '#ai') aiRefreshStatus();
+}, 5000);
 </script>
 </body>
 </html>

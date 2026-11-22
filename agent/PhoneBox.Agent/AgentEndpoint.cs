@@ -4,7 +4,7 @@ namespace PhoneBox.Agent;
 public sealed record AgentEndpoint(int Port = 8765)
 {
     public string SettingsUrl => $"http://127.0.0.1:{Port}/";
-    public string MutexName => Port == 8765 ? @"Local\PhoneBox.Agent" : $@"Local\PhoneBox.Agent.{Port}";
+    public string MutexName => Port == 8765 ? @"Local\PhoneMon.Agent" : $@"Local\PhoneMon.Agent.{Port}";
 
     public static AgentEndpoint FromArgs(string[] args)
     {

@@ -102,6 +102,7 @@ builder.Services.AddSingleton(sp => new LyricsService(sp.GetRequiredService<Conf
 AddMonitor<BatteryMonitor>(builder.Services);
 AddMonitor<RuleEngine>(builder.Services);
 AddMonitor<ChargeGuard>(builder.Services);
+builder.Services.AddSingleton<AiService>();
 builder.Services.AddHostedService<Tray>();
 
 var app = builder.Build();
@@ -253,15 +254,17 @@ app.Use(async (ctx, next) =>
             return;
         }
     }
-    if (ctx.Request.Path.StartsWithSegments("/api/state") && ctx.Request.Headers.ContainsKey("X-PhoneBox-App"))
+    if (ctx.Request.Path.StartsWithSegments("/api/state") && (ctx.Request.Headers.ContainsKey("X-PhoneMon-App") || ctx.Request.Headers.ContainsKey("X-PhoneBox-App")))
         Interlocked.Exchange(ref ApprovalStore.PhoneLastSeen, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
-    if (ctx.Request.Headers.TryGetValue("X-PhoneBox-Device", out var device))
+    if (ctx.Request.Headers.TryGetValue("X-PhoneMon-Device", out var device) || ctx.Request.Headers.TryGetValue("X-PhoneBox-Device", out device))
     {
-        var problem = PhoneRegistry.Touch(device.ToString(), ctx.Request.Headers["X-PhoneBox-Model"].ToString(),
-            ctx.Connection.LocalPort == usb.Port ? "USB" : ctx.Connection.LocalPort == Port ? "local" : "Wi-Fi", ctx.Request.Headers["X-PhoneBox-WebView"].ToString());
+        var model = ctx.Request.Headers.TryGetValue("X-PhoneMon-Model", out var m) ? m.ToString() : ctx.Request.Headers["X-PhoneBox-Model"].ToString();
+        var wv = ctx.Request.Headers.TryGetValue("X-PhoneMon-WebView", out var w) ? w.ToString() : ctx.Request.Headers["X-PhoneBox-WebView"].ToString();
+        var problem = PhoneRegistry.Touch(device.ToString(), model,
+            ctx.Connection.LocalPort == usb.Port ? "USB" : ctx.Connection.LocalPort == Port ? "local" : "Wi-Fi", wv);
         if (problem is not null) app.Logger.LogWarning("WebView: {Problem}", problem);
     }
-    if (ctx.Request.Headers.TryGetValue("X-PhoneBox-App", out var appVersion) && appVersion.ToString().Length is > 0 and < 32)
+    if ((ctx.Request.Headers.TryGetValue("X-PhoneMon-App", out var appVersion) || ctx.Request.Headers.TryGetValue("X-PhoneBox-App", out appVersion)) && appVersion.ToString().Length is > 0 and < 32)
         UpdateService.AppVersion = appVersion.ToString();
     ctx.Response.Headers.CacheControl = "no-store";
     // only the panel may be framed, and only by the settings page itself (the live preview)
@@ -350,10 +353,26 @@ app.MapPost("/api/restart", (IHostApplicationLifetime life) =>
 // ---------------------------------------------------------------- settings UI (browser)
 app.MapGet("/", () =>
 {
+    var diskPath = Path.Combine(AppContext.BaseDirectory, "settings.html");
+    if (!File.Exists(diskPath))
+    {
+        diskPath = Path.Combine(Directory.GetCurrentDirectory(), "agent", "PhoneBox.Agent", "settings.html");
+    }
+    if (File.Exists(diskPath))
+    {
+        return Results.Content(File.ReadAllText(diskPath), "text/html; charset=utf-8");
+    }
     using var s = AppPaths.Resource("settings.html")!;
     using var r = new StreamReader(s);
     return Results.Content(r.ReadToEnd(), "text/html; charset=utf-8");
 });
+
+// ---------------------------------------------------------------- JARVIS Local AI API
+app.MapGet("/api/ai/status", (AiService ai) => Results.Json(ai.GetStatus()));
+app.MapGet("/api/ai/models", (AiService ai) => Results.Json(ai.GetModels()));
+app.MapPost("/api/ai/swap", (AiSwapRequest req, AiService ai) => Results.Json(ai.SwapModel(req.Model)));
+app.MapPost("/api/ai/verify", (AiVerifyRequest req, AiService ai) => Results.Json(ai.VerifyModel(req.Model)));
+app.MapPost("/api/ai/prompt", async (AiPromptRequest req, AiService ai) => Results.Json(await ai.ExecutePrompt(req.Prompt, req.Model, req.Image)));
 // The phone's panel (embedded at build time) for the live preview in the layout editor; local port only.
 app.MapGet("/panel/{*file}", (string? file, HttpRequest req) =>
 {

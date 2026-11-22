@@ -5,25 +5,33 @@ namespace PhoneBox.Agent;
 /// <summary>File locations. The install folder is replaced on update; settings and logs are kept.</summary>
 public static class AppPaths
 {
-    public const string AppName = "PhoneBox";
+    public const string AppName = "PhoneMon";
+    public const string LegacyAppName = "PhoneBox";
 
     private static string Home => Environment.GetFolderPath(Environment.SpecialFolder.UserProfile, Environment.SpecialFolderOption.DoNotVerify);
     private static string Xdg(string variable, string fallback) =>
         Environment.GetEnvironmentVariable(variable) is { Length: > 0 } v ? v : Path.Combine(Home, fallback);
 
-    /// <summary>%APPDATA%\PhoneBox — user settings (config.json).</summary>
-    /// <summary>Windows: %APPDATA%\PhoneBox. Linux: ~/.config/PhoneBox. macOS: ~/Library/Application Support/PhoneBox.</summary>
-    public static readonly string ConfigDir = Path.Combine(
+    private static string ResolveDir(string parent, string name, string legacyName)
+    {
+        var target = Path.Combine(parent, name);
+        if (Directory.Exists(target)) return target;
+        var legacy = Path.Combine(parent, legacyName);
+        if (Directory.Exists(legacy)) return legacy;
+        return target;
+    }
+
+    /// <summary>%APPDATA%\PhoneMon (or legacy %APPDATA%\PhoneBox) — user settings (config.json).</summary>
+    public static readonly string ConfigDir = ResolveDir(
         OperatingSystem.IsWindows() ? Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)
         : OperatingSystem.IsMacOS() ? Path.Combine(Home, "Library", "Application Support")
-        : Xdg("XDG_CONFIG_HOME", ".config"), AppName);
+        : Xdg("XDG_CONFIG_HOME", ".config"), AppName, LegacyAppName);
 
-    /// <summary>%LOCALAPPDATA%\PhoneBox — logs and the installed binaries.</summary>
-    /// <summary>Windows: %LOCALAPPDATA%\PhoneBox. Linux: ~/.local/share/PhoneBox. macOS: same folder as the settings.</summary>
-    public static readonly string LocalDir = Path.Combine(
+    /// <summary>%LOCALAPPDATA%\PhoneMon (or legacy %LOCALAPPDATA%\PhoneBox) — logs and the installed binaries.</summary>
+    public static readonly string LocalDir = ResolveDir(
         OperatingSystem.IsWindows() ? Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)
         : OperatingSystem.IsMacOS() ? Path.Combine(Home, "Library", "Application Support")
-        : Xdg("XDG_DATA_HOME", Path.Combine(".local", "share")), AppName);
+        : Xdg("XDG_DATA_HOME", Path.Combine(".local", "share")), AppName, LegacyAppName);
 
     public static readonly string ConfigPath = Path.Combine(ConfigDir, "config.json");
     public static readonly string LogPath = Path.Combine(LocalDir, "agent.log");
