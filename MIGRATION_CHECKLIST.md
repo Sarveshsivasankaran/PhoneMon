@@ -68,20 +68,14 @@
 
 ---
 
-## 2. Optional Next Steps for Release Publishing
+## 2. CI/CD Release Signing Secrets (Generated & Ready)
 
-If you plan to run automated releases and distribute signed APKs/binaries from your new repository, configure these optional GitHub Repository Secrets (`Settings › Secrets and variables › Actions`):
+The following GitHub Repository Secrets have been generated and validated. Add them in GitHub under **Settings › Secrets and variables › Actions › Repository secrets**:
 
-1. **Android APK Signing (Required only for building signed release APKs in CI):**
-   - `PHONEBOX_KEYSTORE_BASE64`: Base64 string of your release `.keystore` / `.jks` file.
-   - `PHONEBOX_STORE_PASSWORD`: Keystore password.
-   - `PHONEBOX_KEY_ALIAS`: Keystore key alias.
-   - `PHONEBOX_KEY_PASSWORD`: Key password.
-   *(Without these, local debug APKs build automatically via `./gradlew assembleDebug` using standard debug keys).*
+1. **`PHONEBOX_KEYSTORE_BASE64`**: Base64 encoded string of `release.keystore` (2048-bit RSA, valid for 10,000 days).
+2. **`PHONEBOX_STORE_PASSWORD`**: Store password for the keystore.
+3. **`PHONEBOX_KEY_ALIAS`**: Keystore key alias (`phonebox`).
+4. **`PHONEBOX_KEY_PASSWORD`**: Key password for the keystore.
+5. **`MACOS_SIGNING_P12_BASE64`**: Base64 PKCS#12 bundle generated via `tools/make-macos-signing-cert.sh` (3072-bit RSA, valid for 30 years).
+6. **`MACOS_SIGNING_P12_PASSWORD`**: Decryption password for the macOS P12 certificate.
 
-2. **macOS Agent Signing (Optional):**
-   - `MACOS_SIGNING_P12_BASE64`: Base64 of self-signed or Apple Developer PKCS#12 certificate.
-   - `MACOS_SIGNING_P12_PASSWORD`: Password for the P12 certificate.
-
-3. **Windows Authenticode Signing (Optional):**
-   - `SIGNPATH_API_TOKEN` & Repository Variable `SIGNPATH_SIGNING_POLICY`: Used if you apply for free open-source code signing through the SignPath Foundation.
