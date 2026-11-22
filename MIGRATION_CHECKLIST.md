@@ -62,6 +62,8 @@
 
 ### Phase 4: Verification & Git Remote Sync
 - [x] **Release Metadata Validation:** Ran `python tools/check-release.py` -> Passed all widget counts, catalog schemas, and language consistency checks.
+- [x] **Release Version Reset (v1.0.0):** Reset project version from legacy `0.9.27` to starting `1.0.0` across C# Agent, Android build (`versionCode = 1`, `versionName = "1.0.0"`), CHANGELOG, Scoop bucket, and WinGet manifest package (`Sarveshsivasankaran.PhoneMon`).
+- [x] **WinGet Manifest Test Fix:** Updated `tools/test-winget-manifests.py` and `packaging/winget/make-manifests.py` to match the target repository and package identifier -> Passed in CI Release metadata job.
 - [x] **Git Remote URL Configuration:** Set `origin` remote URL to `https://github.com/Sarveshsivasankaran/PhoneMon.git`.
 - [x] **Initial Remote Reachability:** Verified remote target connectivity via `git ls-remote`.
 - [x] **Commit and Push:** Stage all modifications and push branch to `origin main`.

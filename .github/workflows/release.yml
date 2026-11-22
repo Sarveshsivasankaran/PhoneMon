@@ -183,7 +183,7 @@ jobs:
           section() { awk -v v="$1" '/^## /{ if (on) exit; on = ($2 == v); next } on' CHANGELOG.md; }
           section "$v" > notes.md
           [ -s notes.md ] || section Unreleased > notes.md
-          [ -s notes.md ] || echo "PhoneBox $v" > notes.md
+          [ -s notes.md ] || echo "PhoneMon $v" > notes.md
           cat >> notes.md <<'EOF'
 
           ---
@@ -194,7 +194,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           v="${{ needs.version.outputs.version }}"
-          gh release create "v$v" dist/* --title "PhoneBox $v" --notes-file notes.md --target "${{ github.sha }}" ${{ inputs.draft && '--draft' || '' }}
+          gh release create "v$v" dist/* --title "PhoneMon $v" --notes-file notes.md --target "${{ github.sha }}" ${{ inputs.draft && '--draft' || '' }}
       # a draft's downloads are not public yet, so the package manifests follow only published releases
       - name: Update the Scoop bucket and the winget manifests
         if: ${{ !inputs.draft }}

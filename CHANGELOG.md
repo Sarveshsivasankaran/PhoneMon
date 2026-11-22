@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.0 — 2026-11-23
+
+First release of PhoneMon — desk panel for PC monitoring, AI coding sessions, music, and touch controls.
+
 ## Unreleased
 
 **Widgets**

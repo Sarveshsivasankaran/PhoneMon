@@ -1,10 +1,10 @@
 {
-    "version": "0.9.27",
-    "description": "PhoneBox agent: turns an old Android phone into a desk panel for this PC (widgets, AI coding sessions, music, webhooks).",
+    "version": "1.0.0",
+    "description": "PhoneMon agent: turns an old Android phone into a desk panel for this PC (widgets, AI coding sessions, music, webhooks).",
     "homepage": "https://github.com/Sarveshsivasankaran/PhoneMon",
     "license": "MIT",
     "notes": [
-        "Start PhoneBox from the Start menu; it lives in the tray (right-click it to start it with Windows).",
+        "Start PhoneMon from the Start menu; it lives in the tray (right-click it to start it with Windows).",
         "Plug the phone in with USB debugging on, then open the settings (double-click the tray icon) and use",
         "General › Phone connection › Install the phone app."
     ],
@@ -13,20 +13,20 @@
     },
     "architecture": {
         "64bit": {
-            "url": "https://github.com/Sarveshsivasankaran/PhoneMon/releases/download/v0.9.27/PhoneBoxAgent-0.9.27-win-x64.zip",
+            "url": "https://github.com/Sarveshsivasankaran/PhoneMon/releases/download/v1.0.0/PhoneBoxAgent-1.0.0-win-x64.zip",
             "hash": "48b2397b99eb348c02944d01cb8712075c5b40be6d79be0123472dbb90c717f1"
         }
     },
     "bin": [
         [
             "PhoneBoxAgent.exe",
-            "phonebox"
+            "phonemon"
         ]
     ],
     "shortcuts": [
         [
             "PhoneBoxAgent.exe",
-            "PhoneBox"
+            "PhoneMon"
         ]
     ],
     "checkver": "github",
