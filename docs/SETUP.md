@@ -59,7 +59,7 @@ and changes nothing.
 | `-NoAutostart` | `--no-autostart` | Do not start PhoneBox at login |
 | `-NoStart` | `--no-start` | Install only |
 | — | `--no-extras` | Do not offer the optional helpers |
-| `-Version 0.9.8` | `--version 0.9.8` | Install that release instead of the latest |
+| `-Version 1.0.0` | `--version 1.0.0` | Install that release instead of the latest |
 | `-DryRun` | `--dry-run` | Download and check, change nothing |
 
 To pass options:

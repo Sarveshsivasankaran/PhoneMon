@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-  PhoneBox setup for Windows: installs the latest release, everything it needs, and the phone app.
+  PhoneMon setup for Windows: installs the latest release, everything it needs, and the phone app.
 
 .DESCRIPTION
   Run it from a normal PowerShell window (not "Run as administrator"):
@@ -11,14 +11,14 @@
 
     & ([scriptblock]::Create((irm https://raw.githubusercontent.com/Sarveshsivasankaran/PhoneMon/main/setup.ps1))) -NoPhone
 
-  What it does, asking first before anything outside the PhoneBox folders:
-    1. Checks this PC (Windows 10/11, x64) and finds the latest PhoneBox release.
+  What it does, asking first before anything outside the PhoneMon folders:
+    1. Checks this PC (Windows 10/11, x64) and finds the latest PhoneMon release.
     2. Downloads the agent and checks its SHA-256 checksum (and its build provenance when the GitHub CLI is signed in).
     3. Installs adb (Android platform tools) when it is missing: with winget, or from Google's download.
-    4. Installs the agent to %LOCALAPPDATA%\PhoneBox\app. Settings in %APPDATA%\PhoneBox are kept.
-    5. Adds a Start Menu shortcut, optionally starts PhoneBox with Windows, puts the app on a phone connected over USB, starts the agent and opens its settings.
+    4. Installs the agent to %LOCALAPPDATA%\PhoneMon\app. Settings in %APPDATA%\PhoneMon are kept.
+    5. Adds a Start Menu shortcut, optionally starts PhoneMon with Windows, puts the app on a phone connected over USB, starts the agent and opens its settings.
 
-  Running it again updates PhoneBox or repairs the installation.
+  Running it again updates PhoneMon or repairs the installation.
 
 .PARAMETER Yes
   Answer every question with its default: for unattended runs.
@@ -27,11 +27,11 @@
 .PARAMETER Serial
   The phone to use when several are connected (see "adb devices").
 .PARAMETER NoAutostart
-  Do not start PhoneBox with Windows.
+  Do not start PhoneMon with Windows.
 .PARAMETER NoStart
   Install only; do not start the agent.
 .PARAMETER Version
-  Install this release (for example 0.9.8) instead of the latest.
+  Install this release (for example 1.0.0) instead of the latest.
 .PARAMETER DryRun
   Download and check everything, show what would happen, and change nothing.
 .PARAMETER AllowAdministrator
@@ -89,24 +89,31 @@ function Invoke-Native([string]$File, [string[]]$Arguments) {
 }
 
 function Get-Download([string]$Url, [string]$Path) {
-    Invoke-WebRequest -UseBasicParsing -Uri $Url -OutFile $Path -Headers @{ 'User-Agent' = 'phonebox-setup' }
+    Invoke-WebRequest -UseBasicParsing -Uri $Url -OutFile $Path -Headers @{ 'User-Agent' = 'phonemon-setup' }
 }
 
 function Get-LatestVersion {
     try {
         $release = Invoke-RestMethod -UseBasicParsing -Uri "https://api.github.com/repos/$Repo/releases/latest" `
-            -Headers @{ 'User-Agent' = 'phonebox-setup'; 'Accept' = 'application/vnd.github+json' } -TimeoutSec 30
+            -Headers @{ 'User-Agent' = 'phonemon-setup'; 'Accept' = 'application/vnd.github+json' } -TimeoutSec 30
         if ($release.tag_name) { return [string]$release.tag_name }
     } catch { }
+    try {
+        $releases = Invoke-RestMethod -UseBasicParsing -Uri "https://api.github.com/repos/$Repo/releases" `
+            -Headers @{ 'User-Agent' = 'phonemon-setup'; 'Accept' = 'application/vnd.github+json' } -TimeoutSec 30
+        if ($releases -and $releases[0].tag_name) { return [string]$releases[0].tag_name }
+    } catch { }
     # The API allows 60 requests an hour per address; the release page redirects to the newest tag as well.
-    $request = [System.Net.HttpWebRequest]::Create("https://github.com/$Repo/releases/latest")
-    $request.AllowAutoRedirect = $false
-    $request.Method = 'HEAD'
-    $request.UserAgent = 'phonebox-setup'
-    $response = $request.GetResponse()
-    try { $location = [string]$response.Headers['Location'] } finally { $response.Close() }
-    if ($location -match '/tag/([^/?#]+)$') { return $Matches[1] }
-    throw 'Could not find the latest release on GitHub. Check the internet connection, or pass -Version (for example -Version 0.9.8).'
+    try {
+        $request = [System.Net.HttpWebRequest]::Create("https://github.com/$Repo/releases/latest")
+        $request.AllowAutoRedirect = $false
+        $request.Method = 'HEAD'
+        $request.UserAgent = 'phonemon-setup'
+        $response = $request.GetResponse()
+        try { $location = [string]$response.Headers['Location'] } finally { $response.Close() }
+        if ($location -match '/tag/([^/?#]+)$') { return $Matches[1] }
+    } catch { }
+    return 'v1.0.0'
 }
 
 function Assert-Checksum([string]$File, [string]$SumsFile) {
@@ -174,13 +181,14 @@ function Install-Adb([string]$Temp) {
     Find-Adb
 }
 
-function Stop-PhoneBox {
-    $running = @(Get-Process PhoneBoxAgent, DeskAgent -ErrorAction SilentlyContinue)
+function Stop-PhoneMon {
+    $running = @(Get-Process PhoneBoxAgent, PhoneMonAgent, DeskAgent -ErrorAction SilentlyContinue)
     foreach ($process in $running) {
         try { $process.Kill(); [void]$process.WaitForExit(10000) } catch { }
     }
     if ($running.Count) { Write-Info "Stopped the running agent ($($running.Count) process(es))" }
 }
+function Stop-PhoneBox { Stop-PhoneMon }
 
 # Copies the new release over the installed one; Windows can hold a just-stopped program's files for a moment.
 function Copy-Release([string]$From, [string]$To) {
@@ -270,7 +278,7 @@ function Install-PhoneApp([string]$Adb, [string]$Apk, [string]$Device) {
         Write-Caution '(this deletes its settings) and run setup again.'
         return $false
     }
-    if ($text -match 'INSTALL_FAILED_VERSION_DOWNGRADE') { Write-Ok 'The phone already has a newer PhoneBox app; it was kept.'; return $true }
+    if ($text -match 'INSTALL_FAILED_VERSION_DOWNGRADE') { Write-Ok 'The phone already has a newer PhoneMon app; it was kept.'; return $true }
     if ($text -match 'INSTALL_FAILED_USER_RESTRICTED|INSTALL_FAILED_ABORTED') {
         Write-Caution 'The phone refused the installation. Confirm it on the phone; Xiaomi / Redmi / POCO phones also need'
         Write-Caution '"Install via USB" in Developer options. Then run setup again.'
@@ -280,41 +288,44 @@ function Install-PhoneApp([string]$Adb, [string]$Apk, [string]$Device) {
         Write-Caution "The app could not be installed: $text"
         return $false
     }
-    Write-Ok 'PhoneBox app installed on the phone'
+    Write-Ok 'PhoneMon app installed on the phone'
     [void](Invoke-Native $Adb @('-s', $Device, 'shell', 'am', 'start', '-n', "$Package/.MainActivity"))
     $true
 }
 
-function Install-PhoneBox {
+function Install-PhoneMon {
     $ErrorActionPreference = 'Stop'
     $ProgressPreference = 'SilentlyContinue'   # the progress bar makes downloads in Windows PowerShell 5.1 many times slower
     [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
 
     Write-Host ''
-    Write-Host 'PhoneBox setup' -ForegroundColor Cyan
+    Write-Host 'PhoneMon setup' -ForegroundColor Cyan
     if ($DryRun) { Write-Host 'Dry run: downloads and checks everything, changes nothing.' -ForegroundColor Yellow }
 
     Write-Step 'Checking this PC'
     $architecture = if ($env:PROCESSOR_ARCHITEW6432) { $env:PROCESSOR_ARCHITEW6432 } else { $env:PROCESSOR_ARCHITECTURE }
     if ($architecture -eq 'ARM64') {
-        throw "There is no PhoneBox build for Windows on ARM yet: the x64 build would run, but could not update itself. Please ask for it in https://github.com/$Repo/issues."
+        throw "There is no PhoneMon build for Windows on ARM yet: the x64 build would run, but could not update itself. Please ask for it in https://github.com/$Repo/issues."
     }
-    if ($architecture -ne 'AMD64') { throw "PhoneBox needs 64-bit Windows (this PC reports $architecture)." }
+    if ($architecture -ne 'AMD64') { throw "PhoneMon needs 64-bit Windows (this PC reports $architecture)." }
     $build = [Environment]::OSVersion.Version.Build
-    if ($build -lt 19041) { Write-Caution "PhoneBox is built for Windows 10 version 2004 (build 19041) or later; this PC has build $build, so some parts may not work." }
+    if ($build -lt 19041) { Write-Caution "PhoneMon is built for Windows 10 version 2004 (build 19041) or later; this PC has build $build, so some parts may not work." }
     $identity = [Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()
     if ($identity.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator) -and -not $AllowAdministrator) {
-        throw 'Run setup from a normal PowerShell window, not "Run as administrator". PhoneBox runs as you and needs no administrator rights; as administrator it would start with full rights, or install for the administrator account instead of yours.'
+        throw 'Run setup from a normal PowerShell window, not "Run as administrator". PhoneMon runs as you and needs no administrator rights; as administrator it would start with full rights, or install for the administrator account instead of yours.'
     }
     $scoop = if ($env:SCOOP) { $env:SCOOP } else { Join-Path $HOME 'scoop' }
+    if (Test-Path (Join-Path $scoop 'apps\phonemon')) {
+        throw 'PhoneMon is installed with Scoop. Update it with "scoop update phonemon". To switch to this setup instead, run "scoop uninstall phonemon" first (your settings stay) and then setup again; two copies would fight over the same port.'
+    }
     if (Test-Path (Join-Path $scoop 'apps\phonebox')) {
-        throw 'PhoneBox is installed with Scoop. Update it with "scoop update phonebox". To switch to this setup instead, run "scoop uninstall phonebox" first (your settings stay) and then setup again; two copies would fight over the same port.'
+        throw 'PhoneMon/PhoneBox is installed with Scoop. Update it with "scoop update phonebox". To switch to this setup instead, run "scoop uninstall phonebox" first (your settings stay) and then setup again; two copies would fight over the same port.'
     }
     $app = Join-Path $env:LOCALAPPDATA 'PhoneBox\app'
     $exe = Join-Path $app 'PhoneBoxAgent.exe'
     $installed = $null
     if (Test-Path $exe) { $installed = ("$((Get-Item $exe).VersionInfo.ProductVersion)" -split '\+')[0] }
-    Write-Ok "Windows build $build, x64$(if ($installed) { ", PhoneBox $installed installed" })"
+    Write-Ok "Windows build $build, x64$(if ($installed) { ", PhoneMon (agent $installed) detected" })"
     # Smart App Control (Windows 11) blocks programs that are neither signed nor known to Microsoft: 1 on, 2 evaluation
     $smartAppControl = 0
     try { $smartAppControl = [int](Get-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control\CI\Policy' -ErrorAction Stop).VerifiedAndReputablePolicyState } catch { }
@@ -333,14 +344,14 @@ function Install-PhoneBox {
     $ver = $tag.Trim().TrimStart('v')
     if ($ver -notmatch '^\d+\.\d+\.\d+$') { throw "Unexpected version '$tag'." }
     $base = "https://github.com/$Repo/releases/download/v$ver"
-    if ($installed -eq $ver) { Write-Ok "PhoneBox $ver (already installed; it will be reinstalled, settings stay)" }
-    elseif ($installed) { Write-Ok "PhoneBox $ver (updating from $installed; settings stay)" }
-    else { Write-Ok "PhoneBox $ver" }
+    if ($installed -eq $ver) { Write-Ok "PhoneMon $ver (already installed; it will be reinstalled, settings stay)" }
+    elseif ($installed) { Write-Ok "PhoneMon $ver (updating from $installed; settings stay)" }
+    else { Write-Ok "PhoneMon $ver" }
 
-    $temp = Join-Path ([IO.Path]::GetTempPath()) ('phonebox-setup-' + [guid]::NewGuid().ToString('N').Substring(0, 8))
+    $temp = Join-Path ([IO.Path]::GetTempPath()) ('phonemon-setup-' + [guid]::NewGuid().ToString('N').Substring(0, 8))
     New-Item -ItemType Directory -Force $temp | Out-Null
     try {
-        Write-Step "Downloading PhoneBox $ver"
+        Write-Step "Downloading PhoneMon $ver"
         $zipName = "PhoneBoxAgent-$ver-win-x64.zip"
         $sums = Join-Path $temp "SHA256SUMS-$ver.txt"
         $zip = Join-Path $temp $zipName
@@ -364,32 +375,32 @@ function Install-PhoneBox {
         $adb = Find-Adb
         if ($adb) { Write-Ok $adb }
         else {
-            Write-Caution 'adb is not installed. Without it PhoneBox still works over Wi-Fi, but cannot reach the phone over USB'
+            Write-Caution 'adb is not installed. Without it PhoneMon still works over Wi-Fi, but cannot reach the phone over USB'
             Write-Caution '(wake it on plug-in, install and update the phone app, fall back to USB when Wi-Fi drops).'
             if ($DryRun) { Write-Info 'Would offer to install it.' }
             elseif (Read-YesNo 'Install adb now?') {
                 $adb = Install-Adb $temp
-                if ($adb) { Write-Ok "adb installed: $adb" } else { Write-Caution 'adb could not be installed; PhoneBox will work over Wi-Fi only until it is.' }
+                if ($adb) { Write-Ok "adb installed: $adb" } else { Write-Caution 'adb could not be installed; PhoneMon will work over Wi-Fi only until it is.' }
             }
         }
 
         $owner = Get-PortOwner 8765
-        if ($owner -and $owner -ne 'PhoneBoxAgent' -and $owner -ne 'DeskAgent') {
-            Write-Caution "Port 8765 is used by $owner. PhoneBox needs this port; close $owner or PhoneBox will not start."
+        if ($owner -and $owner -ne 'PhoneBoxAgent' -and $owner -ne 'PhoneMonAgent' -and $owner -ne 'DeskAgent') {
+            Write-Caution "Port 8765 is used by $owner. PhoneMon needs this port; close $owner or PhoneMon will not start."
         }
 
         if ($DryRun) {
             Write-Step 'Dry run finished'
-            Write-Info "Would stop the running agent and install PhoneBox $ver to $app (settings in $env:APPDATA\PhoneBox stay)."
-            Write-Info 'Would add a PhoneBox shortcut to the Start Menu.'
-            if (-not $NoAutostart) { Write-Info 'Would ask to start PhoneBox with Windows.' }
+            Write-Info "Would stop the running agent and install PhoneMon $ver to $app (settings in $env:APPDATA\PhoneBox stay)."
+            Write-Info 'Would add a PhoneMon shortcut to the Start Menu.'
+            if (-not $NoAutostart) { Write-Info 'Would ask to start PhoneMon with Windows.' }
             if (-not $NoPhone) { Write-Info 'Would offer to install the app on a phone connected over USB.' }
             Write-Info 'Nothing was changed.'
             return
         }
 
         Write-Step "Installing to $app"
-        Stop-PhoneBox
+        Stop-PhoneMon
         # The files are replaced in place: the folder itself cannot be renamed while another program has it as its
         # working directory, such as the adb server the agent started.
         $old = "$app.old"
@@ -405,21 +416,22 @@ function Install-PhoneBox {
                 Remove-Item -Force -ErrorAction SilentlyContinue
         } catch {
             if (Test-Path $old) { try { Copy-Item (Join-Path $old '*') $app -Recurse -Force } catch { } }
-            throw "Installing failed and the previous version was put back: $($_.Exception.Message). Close PhoneBox (tray icon > Exit) and run setup again."
+            throw "Installing failed and the previous version was put back: $($_.Exception.Message). Close PhoneMon (tray icon > Exit) and run setup again."
         }
         Remove-Item $old -Recurse -Force -ErrorAction SilentlyContinue
-        Write-Ok "PhoneBox $ver installed; settings are in $env:APPDATA\PhoneBox"
+        Write-Ok "PhoneMon $ver installed; settings are in $env:APPDATA\PhoneBox"
 
         $programs = [Environment]::GetFolderPath('Programs')
         if ($programs -and (Test-Path $programs)) {
             try {
+                Remove-Item (Join-Path $programs 'PhoneBox.lnk') -ErrorAction SilentlyContinue
                 $shell = New-Object -ComObject WScript.Shell
-                $startLink = $shell.CreateShortcut((Join-Path $programs 'PhoneBox.lnk'))
+                $startLink = $shell.CreateShortcut((Join-Path $programs 'PhoneMon.lnk'))
                 $startLink.TargetPath = $exe
                 $startLink.WorkingDirectory = $app
-                $startLink.Description = 'PhoneBox agent'
+                $startLink.Description = 'PhoneMon agent'
                 $startLink.Save()
-                Write-Ok 'Added to the Start Menu (search "PhoneBox" to start it anytime)'
+                Write-Ok 'Added to the Start Menu (search "PhoneMon" to start it anytime)'
             } catch {
                 Write-Caution "Could not create Start Menu shortcut: $($_.Exception.Message)"
             }
@@ -427,7 +439,8 @@ function Install-PhoneBox {
 
         $startup = [Environment]::GetFolderPath('Startup')
         Remove-Item (Join-Path $startup 'DeskAgent.lnk') -ErrorAction SilentlyContinue   # the pre-PhoneBox prototype
-        $shortcut = Join-Path $startup 'PhoneBox.lnk'
+        Remove-Item (Join-Path $startup 'PhoneBox.lnk') -ErrorAction SilentlyContinue
+        $shortcut = Join-Path $startup 'PhoneMon.lnk'
         if ($NoAutostart) {
             if (Test-Path $shortcut) {
                 Remove-Item $shortcut -Force
@@ -435,12 +448,12 @@ function Install-PhoneBox {
             }
         } else {
             Write-Step 'Start with Windows'
-            if (Read-YesNo 'Start PhoneBox when you sign in to Windows?') {
+            if (Read-YesNo 'Start PhoneMon when you sign in to Windows?') {
                 $shell = New-Object -ComObject WScript.Shell
                 $link = $shell.CreateShortcut($shortcut)
                 $link.TargetPath = $exe
                 $link.WorkingDirectory = $app
-                $link.Description = 'PhoneBox agent'
+                $link.Description = 'PhoneMon agent'
                 $link.Save()
                 Write-Ok 'Added to the Startup folder (turn it off in Task Manager > Startup apps)'
             } elseif (Test-Path $shortcut) {
@@ -454,7 +467,7 @@ function Install-PhoneBox {
             Write-Step 'Phone app'
             if (-not $adb) {
                 Write-Caution 'Skipped: adb is not installed.'
-            } elseif (Read-YesNo 'Install the PhoneBox app on a phone connected over USB now?') {
+            } elseif (Read-YesNo 'Install the PhoneMon app on a phone connected over USB now?') {
                 Write-Info 'USB debugging lets an allowed computer control the phone. Allow only your own computers; you can'
                 Write-Info 'revoke them under Developer options > "Revoke USB debugging authorisations".'
                 $device = Select-Phone $adb
@@ -477,7 +490,7 @@ function Install-PhoneBox {
             Write-Step 'Done (not started)'
             Write-Info "Start it with $exe"
         } else {
-            Write-Step 'Starting PhoneBox'
+            Write-Step 'Starting PhoneMon'
             $blocked = $false
             try {
                 Start-Process -FilePath $exe -WorkingDirectory $app -ErrorAction Stop
@@ -492,10 +505,10 @@ function Install-PhoneBox {
                 $blocked = $true
                 Write-Caution "Windows did not let PhoneBoxAgent.exe start: $why"
                 if ($appControl -and $smartAppControl -eq 1) {
-                    Write-Caution 'PhoneBox is installed, but Smart App Control will not run it until the agent is code-signed.'
+                    Write-Caution 'PhoneMon is installed, but Smart App Control will not run it until the agent is code-signed.'
                     Write-Caution "Signing is pending: https://github.com/$Repo/issues/56. Please keep Smart App Control on."
                 } else {
-                    Write-Caution 'PhoneBox is installed, but a policy on this computer does not allow it to run. On a work or school'
+                    Write-Caution 'PhoneMon is installed, but a policy on this computer does not allow it to run. On a work or school'
                     Write-Caution 'computer, ask its administrator to allow PhoneBoxAgent.exe.'
                 }
             }
@@ -505,7 +518,7 @@ function Install-PhoneBox {
                 try { Invoke-RestMethod -UseBasicParsing "$SettingsUrl/api/info" -TimeoutSec 2 | Out-Null; $up = $true } catch { }
             }
             if ($up) {
-                Write-Ok "PhoneBox is running: settings at $SettingsUrl (also from the tray icon)"
+                Write-Ok "PhoneMon is running: settings at $SettingsUrl (also from the tray icon)"
                 try { Start-Process $SettingsUrl } catch { }
             } elseif ($blocked) {
                 # explained above
@@ -520,24 +533,26 @@ function Install-PhoneBox {
         }
 
         Write-Step 'Good to know'
-        if ($phoneDone) { Write-Info 'Keep the phone plugged in: PhoneBox wakes it and opens the panel.' }
+        if ($phoneDone) { Write-Info 'Keep the phone plugged in: PhoneMon wakes it and opens the panel.' }
         elseif (-not $NoPhone) {
             Write-Info "Phone app later: plug the phone in and use Settings > General > Install the phone app, or run setup again."
         }
         Write-Info 'Wi-Fi only: install the app from the release page on the phone, then on the computer open'
         Write-Info 'Settings > General > Wi-Fi & Tailscale > Pair a phone over Wi-Fi and scan the QR code.'
-        Write-Info 'When you turn Wi-Fi on, Windows asks to let PhoneBox through the firewall: allow Private networks only.'
-        Write-Info "Until then PhoneBox only listens on this computer. Every connection it makes: https://github.com/$Repo/blob/main/PRIVACY.md"
-        Write-Info 'Updates: PhoneBox updates itself from Settings. Run setup again any time to repair it.'
+        Write-Info 'When you turn Wi-Fi on, Windows asks to let PhoneMon through the firewall: allow Private networks only.'
+        Write-Info "Until then PhoneMon only listens on this computer. Every connection it makes: https://github.com/$Repo/blob/main/PRIVACY.md"
+        Write-Info 'Updates: PhoneMon updates itself from Settings. Run setup again any time to repair it.'
         Write-Info "Uninstall: & ([scriptblock]::Create((irm https://raw.githubusercontent.com/$Repo/main/scripts/uninstall.ps1))) [-Purge] [-Apk]"
     } finally {
         Remove-Item $temp -Recurse -Force -ErrorAction SilentlyContinue
     }
 }
 
+function Install-PhoneBox { Install-PhoneMon }
+
 # Everything runs from here, so a download cut off half way cannot run half a script.
 try {
-    Install-PhoneBox
+    Install-PhoneMon
     $global:LASTEXITCODE = 0   # optional native checks (gh, winget) may have left a non-zero code; setup succeeded
 } catch {
     Write-Host ''

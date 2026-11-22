@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# PhoneBox setup for Linux and macOS: installs the latest release, everything it needs, and the phone app.
+# PhoneMon setup for Linux and macOS: installs the latest release, everything it needs, and the phone app.
 #
 #   curl -fsSL https://raw.githubusercontent.com/Sarveshsivasankaran/PhoneMon/main/setup.sh | bash
 #   curl -fsSL https://raw.githubusercontent.com/Sarveshsivasankaran/PhoneMon/main/setup.sh | bash -s -- --no-phone
 #
 # Run it as yourself, not with sudo: it asks for sudo only to install packages, and asks first.
-# Running it again updates PhoneBox or repairs the installation; settings are kept.
+# Running it again updates PhoneMon or repairs the installation; settings are kept.
 #
 # Options:
 #   --yes               answer every question with its default (unattended)
@@ -144,9 +144,16 @@ latest_version() {
   local v=""
   v="$(download_text "https://api.github.com/repos/$repo/releases/latest" 2>/dev/null \
     | sed -n 's/.*"tag_name"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -n1)" || v=""
+  if [ -z "$v" ]; then
+    v="$(download_text "https://api.github.com/repos/$repo/releases" 2>/dev/null \
+      | sed -n 's/.*"tag_name"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -n1)" || v=""
+  fi
   # the API allows 60 requests an hour per address; the release page redirects to the newest tag as well
   if [ -z "$v" ] && have curl; then
     v="$(curl -fsSLI -o /dev/null -w '%{url_effective}' "https://github.com/$repo/releases/latest" 2>/dev/null | sed -n 's#.*/tag/##p')" || v=""
+  fi
+  if [ -z "$v" ]; then
+    v="v1.0.0"
   fi
   printf '%s' "$v"
 }
@@ -461,11 +468,11 @@ main() {
     shift
   done
 
-  printf '\n%sPhoneBox setup%s\n' "$c_step" "$c_off"
+  printf '\n%sPhoneMon setup%s\n' "$c_step" "$c_off"
   if [ "$dry" = 1 ]; then printf '%sDry run: downloads and checks everything, changes nothing.%s\n' "$c_warn" "$c_off"; fi
 
   step 'Checking this computer'
-  [ "$(id -u)" != 0 ] || die "do not run setup as root or with sudo. PhoneBox runs as you (its settings, autostart and phone pairing belong to your account); setup asks for sudo itself when it installs packages."
+  [ "$(id -u)" != 0 ] || die "do not run setup as root or with sudo. PhoneMon runs as you (its settings, autostart and phone pairing belong to your account); setup asks for sudo itself when it installs packages."
   case "$(uname -s)" in
     Linux) os=linux ;;
     Darwin) os=osx ;;
@@ -478,13 +485,13 @@ main() {
     case "$(uname -m)" in
       x86_64|amd64) arch=x64 ;;
       aarch64|arm64) arch=arm64 ;;
-      *) die "there is no PhoneBox build for this CPU ($(uname -m)); x64 and arm64 are supported." ;;
+      *) die "there is no PhoneMon build for this CPU ($(uname -m)); x64 and arm64 are supported." ;;
     esac
     if [ -f /etc/alpine-release ] || case "$(ldd --version 2>&1 || true)" in *musl*) true ;; *) false ;; esac; then
-      die "PhoneBox's Linux builds need glibc; musl systems such as Alpine are not supported yet."
+      die "PhoneMon's Linux builds need glibc; musl systems such as Alpine are not supported yet."
     fi
   fi
-  have curl || have wget || die "curl or wget is needed to download PhoneBox."
+  have curl || have wget || die "curl or wget is needed to download PhoneMon."
   have sha256sum || have shasum || die "sha256sum (coreutils) or shasum is needed to check the download."
   rid="$os-$arch"
   detect_pm
@@ -493,16 +500,16 @@ main() {
   step 'Finding the release'
   local tag ver base
   tag="${version:-$(latest_version)}"
-  [ -n "$tag" ] || die "could not find the latest release on GitHub. Check the internet connection, or pass --version 0.9.8."
+  [ -n "$tag" ] || die "could not find the latest release on GitHub. Check the internet connection, or pass --version 1.0.0."
   ver="${tag#v}"
   printf '%s' "$ver" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$' || die "unexpected version '$tag'."
   base="https://github.com/$repo/releases/download/v$ver"
-  ok "PhoneBox $ver ($rid)"
+  ok "PhoneMon $ver ($rid)"
 
   tmp="$(mktemp -d "${TMPDIR:-/tmp}/phonebox-setup.XXXXXX")"
   trap 'rm -rf "$tmp"' EXIT
 
-  step "Downloading PhoneBox $ver"
+  step "Downloading PhoneMon $ver"
   local zip_name="PhoneBoxAgent-$ver-$rid.zip" sums
   sums="$tmp/SHA256SUMS-$ver.txt"
   download "$base/SHA256SUMS-$ver.txt" "$sums" || die "release $ver was not found ($base)."
