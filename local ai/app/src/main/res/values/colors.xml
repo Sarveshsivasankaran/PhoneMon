@@ -1,0 +1,16 @@
+<resources>
+    <!-- Futuristic Dark Navy & Cyan Palette -->
+    <color name="jarvis_bg_deep">#060913</color>
+    <color name="jarvis_bg_surface">#0D1322</color>
+    <color name="jarvis_bg_card">#131B30</color>
+    <color name="jarvis_cyan_glow">#00F2FE</color>
+    <color name="jarvis_blue_neon">#4FACFE</color>
+    <color name="jarvis_violet_accent">#7F00FF</color>
+    <color name="jarvis_text_primary">#EBF4FF</color>
+    <color name="jarvis_text_muted">#7E8DA6</color>
+    <color name="jarvis_border_glow">#1E2C4D</color>
+    <color name="jarvis_state_ok">#00E676</color>
+    <color name="jarvis_state_warn">#FFB300</color>
+    <color name="jarvis_state_error">#FF1744</color>
+</resources>
+

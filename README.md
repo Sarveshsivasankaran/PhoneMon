@@ -119,6 +119,14 @@ Open <http://127.0.0.1:8765> (or double-click the Windows tray icon). Under **Pa
 resize widgets, then **Save**. Use **Live preview** to see unsaved edits with live data.
 Swipe, tap the page dots or use the phone's volume keys to move between pages.
 
+### 4. JARVIS Local AI (On-Device Assistant)
+
+Manage on-device neural reasoning and vision from the desktop settings at <http://127.0.0.1:8765/#ai>:
+- **Local Models:** Qwen3 1.7B Instruct (reasoning) and LFM2.5-VL 450M (vision) run directly on the phone (ARM Cortex-A73, 4 threads, NEON SIMD).
+- **Zero Cloud:** Offline wake-word ("JARVIS"), offline speech recognition, neural TTS, CameraX vision, and persistent Room DB memory.
+- **Sequential RAM Paging:** Dynamic memory arbitration ensures active models respect the 1,800 MB RAM budget on devices like the Samsung Galaxy M31.
+- See the [JARVIS Local AI guide](local%20ai/README.md) for independent standalone build scripts, hardware benchmarks, and model download instructions.
+
 <details>
 <summary><b>Other installation methods</b></summary>
 

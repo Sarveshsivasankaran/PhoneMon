@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">JARVIS AI</string>
+    <string name="wake_word">JARVIS</string>
+    <string name="status_offline">OFFLINE</string>
+    <string name="status_standby">STANDBY</string>
+    <string name="status_listening">LISTENING</string>
+    <string name="status_thinking">THINKING</string>
+    <string name="status_vision">VISION</string>
+    <string name="status_executing">EXECUTING</string>
+    <string name="status_speaking">SPEAKING</string>
+    <string name="status_error">ERROR</string>
+</resources>
+
