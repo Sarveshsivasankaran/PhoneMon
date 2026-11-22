@@ -38,7 +38,7 @@ Dependencies:
   - PackageIdentifier: Google.PlatformTools
 Installers:
 - Architecture: x64
-  InstallerUrl: https://github.com/ersinkoc/phonebox/releases/download/v{version}/PhoneBoxAgent-{version}-win-x64.zip
+  InstallerUrl: https://github.com/Sarveshsivasankaran/PhoneMon/releases/download/v{version}/PhoneBoxAgent-{version}-win-x64.zip
   InstallerSha256: {sha}
 ManifestType: installer
 ManifestVersion: {schema}
@@ -48,13 +48,13 @@ ManifestVersion: {schema}
 PackageIdentifier: {pkg}
 PackageVersion: {version}
 PackageLocale: en-US
-Publisher: ersinkoc
-PublisherUrl: https://github.com/ersinkoc
+Publisher: Sarveshsivasankaran
+PublisherUrl: https://github.com/Sarveshsivasankaran
 PackageName: PhoneBox
-PackageUrl: https://github.com/ersinkoc/phonebox
+PackageUrl: https://github.com/Sarveshsivasankaran/PhoneMon
 License: MIT
-LicenseUrl: https://github.com/ersinkoc/phonebox/blob/main/LICENSE
-ReleaseNotesUrl: https://github.com/ersinkoc/phonebox/releases/tag/v{version}
+LicenseUrl: https://github.com/Sarveshsivasankaran/PhoneMon/blob/main/LICENSE
+ReleaseNotesUrl: https://github.com/Sarveshsivasankaran/PhoneMon/releases/tag/v{version}
 ShortDescription: Turn an old Android phone into a desk panel for your PC.
 Description: |-
   PhoneBox has two parts: an Android app that runs full screen on an old phone, and this agent, which lives in the

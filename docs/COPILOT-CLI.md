@@ -28,7 +28,7 @@ Copy [copilot-cli-bridge.py](copilot-cli-bridge.py) into Copilot CLI's user hook
 ```sh
 mkdir -p ~/.copilot/hooks
 curl -fsSL -o ~/.copilot/hooks/copilot-cli-bridge.py \
-     https://raw.githubusercontent.com/ersinkoc/phonebox/main/docs/copilot-cli-bridge.py
+     https://raw.githubusercontent.com/Sarveshsivasankaran/PhoneMon/main/docs/copilot-cli-bridge.py
 ```
 
 Copilot CLI only loads `*.json` files from that folder, and a hook may always read the folder it was loaded from, so
