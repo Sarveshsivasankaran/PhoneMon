@@ -2,7 +2,7 @@ import os
 import shutil
 from PIL import Image, ImageDraw
 
-SRC_IMG = r"C:\Users\Solo-P-Leveller\.gemini\antigravity\brain\b7812721-6b54-453f-9286-917af11f7e17\.user_uploaded\media_1795413659620_8758a6de.jpg"
+SRC_IMG = r"C:\Users\Solo-P-Leveller\.gemini\antigravity\brain\b7812721-6b54-453f-9286-917af11f7e17\.user_uploaded\media_1795416534305_20c20d93.jpg"
 ROOT = r"d:\Program files\phonebox-AI"
 
 def make_squircle_mask(size, radius_ratio=0.20):
@@ -100,7 +100,7 @@ def main():
     drawable_dir = os.path.join(android_res, "drawable")
     fg_adaptive = create_adaptive_foreground(base_img, canvas_size=432, content_ratio=0.74)
     fg_adaptive.save(os.path.join(drawable_dir, "ic_launcher_fg.png"), "PNG")
-    # Remove old vector xml to prevent duplicate resource name collision
+    fg_adaptive.save(os.path.join(drawable_dir, "ic_launcher_foreground.png"), "PNG")
     old_fg_xml = os.path.join(drawable_dir, "ic_launcher_fg.xml")
     if os.path.exists(old_fg_xml):
         os.remove(old_fg_xml)
@@ -119,11 +119,20 @@ def main():
         round_icon.save(os.path.join(dir_path, "ic_launcher_round.png"), "PNG")
 
     local_ai_drawable = os.path.join(local_ai_res, "drawable")
+    fg_adaptive.save(os.path.join(local_ai_drawable, "ic_launcher_fg.png"), "PNG")
     fg_adaptive.save(os.path.join(local_ai_drawable, "ic_launcher_foreground.png"), "PNG")
     old_local_fg_xml = os.path.join(local_ai_drawable, "ic_launcher_foreground.xml")
     if os.path.exists(old_local_fg_xml):
         os.remove(old_local_fg_xml)
         print(f"Removed obsolete vector: {old_local_fg_xml}")
+
+    # 4. Copy to installed app directory if present
+    installed_app_dir = os.path.expandvars(r"%LOCALAPPDATA%\PhoneBox\app")
+    if os.path.exists(installed_app_dir):
+        shutil.copy(os.path.join(ROOT, "agent", "PhoneBox.Agent", "logo.png"), os.path.join(installed_app_dir, "logo.png"))
+        shutil.copy(os.path.join(ROOT, "agent", "PhoneBox.Agent", "phonebox.ico"), os.path.join(installed_app_dir, "phonebox.ico"))
+        shutil.copy(os.path.join(ROOT, "agent", "PhoneBox.Agent", "phonemon.ico"), os.path.join(installed_app_dir, "phonemon.ico"))
+        print(f"Updated installed app assets in {installed_app_dir}")
 
     print("All assets successfully generated!")
 
