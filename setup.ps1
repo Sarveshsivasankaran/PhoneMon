@@ -478,13 +478,17 @@ function Install-PhoneMon {
                     # installed and stopped for the update) still starts below.
                     try {
                         $apk = Join-Path $temp "PhoneMon-$ver.apk"
+                        $downloaded = $false
                         try {
                             Get-Download "$base/PhoneMon-$ver.apk" $apk
-                        } catch {
+                            try { Assert-Checksum $apk $sums; $downloaded = $true } catch { }
+                        } catch { }
+
+                        if (-not $downloaded) {
                             $apk = Join-Path $temp "PhoneBox-$ver.apk"
                             Get-Download "$base/PhoneBox-$ver.apk" $apk
+                            Assert-Checksum $apk $sums
                         }
-                        Assert-Checksum $apk $sums
                         $phoneDone = Install-PhoneApp $adb $apk $device
                     } catch {
                         Write-Caution "Phone app skipped: $($_.Exception.Message)"

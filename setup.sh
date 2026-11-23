@@ -609,7 +609,7 @@ main() {
       device="$(select_phone)"
       if [ -n "$device" ]; then
         apk="$tmp/PhoneMon-$ver.apk"
-        if ! download "$base/PhoneMon-$ver.apk" "$apk" 2>/dev/null; then
+        if ! download "$base/PhoneMon-$ver.apk" "$apk" 2>/dev/null || ! check_sum "$apk" "$sums" 2>/dev/null; then
           apk="$tmp/PhoneBox-$ver.apk"
           if ! download "$base/PhoneBox-$ver.apk" "$apk"; then
             caution "Phone app skipped: the download failed ($base/PhoneMon-$ver.apk)."
