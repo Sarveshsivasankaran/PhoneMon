@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.1 — 2026-11-23
+
+- Fix mobile pairing QR code links, Android intent filters, and deep-link handling.
+- Add direct local Wi-Fi pairing option on the desktop agent and pairing interface.
+- Update project branding, icons, and logo assets across Android, desktop agent, and web.
+- Integrate JARVIS Local AI telemetry and control section into desktop agent settings.
+- Fix setup scripts and release checksum verification for PhoneMon APKs.
+
 ## 1.0.0 — 2026-11-23
 
 First release of PhoneMon — desk panel for PC monitoring, AI coding sessions, music, and touch controls.
