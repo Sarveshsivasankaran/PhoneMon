@@ -1,5 +1,5 @@
 {
-    "version": "1.0.3",
+    "version": "1.1.0",
     "description": "PhoneMon agent: turns an old Android phone into a desk panel for this PC (widgets, AI coding sessions, music, webhooks).",
     "homepage": "https://github.com/Sarveshsivasankaran/PhoneMon",
     "license": "MIT",
@@ -13,8 +13,8 @@
     },
     "architecture": {
         "64bit": {
-            "url": "https://github.com/Sarveshsivasankaran/PhoneMon/releases/download/v1.0.3/PhoneBoxAgent-1.0.3-win-x64.zip",
-            "hash": "bff3b4f221584eecc1e854165435998ed71f1696676f5423fe49614121819cca"
+            "url": "https://github.com/Sarveshsivasankaran/PhoneMon/releases/download/v1.1.0/PhoneBoxAgent-1.1.0-win-x64.zip",
+            "hash": "edfbb9aee7a8729ed290b6d272b28d87543b19ce3d9821f4a0c9b29d407e9f38"
         }
     },
     "bin": [
