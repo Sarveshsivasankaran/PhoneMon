@@ -4,8 +4,8 @@ package com.phonebox.jarvis.core.ai
  * Hardware and model runtime configuration data structures.
  */
 data class DeviceProfile(
-    val targetDevice: String = "Samsung Galaxy M31",
-    val soc: String = "Exynos 9611",
+    val targetDevice: String = "Android device",
+    val soc: String = "Android platform",
     val architecture: String = "arm64-v8a",
     val totalRamMb: Int = 6144,
     val maxWorkingBudgetMb: Int = 1800,
@@ -27,8 +27,8 @@ data class ReasoningModelSpec(
     val topP: Float = 0.8f,
     val topK: Int = 40,
     val repeatPenalty: Float = 1.1f,
-    val nThreads: Int = 4,
-    val nBatch: Int = 512
+    val nThreads: Int = Runtime.getRuntime().availableProcessors().coerceIn(1, 4),
+    val nBatch: Int = 64
 )
 
 data class VisionModelSpec(

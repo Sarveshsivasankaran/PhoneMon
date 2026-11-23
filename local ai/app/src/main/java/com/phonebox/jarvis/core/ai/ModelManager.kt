@@ -15,7 +15,7 @@ import java.security.MessageDigest
 
 /**
  * ModelManager oversees model downloads, SHA-256 verification, dynamic sequential paging,
- * memory monitoring, and thermal governor mitigation on the Samsung Galaxy M31.
+ * memory monitoring, and thermal governor mitigation on the Android phone.
  */
 class ModelManager(private val context: Context) {
 
@@ -70,7 +70,7 @@ class ModelManager(private val context: Context) {
     }
 
     /**
-     * Loads Qwen3 1.7B into memory, ensuring memory safety on Galaxy M31.
+     * Loads Qwen3 1.7B into memory, ensuring memory safety on Android phone.
      */
     suspend fun loadReasoningModel(): Boolean = withContext(Dispatchers.IO) {
         val qwenFile = File(modelsDir, reasoningSpec.fileName)

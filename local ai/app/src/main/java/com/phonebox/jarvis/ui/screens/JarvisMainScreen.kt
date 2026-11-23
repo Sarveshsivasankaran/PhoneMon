@@ -29,6 +29,7 @@ import com.phonebox.jarvis.ui.theme.*
 
 @Composable
 fun JarvisMainScreen(
+    wakeCount: Int,
     orchestrator: AgentOrchestrator,
     modelManager: ModelManager,
     micAmplitude: Float,
@@ -39,28 +40,38 @@ fun JarvisMainScreen(
     val state by orchestrator.currentState.collectAsState()
     val streamingText by orchestrator.currentStreamingText.collectAsState()
     val pendingTool by orchestrator.pendingApprovalTool.collectAsState()
-    val memoryUsageMb by modelManager.systemMemoryUsageMb.collectAsState()
     val isThrottled by modelManager.thermalThrottled.collectAsState()
 
     var textInput by remember { mutableStateOf("") }
     val glowColor = Color(state.glowColorHex)
 
-    Box(
+    var showFace by remember { mutableStateOf(false) }
+    LaunchedEffect(wakeCount) {
+        if (wakeCount > 0) {
+            showFace = true
+            kotlinx.coroutines.delay(2400)
+            showFace = false
+        }
+    }
+    BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
             .background(BgDeep)
     ) {
         // Glowing Screen Borders on Active Voice/Listening
         GlowingBorder(
-            isActive = isMicActive || state == JarvisState.LISTENING || state == JarvisState.SPEAKING,
+            isActive = showFace,
             glowColor = glowColor
         )
 
+        val compact = maxHeight < 520.dp
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .windowInsetsPadding(WindowInsets.safeDrawing)
+                .imePadding()
                 .padding(16.dp),
-            horizontalAlignment = Alignment.CenterAlignment
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // Top HUD Status Bar
             Row(
@@ -71,14 +82,14 @@ fun JarvisMainScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "JARVIS // M31-ARM64",
+                    text = "JARVIS",
                     color = CyanGlow,
                     fontSize = 13.sp,
                     fontFamily = FontFamily.Monospace,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = "RAM: ${memoryUsageMb}MB / 1800MB" + if (isThrottled) " [THROTTLED]" else "",
+                    text = if (isThrottled) "THROTTLED" else state.displayName,
                     color = if (isThrottled) Color.Yellow else TextMuted,
                     fontSize = 11.sp,
                     fontFamily = FontFamily.Monospace
@@ -88,7 +99,7 @@ fun JarvisMainScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             // Central Animated Circular Visualizer
-            OrbVisualizer(
+            if (!compact) OrbVisualizer(
                 state = state,
                 amplitude = micAmplitude
             )
@@ -96,7 +107,7 @@ fun JarvisMainScreen(
             Spacer(modifier = Modifier.height(12.dp))
 
             // Audio Waveform Visualizer
-            AudioWaveVisualizer(
+            if (!compact && isMicActive) AudioWaveVisualizer(
                 amplitude = micAmplitude,
                 barColor = glowColor
             )
@@ -217,6 +228,15 @@ fun JarvisMainScreen(
                 }
             }
         }
+        androidx.compose.animation.AnimatedVisibility(
+            visible = showFace,
+            modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 76.dp)
+        ) {
+            androidx.compose.foundation.Image(
+                painter = androidx.compose.ui.res.painterResource(com.phonebox.jarvis.R.drawable.jarvis_face),
+                contentDescription = "Jarvis heard you",
+                modifier = Modifier.size(if (compact) 64.dp else 96.dp)
+            )
+        }
     }
 }
-

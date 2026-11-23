@@ -1,8 +1,8 @@
 {
   "version": "1.0.0",
   "device_profile": {
-    "target_device": "Samsung Galaxy M31",
-    "soc": "Exynos 9611",
+    "target_device": "Android phone",
+    "soc": "mobile CPU",
     "architecture": "arm64-v8a",
     "total_ram_mb": 6144,
     "max_working_budget_mb": 1800,

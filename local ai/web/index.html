@@ -17,7 +17,7 @@
         <h1>JARVIS <span>LOCAL AI CONSOLE</span></h1>
       </div>
       <div class="header-right">
-        <span class="device-badge">Samsung Galaxy M31 // ARM64</span>
+        <span class="device-badge">Demo telemetry</span>
         <span class="status-badge" id="activenessBadge">CHECKING...</span>
       </div>
     </header>
@@ -38,7 +38,7 @@
       </div>
       <div class="telemetry-item">
         <span class="label">CPU PINNING</span>
-        <span class="val" id="cpuPinning">4x Cortex-A73 (Cores 4-7)</span>
+        <span class="val" id="cpuPinning">4 demo threads</span>
       </div>
       <div class="telemetry-item">
         <span class="label">THERMAL STATUS</span>
@@ -57,7 +57,7 @@
           <h2>AI MODEL MANAGEMENT</h2>
           <span class="badge">ON-DEVICE RUNTIME</span>
         </div>
-        <p class="card-desc">Manage local GGUF models running directly on Exynos 9611. Memory arbitration sequentially pages models to fit the 1,800 MB RAM budget.</p>
+        <p class="card-desc">Manage local GGUF models running directly on the phone. Memory arbitration sequentially pages models to fit the 1,800 MB RAM budget.</p>
 
         <div class="model-list">
           <!-- Model A: Qwen3 1.7B -->
@@ -106,7 +106,7 @@
         <!-- Sequential Swapping & RAM Budget Gauge -->
         <div class="ram-budget-wrap">
           <div class="ram-labels">
-            <span>Galaxy M31 LMK Working RAM Floor: 1,800 MB</span>
+            <span>Working memory budget: 1,800 MB</span>
             <span id="ramPercentText">75% Utilized</span>
           </div>
           <div class="progress-track">

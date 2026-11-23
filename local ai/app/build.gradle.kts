@@ -11,7 +11,7 @@ android {
 
     defaultConfig {
         applicationId = "com.phonebox.jarvis"
-        minSdk = 26 // Android 8.0 Oreo (Samsung Galaxy M31 runs Android 10-12)
+        minSdk = 26 // Android 8.0 Oreo
         targetSdk = 35
         versionCode = 1
         versionName = "1.0.0"
@@ -52,6 +52,8 @@ android {
             "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi"
         )
     }
+
+    sourceSets["test"].java.srcDir("../tests/agent")
 
     buildFeatures {
         compose = true
@@ -94,8 +96,6 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("com.google.code.gson:gson:2.11.0")
 
-    // ONNX Runtime for Wake-word (JARVIS keyword spotting)
-    implementation("com.microsoft.onnxruntime:onnxruntime-android:1.19.2")
 
     // Testing
     testImplementation("junit:junit:4.13.2")

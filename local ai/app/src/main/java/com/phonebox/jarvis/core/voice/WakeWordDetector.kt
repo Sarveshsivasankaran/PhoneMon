@@ -1,123 +1,92 @@
 package com.phonebox.jarvis.core.voice
 
-import android.annotation.SuppressLint
-import android.media.AudioFormat
-import android.media.AudioRecord
-import android.media.MediaRecorder
-import android.util.Log
-import kotlinx.coroutines.*
+import android.content.Context
+import android.content.Intent
+import android.os.Build
+import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.speech.RecognitionListener
+import android.speech.RecognizerIntent
+import android.speech.SpeechRecognizer
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import java.util.concurrent.atomic.AtomicBoolean
-import kotlin.math.sqrt
 
-/**
- * Offline Wake-Word Detection for "JARVIS".
- * Operates on 16kHz 16-bit Mono PCM audio via AudioRecord.
- * Computes live RMS amplitude for the HUD visualizer and triggers wake-word events
- * with zero cloud dependencies.
- */
 class WakeWordDetector(
+    private val context: Context,
     private val onWakeWordDetected: () -> Unit,
-    private val onAmplitudeChanged: (Float) -> Unit
+    private val onAmplitudeChanged: (Float) -> Unit,
+    private val onCommand: (String) -> Unit = {},
+    private val onUnavailable: () -> Unit = {}
 ) {
-    private val isListening = AtomicBoolean(false)
-    private var recordingJob: Job? = null
-    private var audioRecord: AudioRecord? = null
+    private val active = MutableStateFlow(false)
+    val isMicActive = active.asStateFlow()
+    private val handler = Handler(Looper.getMainLooper())
+    private var recognizer: SpeechRecognizer? = null
+    private var commandDeadline = 0L
+    private val request = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+        putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+        putExtra(RecognizerIntent.EXTRA_LANGUAGE, "en-US")
+    }
 
-    private val _isMicActive = MutableStateFlow(false)
-    val isMicActive: StateFlow<Boolean> = _isMicActive.asStateFlow()
-
-    private val sampleRate = 16000
-    private val channelConfig = AudioFormat.CHANNEL_IN_MONO
-    private val audioFormat = AudioFormat.ENCODING_PCM_16BIT
-    private val bufferSize = AudioRecord.getMinBufferSize(sampleRate, channelConfig, audioFormat).coerceAtLeast(4096)
-
-    @SuppressLint("MissingPermission")
-    fun startListening(scope: CoroutineScope) {
-        if (isListening.getAndSet(true)) return
-
-        recordingJob = scope.launch(Dispatchers.IO) {
-            try {
-                audioRecord = AudioRecord(
-                    MediaRecorder.AudioSource.VOICE_RECOGNITION,
-                    sampleRate,
-                    channelConfig,
-                    audioFormat,
-                    bufferSize
-                )
-
-                if (audioRecord?.state != AudioRecord.STATE_INITIALIZED) {
-                    Log.e(TAG, "AudioRecord failed to initialize.")
-                    isListening.set(false)
-                    return@launch
-                }
-
-                audioRecord?.startRecording()
-                _isMicActive.value = true
-                Log.i(TAG, "Wake-word detector listening for keyword 'JARVIS'...")
-
-                val audioBuffer = ShortArray(1024)
-                var consecutiveSpeechFrames = 0
-                val energyThreshold = 1800f // Voice Activity Detection floor
-
-                while (isListening.get() && isActive) {
-                    val readSamples = audioRecord?.read(audioBuffer, 0, audioBuffer.size) ?: -1
-                    if (readSamples > 0) {
-                        // Calculate RMS amplitude for UI audio visualizer
-                        var sum = 0.0
-                        for (i in 0 until readSamples) {
-                            sum += audioBuffer[i] * audioBuffer[i]
-                        }
-                        val rms = sqrt(sum / readSamples).toFloat()
-                        val normalizedAmplitude = (rms / 32768f).coerceIn(0f, 1f)
-                        onAmplitudeChanged(normalizedAmplitude)
-
-                        // VAD and Keyword Matching
-                        if (rms > energyThreshold) {
-                            consecutiveSpeechFrames++
-                            // When sustained structured speech pattern matches wake-word duration
-                            if (consecutiveSpeechFrames == 12) {
-                                Log.i(TAG, "Wake word 'JARVIS' recognized locally!")
-                                withContext(Dispatchers.Main) {
-                                    onWakeWordDetected()
-                                }
-                            }
-                        } else {
-                            if (consecutiveSpeechFrames > 0) {
-                                consecutiveSpeechFrames = (consecutiveSpeechFrames - 1).coerceAtLeast(0)
-                            }
-                        }
-                    }
-                }
-            } catch (e: Exception) {
-                Log.e(TAG, "Error in wake-word audio loop", e)
-            } finally {
-                stopInternal()
-            }
+    fun startListening() {
+        if (active.value) return
+        if (Build.VERSION.SDK_INT < 31 || !SpeechRecognizer.isOnDeviceRecognitionAvailable(context)) {
+            onUnavailable()
+            return
         }
+        val engine = SpeechRecognizer.createOnDeviceSpeechRecognizer(context)
+        recognizer = engine
+        active.value = true
+        engine.setRecognitionListener(object : RecognitionListener {
+            private fun restart(delay: Long) {
+                handler.postDelayed({ if (recognizer === engine) engine.startListening(request) }, delay)
+            }
+            override fun onResults(results: Bundle?) {
+                if (recognizer !== engine) return
+                val words = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)?.firstOrNull()
+                val match = words?.let { KEYWORD.find(it) }
+                val now = android.os.SystemClock.elapsedRealtime()
+                if (words != null && match != null) {
+                    onWakeWordDetected()
+                    val command = words.substring(match.range.last + 1).trim(' ', ',', '.', '?', '!')
+                    commandDeadline = if (command.isEmpty()) now + 8000 else 0
+                    if (command.isNotEmpty()) onCommand(command)
+                } else if (!words.isNullOrBlank() && now < commandDeadline) {
+                    commandDeadline = 0
+                    onCommand(words)
+                }
+                restart(350)
+            }
+            override fun onError(error: Int) {
+                if (recognizer !== engine) return
+                when (error) {
+                    SpeechRecognizer.ERROR_NO_MATCH, SpeechRecognizer.ERROR_SPEECH_TIMEOUT -> restart(350)
+                    else -> { stopListening(); onUnavailable() }
+                }
+            }
+            override fun onRmsChanged(rmsdB: Float) = onAmplitudeChanged((rmsdB / 12f).coerceIn(0f, 1f))
+            override fun onReadyForSpeech(params: Bundle?) {}
+            override fun onBeginningOfSpeech() {}
+            override fun onBufferReceived(buffer: ByteArray?) {}
+            override fun onEndOfSpeech() {}
+            override fun onPartialResults(partialResults: Bundle?) {}
+            override fun onEvent(eventType: Int, params: Bundle?) {}
+        })
+        engine.startListening(request)
     }
 
     fun stopListening() {
-        isListening.set(false)
-        recordingJob?.cancel()
-        stopInternal()
-    }
-
-    private fun stopInternal() {
-        try {
-            audioRecord?.stop()
-            audioRecord?.release()
-        } catch (ignored: Exception) {}
-        audioRecord = null
-        _isMicActive.value = false
+        handler.removeCallbacksAndMessages(null)
+        val engine = recognizer
+        commandDeadline = 0
+        recognizer = null
+        engine?.destroy()
+        active.value = false
         onAmplitudeChanged(0f)
-        Log.i(TAG, "Wake-word detector stopped.")
     }
 
-    companion object {
-        private const val TAG = "JarvisWakeWord"
+    private companion object {
+        val KEYWORD = Regex("""\bjarvis\b""", RegexOption.IGNORE_CASE)
     }
 }
-

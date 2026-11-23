@@ -442,3 +442,16 @@ body {
   font-family: monospace;
 }
 
+
+@media (max-width: 600px) {
+  .hud-header, .model-row, .model-title, .hud-footer {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .subsystem-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .telemetry-bar {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  }
+}

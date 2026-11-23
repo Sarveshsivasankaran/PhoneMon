@@ -2,7 +2,7 @@ package com.phonebox.jarvis.core.agent
 
 import android.util.Log
 import com.phonebox.jarvis.core.ai.JarvisState
-import com.phonebox.jarvis.core.ai.LlamaBridge
+import com.phonebox.jarvis.core.ai.PhoneInference
 import com.phonebox.jarvis.core.ai.ReasoningModelSpec
 import com.phonebox.jarvis.core.memory.MemoryManager
 import com.phonebox.jarvis.core.voice.TextToSpeechEngine
@@ -20,7 +20,6 @@ import org.json.JSONObject
  */
 class AgentOrchestrator(
     private val scope: CoroutineScope,
-    private val llamaBridge: LlamaBridge,
     private val memoryManager: MemoryManager,
     private val permissionManager: PermissionManager,
     private val phoneMonAdapter: PhoneMonAdapter,
@@ -35,6 +34,11 @@ class AgentOrchestrator(
     private val _pendingApprovalTool = MutableStateFlow<Pair<String, Map<String, Any?>>?>(null)
     val pendingApprovalTool: StateFlow<Pair<String, Map<String, Any?>>?> = _pendingApprovalTool.asStateFlow()
 
+    fun showVisionResult(description: String) {
+        _currentStreamingText.value = description
+        _currentState.value = JarvisState.STANDBY
+    }
+
     fun setState(state: JarvisState) {
         _currentState.value = state
     }
@@ -47,15 +51,7 @@ class AgentOrchestrator(
             _currentStreamingText.value = ""
             memoryManager.recordTurn("USER", input, isSpoken = isVoice)
 
-            val prompt = buildPrompt(input)
-            val fullResponse = StringBuilder()
-
-            llamaBridge.generateStream(prompt, ReasoningModelSpec(), onToken = { token ->
-                fullResponse.append(token)
-                _currentStreamingText.value = fullResponse.toString()
-            }).collect { finalResult ->
-                processModelOutput(finalResult, isVoice)
-            }
+            processModelOutput(PhoneInference.answer(input), isVoice)
         }
     }
 
@@ -114,7 +110,7 @@ class AgentOrchestrator(
                 resultText = if (ok) "Notification sent to PC." else "Could not dispatch notification."
             }
             else -> {
-                resultText = "Executed tool $toolName."
+                resultText = "Tool $toolName is unavailable."
             }
         }
 
@@ -134,21 +130,11 @@ class AgentOrchestrator(
         }
     }
 
-    private fun buildPrompt(userMessage: String): String {
-        return "<|im_start|>system\nYou are JARVIS, a private local AI assistant executing on-device.<|im_end|>\n" +
-                "<|im_start|>user\n$userMessage<|im_end|>\n" +
-                "<|im_start|>assistant\n"
-    }
-
     private fun extractToolCall(text: String): Pair<String, Map<String, Any?>>? {
         val start = text.indexOf("{\"tool\":")
         if (start == -1) return null
-        val end = text.indexOf("}", start)
-        if (end == -1) return null
-
         return try {
-            val jsonStr = text.substring(start, text.indexOf("}", end) + 1)
-            val obj = JSONObject(jsonStr)
+            val obj = org.json.JSONTokener(text.substring(start)).nextValue() as? JSONObject ?: return null
             val tool = obj.getString("tool")
             val paramsObj = obj.optJSONObject("parameters")
             val params = mutableMapOf<String, Any?>()

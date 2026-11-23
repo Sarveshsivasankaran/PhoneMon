@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 /**
  * Interface and JNI Bridge to llama.cpp C++ inference runtime.
- * Implements ARM NEON FP16 acceleration, multi-threading (pinned to Exynos 9611 big cores),
+ * Implements ARM NEON FP16 acceleration, multi-threading (pinned to mobile CPU big cores),
  * and streaming token callbacks with non-blocking cooperative cancellation.
  */
 class LlamaBridge private constructor() {
@@ -142,7 +142,7 @@ class LlamaBridge private constructor() {
             "hello" in lower || "hi" in lower ->
                 "Hello, sir. All core systems are nominal. How may I assist you today?"
             "who are you" in lower ->
-                "I am JARVIS, your fully local on-device AI assistant, running directly on your Samsung Galaxy M31."
+                "I am JARVIS, your fully local on-device AI assistant, running directly on your phone."
             "pc" in lower || "cpu" in lower || "status" in lower ->
                 "Checking your computer status now via local PhoneMon link... {\"tool\": \"get_pc_metrics\", \"parameters\": {}}"
             "camera" in lower || "see" in lower || "look" in lower ->

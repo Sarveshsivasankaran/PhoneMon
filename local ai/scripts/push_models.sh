@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Push Qwen3 and LFM2.5-VL model weights directly to connected Samsung Galaxy M31 over ADB
+# Push Qwen3 and LFM2.5-VL model weights directly to connected Android phone over ADB
 set -euo pipefail
 
 TARGET_DIR="/sdcard/Android/data/com.phonebox.jarvis/files/models"

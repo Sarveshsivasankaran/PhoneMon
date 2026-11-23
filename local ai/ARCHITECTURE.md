@@ -74,7 +74,7 @@ JARVIS is built using a clean, layered Android architecture that strictly separa
   - `control_media`: Play, pause, skip, volume controls on PC.
   - `switch_panel_page`: Remotely switches the active desk panel template.
   - `send_notification`: Triggers desktop toast notifications.
-  - `query_device_status`: Battery, thermals, storage of the Galaxy M31.
+  - `query_device_status`: Battery, thermals, storage of the Android phone.
   - `remember_fact`: Stores a persistent user fact into Room DB.
   - `recall_memory`: Searches stored memory for facts.
 - **`PermissionManager.kt`:** Evaluates tool execution risks (READ-ONLY, REVERSIBLE, DESTRUCTIVE). Destructive or external actions mandate explicit user confirmation on the UI.

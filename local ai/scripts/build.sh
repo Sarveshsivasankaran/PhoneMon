@@ -4,6 +4,6 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 echo "==> Building JARVIS standalone Android Application..."
-./gradlew assembleDebug testDebugUnitTest --no-daemon --console=plain
+sh ./gradlew assembleDebug testDebugUnitTest --no-daemon --console=plain
 echo "==> JARVIS build complete. Artifact at app/build/outputs/apk/debug/app-debug.apk"
 

@@ -11,7 +11,7 @@ import java.nio.ByteOrder
 /**
  * On-Device Vision Engine for LFM2.5-VL-450M.
  * Executes image preprocessing (resizing to 384x384, RGB normalization, planar tensor formation)
- * and vision-language visual question answering directly on the Exynos 9611.
+ * and vision-language visual question answering directly on the mobile CPU.
  */
 class LfmVisionEngine private constructor() {
 

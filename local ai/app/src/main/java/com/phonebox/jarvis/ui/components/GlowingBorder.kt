@@ -35,6 +35,9 @@ fun GlowingBorder(
     )
 
     Canvas(modifier = modifier.fillMaxSize()) {
+        for (width in listOf(18.dp, 10.dp)) {
+            drawRect(color = glowColor.copy(alpha = alpha * 0.15f), style = Stroke(width = width.toPx()))
+        }
         val strokeWidth = 4.dp.toPx()
         drawRect(
             color = glowColor.copy(alpha = alpha),

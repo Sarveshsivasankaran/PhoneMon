@@ -29,26 +29,18 @@ fun OrbVisualizer(
     amplitude: Float,
     modifier: Modifier = Modifier
 ) {
-    val infiniteTransition = rememberInfiniteTransition(label = "orb_pulse")
-
-    val pulseScale by infiniteTransition.animateFloat(
-        initialValue = 0.92f,
-        targetValue = 1.08f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(if (state == JarvisState.LISTENING) 500 else 1400, easing = FastOutSlowInEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "pulse_scale"
-    )
-
-    val rotationAngle by infiniteTransition.animateFloat(
-        initialValue = 0f,
-        targetValue = 360f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(if (state == JarvisState.THINKING) 2000 else 8000, easing = LinearEasing)
-        ),
-        label = "rotation"
-    )
+    val pulseScale = if (state == JarvisState.STANDBY || state == JarvisState.OFFLINE) {
+        1f
+    } else {
+        val transition = rememberInfiniteTransition(label = "orb")
+        val pulse by transition.animateFloat(
+            initialValue = 0.92f,
+            targetValue = 1.08f,
+            animationSpec = infiniteRepeatable(tween(800), RepeatMode.Reverse),
+            label = "pulse"
+        )
+        pulse
+    }
 
     val stateColor = Color(state.glowColorHex)
 

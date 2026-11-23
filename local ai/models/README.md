@@ -1,6 +1,6 @@
 # Model Repository & Verification Guide
 
-This directory holds the configuration, schemas, and verification tooling for the local models executed by JARVIS on the Samsung Galaxy M31.
+This directory holds the configuration, schemas, and verification tooling for the local models executed by JARVIS on the Android phone.
 
 ---
 

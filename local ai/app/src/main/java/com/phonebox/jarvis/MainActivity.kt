@@ -2,7 +2,6 @@ package com.phonebox.jarvis
 
 import android.Manifest
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -13,8 +12,6 @@ import androidx.lifecycle.lifecycleScope
 import com.phonebox.jarvis.core.agent.AgentOrchestrator
 import com.phonebox.jarvis.core.agent.PermissionManager
 import com.phonebox.jarvis.core.ai.JarvisState
-import com.phonebox.jarvis.core.ai.LfmVisionEngine
-import com.phonebox.jarvis.core.ai.LlamaBridge
 import com.phonebox.jarvis.core.memory.MemoryManager
 import com.phonebox.jarvis.core.vision.CameraManager
 import com.phonebox.jarvis.core.voice.TextToSpeechEngine
@@ -30,17 +27,17 @@ class MainActivity : ComponentActivity() {
     private lateinit var wakeWordDetector: WakeWordDetector
     private lateinit var ttsEngine: TextToSpeechEngine
     private lateinit var cameraManager: CameraManager
-    private val visionEngine = LfmVisionEngine.instance
 
     private var micAmplitude by mutableFloatStateOf(0f)
-    private var isMicActive by mutableStateOf(false)
-    private var latestCameraFrame: Bitmap? = null
+    private var wakeCount by mutableIntStateOf(0)
+    private var resumeListening = false
+    private var capturing = false
 
     private val permissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
         val recordAudioGranted = permissions[Manifest.permission.RECORD_AUDIO] == true
-        val cameraGranted = permissions[Manifest.permission.CAMERA] == true
+        if (permissions[Manifest.permission.CAMERA] == true) triggerVisionAnalysis()
         if (recordAudioGranted) {
             startListening()
         }
@@ -63,7 +60,6 @@ class MainActivity : ComponentActivity() {
 
         orchestrator = AgentOrchestrator(
             scope = lifecycleScope,
-            llamaBridge = LlamaBridge.instance,
             memoryManager = memoryManager,
             permissionManager = permissionManager,
             phoneMonAdapter = phoneMonAdapter,
@@ -71,14 +67,12 @@ class MainActivity : ComponentActivity() {
         )
 
         cameraManager = CameraManager(this)
-        cameraManager.initialize(this) { frame ->
-            latestCameraFrame = frame
-        }
-
         wakeWordDetector = WakeWordDetector(
+            context = this,
+            onCommand = { orchestrator.handleUserInput(it, isVoice = true) },
+            onUnavailable = { android.widget.Toast.makeText(this, "Offline English voice recognition unavailable. Use text input.", android.widget.Toast.LENGTH_LONG).show() },
             onWakeWordDetected = {
-                orchestrator.setState(JarvisState.LISTENING)
-                ttsEngine.speak("Yes? I am listening.")
+                wakeCount++
             },
             onAmplitudeChanged = { amp ->
                 micAmplitude = amp
@@ -87,7 +81,9 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             JarvisTheme {
+                val isMicActive by wakeWordDetector.isMicActive.collectAsState()
                 JarvisMainScreen(
+                    wakeCount = wakeCount,
                     orchestrator = orchestrator,
                     modelManager = app.modelManager,
                     micAmplitude = micAmplitude,
@@ -106,41 +102,53 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun checkPermissionsAndStart() {
-        val permissions = arrayOf(
-            Manifest.permission.RECORD_AUDIO,
-            Manifest.permission.CAMERA
-        )
-        val allGranted = permissions.all {
-            ContextCompat.checkSelfPermission(this, it) == PackageManager.PERMISSION_GRANTED
-        }
-
-        if (allGranted) {
-            startListening()
-        } else {
-            permissionLauncher.launch(permissions)
-        }
+        startListening()
     }
 
     private fun startListening() {
-        wakeWordDetector.startListening(lifecycleScope)
-        isMicActive = true
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
+            wakeWordDetector.startListening()
+        } else {
+            permissionLauncher.launch(arrayOf(Manifest.permission.RECORD_AUDIO))
+        }
     }
 
     private fun stopListening() {
         wakeWordDetector.stopListening()
-        isMicActive = false
     }
 
     private fun triggerVisionAnalysis() {
-        val frame = latestCameraFrame
-        if (frame != null) {
-            orchestrator.setState(JarvisState.VISION)
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            permissionLauncher.launch(arrayOf(Manifest.permission.CAMERA))
+            return
+        }
+        if (capturing) return
+        capturing = true
+        cameraManager.capture(this) { frame ->
             lifecycleScope.launch {
-                val description = visionEngine.analyzeFrame(frame, "Describe the scene in view")
-                orchestrator.handleUserInput("I am showing you the camera: $description", isVoice = true)
+                try {
+                    val description = if (frame == null) "Camera frame unavailable." else
+                        com.phonebox.jarvis.core.ai.PhoneInference.answer("Describe the scene in view", frame)
+                    orchestrator.showVisionResult(description)
+                } finally {
+                    frame?.recycle()
+                    capturing = false
+                }
             }
-        } else {
-            orchestrator.handleUserInput("Camera sensor is activating, please point toward the subject.", isVoice = true)
+        }
+    }
+
+    override fun onStop() {
+        resumeListening = wakeWordDetector.isMicActive.value
+        stopListening()
+        super.onStop()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        if (resumeListening) {
+            resumeListening = false
+            startListening()
         }
     }
 

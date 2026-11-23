@@ -27,6 +27,7 @@ class JarvisVoiceService : Service() {
         startForeground(NOTIFICATION_ID, buildNotification("Assistant Ready"))
 
         wakeWordDetector = WakeWordDetector(
+            context = this,
             onWakeWordDetected = {
                 // Broadcast wake-word event to activity or orchestrator
                 val intent = Intent(ACTION_WAKE_WORD_DETECTED).apply {
@@ -36,7 +37,7 @@ class JarvisVoiceService : Service() {
             },
             onAmplitudeChanged = { _ -> }
         )
-        wakeWordDetector?.startListening(serviceScope)
+        wakeWordDetector?.startListening()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {

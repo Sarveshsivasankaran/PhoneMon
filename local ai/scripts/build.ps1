@@ -5,5 +5,6 @@ Set-Location (Join-Path $ScriptDir "..")
 
 Write-Host "==> Building JARVIS standalone Android Application..." -ForegroundColor Cyan
 ./gradlew.bat assembleDebug testDebugUnitTest --no-daemon --console=plain
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 Write-Host "==> JARVIS build complete. Artifact at app/build/outputs/apk/debug/app-debug.apk" -ForegroundColor Green
 

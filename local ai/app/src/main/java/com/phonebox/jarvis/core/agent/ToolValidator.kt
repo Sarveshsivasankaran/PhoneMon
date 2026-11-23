@@ -1,6 +1,5 @@
 package com.phonebox.jarvis.core.agent
 
-import android.util.Log
 
 /**
  * Validates tool invocations, ensuring parameters conform to strict constraints
@@ -15,7 +14,6 @@ object ToolValidator {
     fun validateToolCall(toolName: String, params: Map<String, Any?>): Boolean {
         val tool = ToolRegistry.findTool(toolName)
         if (tool == null) {
-            Log.w("ToolValidator", "Rejected unknown tool: $toolName")
             return false
         }
 

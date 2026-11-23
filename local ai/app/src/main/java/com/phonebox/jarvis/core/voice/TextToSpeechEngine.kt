@@ -29,6 +29,8 @@ class TextToSpeechEngine(
             if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
                 Log.w(TAG, "US English offline language data missing.")
             } else {
+                val voice = tts?.voices?.firstOrNull { it.locale.language == "en" && !it.isNetworkConnectionRequired }
+                if (voice == null || tts?.setVoice(voice) != TextToSpeech.SUCCESS) return
                 tts?.setPitch(0.95f)
                 tts?.setSpeechRate(1.05f)
                 setupListener()

@@ -55,3 +55,5 @@ out_agent/
 .vscode/
 local ai/.gradle/
 local ai/build/
+local ai/app/build/
+local ai/.kotlin/
