@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.3 — 2026-11-23
+
+- Continuous hands-free "JARVIS" wake-word spotting and voice activation.
+- Native Android Text-To-Speech (TTS) integration with natural voice modulation for aloud verbal replies.
+- Universal Adaptive Compatibility Engine: Zero-crash lightweight execution for all phones (2GB+ RAM) alongside high-RAM neural mode (4GB+ RAM, e.g. Samsung Galaxy M31).
+- Dynamic hardware capability detector and compatibility status badge in HUD.
+- Live spoken voice feedback for telemetry, vision inspection, and PC remote control queries.
+
 ## 1.0.2 — 2026-11-23
 
 - Interactive JARVIS Local AI on-device HUD on both phone desk panel and website live demo.

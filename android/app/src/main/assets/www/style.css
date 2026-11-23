@@ -1508,6 +1508,42 @@ body.controls-top .ap-foot { order: -1; margin-bottom: 4px; }
   color: #fff;
   font-weight: 600;
 }
+.hud-badge.mode-badge {
+  background: rgba(16, 185, 129, 0.2);
+  border-color: rgba(52, 211, 153, 0.45);
+  color: #6ee7b7;
+  font-weight: 600;
+}
+.hud-wake-btn {
+  background: rgba(139, 92, 246, 0.18);
+  border: 1px solid rgba(167, 139, 250, 0.35);
+  color: #ddd6fe;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.hud-wake-btn:hover {
+  background: rgba(139, 92, 246, 0.35);
+  border-color: rgba(167, 139, 250, 0.6);
+}
+.hud-wake-btn.active {
+  background: rgba(16, 185, 129, 0.25);
+  border-color: rgba(52, 211, 153, 0.6);
+  color: #a7f3d0;
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+}
+.hud-wake-btn.inactive {
+  opacity: 0.6;
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #94a3b8;
+}
 .hud-close {
   background: rgba(255, 255, 255, 0.08);
   border: none;

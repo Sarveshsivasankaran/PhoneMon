@@ -32,6 +32,7 @@ import android.view.WindowInsetsController
 import android.view.WindowManager
 import android.widget.TextView
 import android.widget.Toast
+import android.speech.tts.TextToSpeech
 import android.webkit.JavascriptInterface
 import android.webkit.ConsoleMessage
 import android.webkit.WebResourceRequest
@@ -78,6 +79,7 @@ class MainActivity : Activity(), SensorEventListener {
     private var lastLux = -1f
     private var lastLuxAt = 0L
     private var near: Boolean? = null
+    private var tts: TextToSpeech? = null
 
     private val assetLoader by lazy {
         WebViewAssetLoader.Builder()
@@ -153,6 +155,16 @@ class MainActivity : Activity(), SensorEventListener {
         web.loadUrl("https://$ASSET_HOST/assets/www/index.html")
         hideSystemUi()
         handlePairingLink(intent)
+
+        try {
+            tts = TextToSpeech(this) { status ->
+                if (status == TextToSpeech.SUCCESS) {
+                    tts?.language = Locale.US
+                }
+            }
+        } catch (e: Exception) {
+            Log.w("PhoneBox", "TTS initialization failed: ${e.message}")
+        }
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -283,6 +295,11 @@ class MainActivity : Activity(), SensorEventListener {
         dictation.cancel(0) // the microphone is never left open behind another app or a dark screen
         sensors?.unregisterListener(this)
         stream.stop()
+        try {
+            tts?.stop()
+            tts?.shutdown()
+            tts = null
+        } catch (_: Exception) {}
         // WebView.onPause() leaves JavaScript running: tell the panel to stop polling and refreshing while nobody sees it
         if (hasWeb) {
             web.evaluateJavascript("window.onAppPause && window.onAppPause(true)", null)
@@ -297,6 +314,11 @@ class MainActivity : Activity(), SensorEventListener {
         dictation.cancel(0)
         sensors?.unregisterListener(this)
         stream.stop()
+        try {
+            tts?.stop()
+            tts?.shutdown()
+            tts = null
+        } catch (_: Exception) {}
         link.trackpadSocket.close()
         link.close()
         if (hasWeb) {
@@ -562,6 +584,33 @@ class MainActivity : Activity(), SensorEventListener {
 
         @JavascriptInterface
         fun cancelListening(key: String, id: Int) { if (ok(key) && id > 0) dictation.cancel(id) }
+
+        @JavascriptInterface
+        fun speak(key: String, text: String, pitch: Float, rate: Float) {
+            if (!ok(key) || text.isBlank()) return
+            runOnUiThread {
+                try {
+                    tts?.setPitch(if (pitch > 0f) pitch else 1.0f)
+                    tts?.setSpeechRate(if (rate > 0f) rate else 1.05f)
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        tts?.speak(text.take(1500), TextToSpeech.QUEUE_FLUSH, null, "phonemon_tts")
+                    } else {
+                        @Suppress("DEPRECATION")
+                        tts?.speak(text.take(1500), TextToSpeech.QUEUE_FLUSH, null)
+                    }
+                } catch (e: Exception) {
+                    Log.w("PhoneBox", "TTS speak failed", e)
+                }
+            }
+        }
+
+        @JavascriptInterface
+        fun stopSpeaking(key: String) {
+            if (!ok(key)) return
+            runOnUiThread {
+                try { tts?.stop() } catch (_: Exception) {}
+            }
+        }
     }
 
     companion object {
