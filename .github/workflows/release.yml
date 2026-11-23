@@ -9,6 +9,9 @@ name: release
 # The macOS agent is signed with PhoneBox's own certificate, MACOS_SIGNING_P12_BASE64 and MACOS_SIGNING_P12_PASSWORD
 # (tools/make-macos-signing-cert.sh); without them the workflow stops too.
 on:
+  push:
+    branches: [main]
+    paths: ['VERSION']
   workflow_dispatch:
     inputs:
       draft:
@@ -70,7 +73,9 @@ jobs:
         run: |
           chmod +x gradlew
           ./gradlew assembleRelease --console=plain
+          bash "../local ai/gradlew" -p "../local ai" assembleRelease testDebugUnitTest --console=plain
           mkdir -p ../dist
+          cp "../local ai/app/build/outputs/apk/release/app-release.apk" "../dist/JARVIS-${{ needs.version.outputs.version }}.apk"
           cp app/build/outputs/apk/release/app-release.apk "../dist/PhoneMon-${{ needs.version.outputs.version }}.apk"
       - name: Remove the signing key
         if: always()
@@ -171,9 +176,9 @@ jobs:
       - name: Checksums
         working-directory: dist
         run: |
-          test "$(find . -maxdepth 1 -type f | wc -l)" -eq 7
+          test "$(find . -maxdepth 1 -type f | wc -l)" -eq 8
           test "$(find . -maxdepth 1 -type f -name '*.zip' | wc -l)" -eq 5
-          test "$(find . -maxdepth 1 -type f -name '*.apk' | wc -l)" -eq 1
+          test "$(find . -maxdepth 1 -type f -name '*.apk' | wc -l)" -eq 2
           sha256sum * > "SHA256SUMS-${{ needs.version.outputs.version }}.txt"
           cat "SHA256SUMS-${{ needs.version.outputs.version }}.txt"
       - name: Release notes from CHANGELOG.md

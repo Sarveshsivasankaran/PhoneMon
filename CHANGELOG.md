@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.1.0 — 2026-11-23
+
+- Added a separate JARVIS Android APK with offline English wake recognition on supported devices, glowing screen edges, and a bottom-center assistant badge.
+- Chat and single-frame camera questions use a llama.cpp server on the phone. Compact layouts and on-demand camera capture reduce resource usage.
+
 ## 1.0.3 — 2026-11-23
 
 - Continuous hands-free "JARVIS" wake-word spotting and voice activation.

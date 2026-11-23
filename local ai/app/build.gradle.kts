@@ -13,8 +13,8 @@ android {
         applicationId = "com.phonebox.jarvis"
         minSdk = 26 // Android 8.0 Oreo
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = 2
+        versionName = "1.1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -26,8 +26,20 @@ android {
         }
     }
 
+    signingConfigs {
+        System.getenv("PHONEBOX_STORE_FILE")?.let { path ->
+            create("release") {
+                storeFile = file(path)
+                storePassword = System.getenv("PHONEBOX_STORE_PASSWORD")
+                keyAlias = System.getenv("PHONEBOX_KEY_ALIAS")
+                keyPassword = System.getenv("PHONEBOX_KEY_PASSWORD")
+            }
+        }
+    }
+
     buildTypes {
         release {
+            signingConfig = signingConfigs.findByName("release")
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),

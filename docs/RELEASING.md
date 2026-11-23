@@ -1,5 +1,8 @@
 # Releasing PhoneBox
 
+Pushing a change to the root `VERSION` file on `main` starts the release workflow and publishes after checks and signing succeed. For a release update, bump both Android version names and codes, the agent version, and the dated changelog together with `VERSION`. Routine changes leave `VERSION` alone. Manual dispatch remains available for retries before publication.
+
+
 1. Update `agent/PhoneBox.Agent/PhoneBox.Agent.csproj`, Android `versionName` and its increasing `versionCode`.
 2. Add dated release notes to `CHANGELOG.md`; update README and demo catalog counts when widgets/templates change.
 3. Run `python tools/check-release.py`, `./gradlew lintDebug assembleDebug` in `android`, the agent tests, `npm test` in `tools/ui-tests`, and

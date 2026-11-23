@@ -2,6 +2,8 @@
 import json,re,pathlib,xml.etree.ElementTree as ET
 root=pathlib.Path(__file__).resolve().parents[1]
 version=ET.parse(root/'agent/PhoneBox.Agent/PhoneBox.Agent.csproj').find('.//Version').text
+assert (root/'VERSION').read_text().strip()==version,'VERSION differs from agent'
+assert f'versionName = "{version}"' in (root/'local ai/app/build.gradle.kts').read_text(),'JARVIS version differs'
 assert re.fullmatch(r'\d+\.\d+\.\d+',version),version
 gradle=(root/'android/app/build.gradle.kts').read_text()
 assert re.search(r'versionName = "'+re.escape(version)+'"',gradle),'Android version differs'
