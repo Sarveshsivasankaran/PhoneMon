@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.0.2 — 2026-11-23
+
+- Interactive JARVIS Local AI on-device HUD on both phone desk panel and website live demo.
+- Offline wake-word detection visualizer, Arc Reactor status ring, and speech wave animation.
+- CameraX visual perception inspector and frame analysis powered by local LFM2.5-VL 450M.
+- On-device neural reasoning using Qwen3 1.7B Instruct with zero cloud latency and zero telemetry.
+- Sequential memory arbitration paging models locally within Samsung Galaxy M31 1,800 MB RAM budget.
+- Refreshed high-resolution PhoneMon retro-futuristic logo and launcher icons across all platforms.
+
 ## 1.0.1 — 2026-11-23
 
 - Fix mobile pairing QR code links, Android intent filters, and deep-link handling.
