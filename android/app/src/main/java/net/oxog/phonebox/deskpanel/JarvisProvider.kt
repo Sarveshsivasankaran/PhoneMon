@@ -33,10 +33,33 @@ class JarvisProvider : ContentProvider() {
                 body = JSONObject().put("state",data.getString("state")).put("text",data.getString("text").take(2000)).toString().toByteArray()
                 post("/api/jarvis/session")
             }
+            "panel_status" -> when (data.getString("section")) {
+                "apps" -> "/api/apps"
+                "processes" -> "/api/procs"
+                "docker" -> "/api/docker"
+                "discord" -> "/api/discord"
+                "steam" -> "/api/steam/library"
+                "batteries" -> "/api/batteries"
+                "home" -> "/api/ha/states?ids=" + Uri.encode(data.optString("ids"))
+                else -> error("Unknown panel section")
+            }
+            "open_app" -> post("/api/apps/open?id=" + segment("id"))
+            "toggle_entity" -> post("/api/ha/toggle/" + segment("id"))
+            "docker_action" -> {
+                val op = data.getString("action")
+                require(op in setOf("start","stop","restart"))
+                post("/api/docker/" + segment("id") + "/" + op)
+            }
+            "discord_action" -> {
+                val op = data.getString("action")
+                require(op in setOf("mute","deafen","inputmode","join","leave"))
+                post("/api/discord/$op" + if (op == "join") "?channel=" + segment("id") else "")
+            }
+            "launch_game" -> post("/api/steam/launch?id=" + segment("id") + "&widget=" + Uri.encode(data.getString("widget")))
             "profile" -> "/api/jarvis/profile"
             "get_pc_metrics" -> "/api/state"
             "list_controls" -> "/api/controls/state"
-            "list_shortcuts" -> "/api/config"
+            "list_shortcuts" -> "/api/jarvis/catalog"
             "obs_status" -> "/api/controls/obs"
             "execute_custom_command" -> post("/api/run/" + segment("command_id"))
             "switch_panel_page" -> post("/api/goto/" + segment("target"))
@@ -74,7 +97,7 @@ class JarvisProvider : ContentProvider() {
             }
             else -> error("Unknown tool")
         }
-        val result = link.request(verb, path, body, if (body != null) "application/json" else null)
+        val result = link.request(verb, path, body, if (body != null) "application/json" else null, panelRequest = false)
         val value = result.body.bufferedReader().use { reader ->
             val chars = CharArray(16000)
             val count = reader.readBlock(chars)

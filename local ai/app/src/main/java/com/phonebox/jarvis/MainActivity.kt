@@ -136,6 +136,7 @@ class MainActivity : ComponentActivity() {
         }
         if (capturing) return
         capturing = true
+        orchestrator.setState(JarvisState.VISION)
         cameraManager.capture(this) { frame ->
             lifecycleScope.launch {
                 try {

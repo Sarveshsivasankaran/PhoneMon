@@ -386,6 +386,15 @@ app.MapGet("/api/jarvis/session", () =>
     return Results.Json(session is not null && DateTimeOffset.UtcNow - session.Seen < TimeSpan.FromSeconds(20)
         ? session : new JarvisSession("OFFLINE", ""));
 });
+app.MapGet("/api/jarvis/catalog", (ConfigStore store, HttpRequest req) =>
+{
+    var config = store.Get();
+    return Results.Json(new {
+        shortcuts = config.Shortcuts.Select(s => new { s.Id, s.Label }),
+        pages = config.PagesFor(req.Headers["X-PhoneBox-Device"].ToString()).Where(p => p.Enabled).Select(p => new { p.Id, p.Title }),
+        rules = config.Rules.Select(r => new { r.Id, r.Name, r.Enabled })
+    });
+});
 app.MapGet("/api/jarvis/profile", () =>
 {
     var file = Path.Combine(configDir, "jarvis-profile.json");

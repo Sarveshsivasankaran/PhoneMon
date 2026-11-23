@@ -143,15 +143,19 @@ class AgentLink(private val context: Context) {
     /** Forwards a request (method + path with query) to the agent over the best available route. */
     fun request(method: String, pathAndQuery: String): Reply = request(method, pathAndQuery, null, null)
 
-    fun request(method: String, pathAndQuery: String, body: ByteArray?, contentType: String?): Reply {
+    fun request(method: String, pathAndQuery: String, body: ByteArray?, contentType: String?, panelRequest: Boolean = true): Reply {
+        if (!panelRequest) synchronized(pcsLock) {
+            pcs = loadPcs()
+            activeId = prefs.getString("active", null)
+        }
         usb(method, pathAndQuery, 4000, body, contentType)?.let {
             route = Route.USB
-            maybePair()
+            if (panelRequest) maybePair()
             return it
         }
         wifi(method, pathAndQuery, 4000, body, contentType)?.let {
             route = Route.WIFI
-            maybeRefreshMacs()
+            if (panelRequest) maybeRefreshMacs()
             return it
         }
         route = Route.NONE

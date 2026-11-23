@@ -18,11 +18,14 @@ internal object AssistantProfile {
         prefs.edit().putString("profile",profile.toString()).apply()
         name.value = profile.getString("assistantName")
     }
-    fun instructions(profile: JSONObject, tools: Boolean): String = buildString {
+    fun instructions(profile: JSONObject, prompt: String, image: Boolean): String = buildString {
         appendLine("You are " + profile.optString("assistantName", "JARVIS") + ". " + profile.optString("personality"))
-        if (tools) {
-            appendLine("""For a requested panel action, respond only with {"tool":"name","parameters":{...}}. Available tools:""")
-            ToolRegistry.ALL_TOOLS.forEach { appendLine(it.name + " " + it.parametersSchemaJson + " " + it.description) }
+        val tools = if (image) emptyList() else ToolRegistry.forRequest(prompt)
+        if (tools.isEmpty()) {
+            appendLine("Answer the user's question directly in plain language.")
+        } else {
+            appendLine("Answer questions normally. Only when the user requests one of these desk actions, output JSON with a tool name and parameters.")
+            tools.forEach { appendLine(it.name + " " + it.parametersSchemaJson + " " + it.description) }
         }
     }
 }

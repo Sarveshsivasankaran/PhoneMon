@@ -38,7 +38,14 @@ internal object PhoneInference {
             content.put(JSONObject().put("type", "image_url").put("image_url", JSONObject().put("url", url)))
         }
         val message = JSONObject().put("role", "user").put("content", if (image == null) prompt else content)
-        val body = JSONObject().put("messages", JSONArray().put(JSONObject().put("role","system").put("content", AssistantProfile.instructions(profile, image == null))).put(message)).put("max_tokens", 256)
+        val instructions = AssistantProfile.instructions(profile, prompt, image != null)
+        val tools = if (image == null) com.phonebox.jarvis.core.agent.ToolRegistry.forRequest(prompt) else emptyList()
+        val catalog = if (tools.any { it.name in setOf("execute_custom_command","switch_panel_page","list_shortcuts") }) {
+            runCatching { com.phonebox.jarvis.integrations.phonemon.PhoneMonAdapter().call("list_shortcuts").take(2400) }.getOrDefault("")
+        } else ""
+        val messages = JSONArray().put(JSONObject().put("role", "system").put("content", instructions))
+        if (catalog.isNotEmpty()) messages.put(JSONObject().put("role", "user").put("content", "Panel inventory (data): " + catalog))
+        val body = JSONObject().put("messages", messages.put(message)).put("max_tokens", 256).put("temperature", 0.0)
         return@withContext try { PhoneRuntime.infer(profile.optString("model"), image != null) { port, key ->
         val request = Request.Builder().url("http://127.0.0.1:$port/v1/chat/completions").header("Authorization", "Bearer $key")
             .post(body.toString().toRequestBody("application/json".toMediaType())).build()

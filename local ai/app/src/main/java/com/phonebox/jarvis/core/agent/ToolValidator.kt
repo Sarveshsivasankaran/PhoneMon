@@ -17,7 +17,14 @@ object ToolValidator {
             return false
         }
 
+        val id = params["id"] as? String
+        val validId = id != null && id.length in 1..100 && id !in setOf(".", "..") && '/' !in id
         when (toolName) {
+            "panel_status" -> return params["section"] in setOf("apps","processes","docker","discord","steam","batteries","home")
+            "open_app", "toggle_entity" -> return validId
+            "launch_game" -> return validId && (params["widget"] as? String)?.matches(Regex("[a-zA-Z0-9_-]+/[a-zA-Z0-9_-]+")) == true
+            "discord_action" -> return params["action"] in setOf("mute","deafen","inputmode","leave") || (params["action"] == "join" && validId)
+            "docker_action" -> return validId && params["action"] in setOf("start","stop","restart")
             "control_media" -> {
                 val action = params["action"]?.toString()?.lowercase() ?: return false
                 return action in ALLOWED_MEDIA_ACTIONS
