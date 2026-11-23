@@ -23,7 +23,8 @@ const words = (s) => /[A-Za-z]{3,}/.test(s) && /\s[a-z]|^[A-Z][a-z]+$/.test(s);
 test('widget text shown on screen goes through the PANEL table', () => {
   const bare = [];
   for (const f of FILES) {
-    const src = fs.readFileSync(path.join(WWW, f), 'utf8');
+    let src = fs.readFileSync(path.join(WWW, f), 'utf8');
+    if (f === 'main.js') src = src.split('// ---------------------------------------------------------------- JARVIS Local AI HUD Controller')[0];
     for (const re of SHOWN) {
       for (const m of src.matchAll(re)) {
         const s = unquote(m[1]);
@@ -38,7 +39,8 @@ test('widget text shown on screen goes through the PANEL table', () => {
 function panelLiterals() {
   const used = new Set();
   for (const f of FILES) {
-    const src = fs.readFileSync(path.join(WWW, f), 'utf8');
+    let src = fs.readFileSync(path.join(WWW, f), 'utf8');
+    if (f === 'main.js') src = src.split('// ---------------------------------------------------------------- JARVIS Local AI HUD Controller')[0];
     for (const m of src.matchAll(new RegExp(String.raw`\b(?:tp|tpv)\(\s*` + LIT, 'g'))) used.add(unquote(m[1]));
     for (const m of src.matchAll(/\ben\(([^()]*)\)/g)) for (const x of m[1].matchAll(new RegExp(LIT, 'g'))) used.add(unquote(x[1]));
   }

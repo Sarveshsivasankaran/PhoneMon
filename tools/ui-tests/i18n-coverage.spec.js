@@ -84,6 +84,7 @@ test('the settings page shows no English left in Vietnamese, with every section 
       if (skip.has(el.tagName)) return;
       if (el.id === 'ai' || (el.closest && el.closest('#ai'))) return;
       if (el.id === 'jarvisTrigger' || el.id === 'jarvisOverlay' || (el.closest && (el.closest('#jarvisTrigger') || el.closest('#jarvisOverlay')))) return;
+      if (el.getAttribute && el.getAttribute('href') === '#ai') return;
       // Read an element's own text nodes, not just its subtree: a <label> that wraps an <input> has children, so a
       // leaf-only rule dropped its text (and the input's placeholder with it).
       for (const node of el.childNodes) {

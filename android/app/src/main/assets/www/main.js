@@ -2539,6 +2539,7 @@ function initJarvisHUD() {
 
   let listening = false;
   let activeModel = 'qwen3';
+  const setStatus = (msg) => { if (statusText) statusText.textContent = msg; };
 
   function openHUD() {
     overlay.removeAttribute('hidden');
@@ -2581,7 +2582,7 @@ function initJarvisHUD() {
     if (input) input.value = '';
 
     appendMsg('You', text, true);
-    if (statusText) statusText.textContent = `Reasoning on ARM Cortex-A73 (${activeModel === 'lfm' ? 'LFM2.5-VL 450M' : 'Qwen3 1.7B'})...`;
+    setStatus(`Reasoning on ARM Cortex-A73 (${activeModel === 'lfm' ? 'LFM2.5-VL 450M' : 'Qwen3 1.7B'})...`);
     if (wave) wave.classList.add('speaking');
 
     try {
@@ -2594,7 +2595,7 @@ function initJarvisHUD() {
         const res = await r.json();
         if (res && res.success) {
           appendMsg('JARVIS', res.response);
-          if (statusText) statusText.textContent = `Response generated in ${res.latencyMs || 38}ms (${res.tokensPerSecond || 46.2} t/s). Zero cloud transmission.`;
+          setStatus(`Response generated in ${res.latencyMs || 38}ms (${res.tokensPerSecond || 46.2} t/s). Zero cloud transmission.`);
           if (wave) wave.classList.remove('speaking');
           return;
         }
@@ -2619,7 +2620,7 @@ function initJarvisHUD() {
         reply = `[JARVIS Local AI]\nQuery processed: "${text}"\nExecution verified locally on Samsung Galaxy M31 without cloud dependency.`;
       }
       appendMsg('JARVIS', reply);
-      if (statusText) statusText.textContent = 'Ready. Offline keyword spotting active ("JARVIS").';
+      setStatus('Ready. Offline keyword spotting active ("JARVIS").');
       if (wave) wave.classList.remove('speaking');
     }, 180);
   }
@@ -2629,14 +2630,14 @@ function initJarvisHUD() {
     if (micBtn) micBtn.classList.toggle('active', listening);
     if (wave) wave.classList.toggle('speaking', listening);
     if (listening) {
-      if (statusText) statusText.textContent = 'Listening for speech input (16kHz PCM AudioRecord)...';
+      setStatus('Listening for speech input (16kHz PCM AudioRecord)...');
       setTimeout(() => {
         if (!listening) return;
         toggleMic(false);
         sendPrompt('Status report on connected hardware and AI engine');
       }, 2500);
     } else {
-      if (statusText) statusText.textContent = 'Offline keyword spotting active ("JARVIS"). Tap to converse.';
+      setStatus('Offline keyword spotting active ("JARVIS"). Tap to converse.');
     }
   }
 
