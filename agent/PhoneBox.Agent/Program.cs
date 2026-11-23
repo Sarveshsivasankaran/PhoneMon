@@ -390,6 +390,8 @@ app.MapGet("/panel/{*file}", (string? file, HttpRequest req) =>
     return AppPaths.Resource("www/" + file) is { } s ? Results.Stream(s, type) : Results.NotFound();
 });
 app.MapGet("/favicon.ico", () => AppPaths.Resource("phonebox.ico") is { } s ? Results.Stream(s, "image/x-icon") : Results.NotFound());
+app.MapGet("/phonemon.ico", () => AppPaths.Resource("phonemon.ico") is { } s ? Results.Stream(s, "image/x-icon") : AppPaths.Resource("phonebox.ico") is { } fb ? Results.Stream(fb, "image/x-icon") : Results.NotFound());
+app.MapGet("/logo.png", () => AppPaths.Resource("logo.png") is { } s ? Results.Stream(s, "image/png") : Results.NotFound());
 
 // The version lets the settings page save only over what it loaded (X-Config-Version, see ConfigStore.Save).
 app.MapGet("/api/settings", (HttpRequest req, ConfigStore cfg, HttpResponse res) =>

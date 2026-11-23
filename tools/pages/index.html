@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PhoneMon — live demo</title>
 <meta name="description" content="Turn an old Android phone into a desk panel for your computer. Try the panel and the layout editor in your browser.">
-<link rel="icon" href="favicon.ico">
+<link rel="icon" type="image/png" href="logo.png">
+<link rel="alternate icon" href="favicon.ico">
 <style>
 :root { --bg: #07090d; --panel: #10141b; --line: #232a35; --text: #eef2f6; --muted: #8a94a3; --accent: #2dd4bf; color-scheme: dark; }
 * { box-sizing: border-box; margin: 0; }
@@ -19,7 +20,7 @@ body {
 a { color: var(--accent); }
 .wrap { max-width: 1060px; margin: 0 auto; padding: 32px 16px 56px; }
 header { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
-header img { width: 36px; height: 36px; }
+header img { width: 36px; height: 36px; border-radius: 8px; object-fit: contain; }
 header h1 { font-size: 22px; font-weight: 700; }
 header .gh { margin-left: auto; color: var(--text); text-decoration: none; border: 1px solid var(--line); padding: 7px 14px; border-radius: 10px; font-size: 14px; }
 header .gh:hover { border-color: var(--accent); }
@@ -59,7 +60,7 @@ footer { margin-top: 40px; text-align: center; color: var(--muted); font-size: 1
 <body>
 <div class="wrap">
   <header>
-    <img src="favicon.ico" alt="">
+    <img src="logo.png" alt="PhoneMon">
     <h1>PhoneMon</h1>
     <a class="gh" href="https://github.com/Sarveshsivasankaran/PhoneMon">★ <span>GitHub</span></a>
   </header>

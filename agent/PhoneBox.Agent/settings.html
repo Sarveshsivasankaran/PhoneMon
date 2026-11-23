@@ -4,7 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PhoneMon Settings</title>
-<link rel="icon" href="/favicon.ico">
+<link rel="icon" type="image/png" href="/logo.png">
+<link rel="alternate icon" href="/favicon.ico">
 <style>
 :root {
   --bg: #f4f5f7; --panel: #ffffff; --panel-2: #f8f9fb; --line: #e3e6eb; --text: #14171c; --muted: #6b7280;
@@ -24,7 +25,7 @@ header {
   padding: 12px 24px; background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(8px);
   border-bottom: 1px solid var(--line);
 }
-header img { width: 28px; height: 28px; }
+header img { width: 32px; height: 32px; border-radius: 6px; object-fit: contain; }
 header h1 { font-size: 17px; margin: 0; font-weight: 650; }
 header .ver { color: var(--muted); font-size: 12px; }
 .pill { font-size: 12px; padding: 4px 10px; border-radius: 99px; background: var(--panel-2); border: 1px solid var(--line); display: inline-flex; gap: 6px; align-items: center; }
@@ -469,7 +470,7 @@ nav a.on::before { color: var(--accent); }
 </head>
 <body>
 <header id="hdr">
-  <img src="/favicon.ico" alt="" width="28" height="28">
+  <img src="/logo.png" alt="PhoneMon" width="32" height="32">
   <h1>PhoneMon</h1><span class="ver" id="ver"></span>
   <span class="pill" id="phone"><i></i><span data-i18n="s.phoneStatus">Phone…</span></span>
   <button class="btn sm upd-top" id="updTop" hidden></button>

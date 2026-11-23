@@ -429,6 +429,7 @@ function Install-PhoneMon {
                 $startLink = $shell.CreateShortcut((Join-Path $programs 'PhoneMon.lnk'))
                 $startLink.TargetPath = $exe
                 $startLink.WorkingDirectory = $app
+                $startLink.IconLocation = "$exe,0"
                 $startLink.Description = 'PhoneMon agent'
                 $startLink.Save()
                 Write-Ok 'Added to the Start Menu (search "PhoneMon" to start it anytime)'
@@ -453,6 +454,7 @@ function Install-PhoneMon {
                 $link = $shell.CreateShortcut($shortcut)
                 $link.TargetPath = $exe
                 $link.WorkingDirectory = $app
+                $link.IconLocation = "$exe,0"
                 $link.Description = 'PhoneMon agent'
                 $link.Save()
                 Write-Ok 'Added to the Startup folder (turn it off in Task Manager > Startup apps)'

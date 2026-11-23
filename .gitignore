@@ -50,3 +50,7 @@ tools/ui-tests/test-results/
 
 *.log
 *.txt
+out_agent/
+.vscode/
+local ai/.gradle/
+local ai/build/

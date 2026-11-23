@@ -5,15 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex">
-<title>Pair PhoneBox</title>
-<link rel="icon" href="../favicon.ico">
+<title>Pair PhoneMon</title>
+<link rel="icon" type="image/png" href="../logo.png">
+<link rel="alternate icon" href="../favicon.ico">
 <style>
 :root { --bg: #07090d; --panel: #10141b; --line: #232a35; --text: #eef2f6; --muted: #8a94a3; --accent: #2dd4bf; --warn: #f59e0b; color-scheme: dark; }
 * { box-sizing: border-box; margin: 0; }
 body { background: var(--bg); color: var(--text); font: 16px/1.5 "Segoe UI", system-ui, -apple-system, sans-serif; min-height: 100vh; }
 .wrap { max-width: 520px; margin: 0 auto; padding: 32px 16px; }
 header { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
-header img { width: 32px; height: 32px; }
+header img { width: 32px; height: 32px; border-radius: 6px; object-fit: contain; }
 h1 { font-size: 20px; }
 .card { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 18px; margin-bottom: 14px; }
 .card h2 { font-size: 17px; margin-bottom: 6px; }
@@ -27,7 +28,7 @@ code { font-size: 13px; }
 </head>
 <body>
 <div class="wrap">
-  <header><img src="../favicon.ico" alt=""><h1>Pair PhoneBox</h1></header>
+  <header><img src="../logo.png" alt="PhoneMon"><h1>Pair PhoneMon</h1></header>
 
   <div class="card" id="ok" hidden>
     <h2>Pair this phone with a computer?</h2>

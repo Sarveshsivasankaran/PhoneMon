@@ -1,4 +1,4 @@
-<p align="center"><img src="../agent/PhoneBox.Agent/phonebox.ico" width="72" alt="PhoneBox-pictogram"></p>
+<p align="center"><img src="logo.png" width="160" alt="PhoneMon logo"></p>
 
 <h1 align="center">PhoneBox</h1>
 

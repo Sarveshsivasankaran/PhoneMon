@@ -278,7 +278,8 @@ public sealed class MediaMonitor(ILogger<MediaMonitor> log) : BackgroundService
         if (value.ValueKind == JsonValueKind.String)
         {
             if (!DateTimeOffset.TryParse(value.GetString(), CultureInfo.InvariantCulture,
-                    DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal, out at)) return null;
+                    DateTimeStyles.None, out at)) return null;
+            at = at.ToUniversalTime();
         }
         else if (value.ValueKind == JsonValueKind.Number && value.TryGetDouble(out var seconds) && double.IsFinite(seconds)
                  && seconds is > 1e9 and < 1e11)

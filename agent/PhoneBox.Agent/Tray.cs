@@ -14,15 +14,7 @@ public sealed class Tray : IHostedService
     private readonly IHostApplicationLifetime _life;
     private readonly AdbReverse _adb;
     private readonly ConfigStore _config;
-    private static readonly ResourceManager Strings = CreateResourceManager();
-    private static ResourceManager CreateResourceManager()
-    {
-        var asm = typeof(Tray).Assembly;
-        var names = asm.GetManifestResourceNames();
-        if (names.Any(n => n.StartsWith("PhoneMon.Agent.TrayStrings")))
-            return new ResourceManager("PhoneMon.Agent.TrayStrings", asm);
-        return new ResourceManager("PhoneBox.Agent.TrayStrings", asm);
-    }
+    private static readonly ResourceManager Strings = new("PhoneBox.Agent.TrayStrings", typeof(Tray).Assembly);
     private Thread? _thread;
     private ApplicationContext? _ctx;
     private Control? _invoker;
@@ -57,8 +49,18 @@ public sealed class Tray : IHostedService
         var language => CultureInfo.GetCultureInfo(language),
     };
 
-    private static string Text(string key, CultureInfo culture) =>
-        Strings.GetString(key, culture) ?? throw new MissingManifestResourceException(key);
+    private static string Text(string key, CultureInfo culture)
+    {
+        try
+        {
+            return Strings.GetString(key, culture) ?? Strings.GetString(key, CultureInfo.InvariantCulture) ?? key;
+        }
+        catch
+        {
+            try { return Strings.GetString(key, CultureInfo.InvariantCulture) ?? key; }
+            catch { return key; }
+        }
+    }
 
     private string Tooltip(CultureInfo culture) =>
         Text(_adb.Connected ? "tooltipConnected" : "tooltipWaiting", culture);
@@ -78,7 +80,7 @@ public sealed class Tray : IHostedService
         autostart.Click += (_, _) => { ToggleAutostart(UiCulture()); autostart.Checked = File.Exists(AppPaths.StartupShortcut); };
 
         var menu = new ContextMenuStrip();
-        menu.Items.Add(new ToolStripMenuItem($"PhoneBox {AppPaths.Version}") { Enabled = false });
+        menu.Items.Add(new ToolStripMenuItem($"PhoneMon {AppPaths.Version}") { Enabled = false });
         menu.Items.Add(status);
         menu.Items.Add(new ToolStripSeparator());
         var settings = new ToolStripMenuItem("", null, (_, _) => OpenUrl(SettingsUrl)) { Font = new Font(menu.Font, FontStyle.Bold) };
@@ -109,9 +111,12 @@ public sealed class Tray : IHostedService
             autostart.Checked = File.Exists(AppPaths.StartupShortcut);
         };
 
+        Icon trayIcon = SystemIcons.Application;
+        try { if (iconStream is not null) trayIcon = new Icon(iconStream, 32, 32); } catch { }
+
         _icon = new NotifyIcon
         {
-            Icon = iconStream is null ? SystemIcons.Application : new Icon(iconStream, 32, 32),
+            Icon = trayIcon,
             Text = Tooltip(UiCulture()),
             ContextMenuStrip = menu,
             Visible = true,

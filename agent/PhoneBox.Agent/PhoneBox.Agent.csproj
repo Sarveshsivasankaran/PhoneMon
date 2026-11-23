@@ -9,7 +9,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <AssemblyName>PhoneBoxAgent</AssemblyName>
-    <RootNamespace>PhoneMon.Agent</RootNamespace>
+    <RootNamespace>PhoneBox.Agent</RootNamespace>
     <Product>PhoneMon</Product>
     <Company>PhoneMon</Company>
     <Description>PhoneMon desktop agent: feeds the PhoneMon Android desk panel over USB or Wi-Fi.</Description>
@@ -59,6 +59,8 @@
     <EmbeddedResource Include="config.default.linux.json" LogicalName="config.default.linux.json" />
     <EmbeddedResource Include="config.default.macos.json" LogicalName="config.default.macos.json" />
     <EmbeddedResource Include="phonebox.ico" LogicalName="phonebox.ico" />
+    <EmbeddedResource Include="phonemon.ico" LogicalName="phonemon.ico" />
+    <EmbeddedResource Include="logo.png" LogicalName="logo.png" />
     <EmbeddedResource Include="settings.html" LogicalName="settings.html" />
     <EmbeddedResource Include="widgets.json" LogicalName="widgets.json" />
     <EmbeddedResource Include="templates.json" LogicalName="templates.json" />

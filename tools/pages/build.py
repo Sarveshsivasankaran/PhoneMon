@@ -43,7 +43,8 @@ def settings_html(relay=False):
     html = (AGENT / 'settings.html').read_text(encoding='utf-8')
     assert '<script>' in html
     return (html.replace('<script>', demo_tag(relay=relay) + '<script>', 1)
-            .replace('href="/favicon.ico"', 'href="../favicon.ico"').replace('src="/favicon.ico"', 'src="../favicon.ico"'))
+            .replace('href="/favicon.ico"', 'href="../favicon.ico"').replace('src="/favicon.ico"', 'src="../favicon.ico"')
+            .replace('href="/logo.png"', 'href="../logo.png"').replace('src="/logo.png"', 'src="../logo.png"'))
 
 
 def build(out):
@@ -54,6 +55,7 @@ def build(out):
     (out / 'index.html').write_text(landing_html(), encoding='utf-8')
     for name in ('widgets.json', 'templates.json'): shutil.copy(AGENT / name, out / name)
     shutil.copy(AGENT / 'phonebox.ico', out / 'favicon.ico')
+    if (AGENT / 'logo.png').exists(): shutil.copy(AGENT / 'logo.png', out / 'logo.png')
     shutil.copytree(WWW, out / 'panel', dirs_exist_ok=True, ignore=shutil.ignore_patterns('index.html'))
     (out / 'panel' / 'index.html').write_text(panel_html(), encoding='utf-8')
     (out / 'settings' / 'index.html').write_text(settings_html(), encoding='utf-8')

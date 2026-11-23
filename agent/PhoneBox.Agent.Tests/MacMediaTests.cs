@@ -33,7 +33,7 @@ public sealed class MacMediaTests
         // a browser published 0:00 when playback began and never refreshed it: the phone must show 0:15, not 0:00
         var now = DateTimeOffset.UtcNow;
         var published = now.AddSeconds(-15);
-        var iso = "\"" + published.UtcDateTime.ToString("yyyy-MM-dd'T'HH:mm:ss'Z'") + "\"";
+        var iso = "\"" + published.UtcDateTime.ToString("yyyy-MM-dd'T'HH':'mm':'ss'Z'", System.Globalization.CultureInfo.InvariantCulture) + "\"";
         var epoch = (published.ToUnixTimeMilliseconds() / 1000.0).ToString(System.Globalization.CultureInfo.InvariantCulture);
         foreach (var stamp in new[] { iso, epoch })
         {
@@ -46,7 +46,7 @@ public sealed class MacMediaTests
     public void ThePublishedPositionIsKeptWhilePausedOrWhenTheTimestampCannotBeTrusted()
     {
         var now = DateTimeOffset.UtcNow;
-        var old = "\"" + now.AddSeconds(-15).UtcDateTime.ToString("yyyy-MM-dd'T'HH:mm:ss'Z'") + "\"";
+        var old = "\"" + now.AddSeconds(-15).UtcDateTime.ToString("yyyy-MM-dd'T'HH':'mm':'ss'Z'", System.Globalization.CultureInfo.InvariantCulture) + "\"";
         Assert.Equal(7000, new MediaMonitor(NullLogger<MediaMonitor>.Instance).ReadMacSystemMedia(Stamped(7, 0, old), now).Item1!.PosMs);
         // a timestamp in the future, or one that is not a date at all, is ignored (the position then advances from the sample)
         var future = "\"" + now.AddMinutes(10).UtcDateTime.ToString("yyyy-MM-dd'T'HH:mm:ss'Z'") + "\"";
@@ -159,7 +159,7 @@ public sealed class MacMediaTests
     public void ExtrapolatedPositionNeverPassesTheDuration()
     {
         var now = DateTimeOffset.UtcNow;
-        var iso = "\"" + now.AddMinutes(-30).UtcDateTime.ToString("yyyy-MM-dd'T'HH:mm:ss'Z'") + "\"";
+        var iso = "\"" + now.AddMinutes(-30).UtcDateTime.ToString("yyyy-MM-dd'T'HH':'mm':'ss'Z'", System.Globalization.CultureInfo.InvariantCulture) + "\"";
         Assert.Equal(600000, new MediaMonitor(NullLogger<MediaMonitor>.Instance).ReadMacSystemMedia(Stamped(5, 1, iso), now).Item1!.PosMs);
     }
 
