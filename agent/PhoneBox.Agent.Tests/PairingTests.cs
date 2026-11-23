@@ -71,6 +71,19 @@ public sealed class PairingTests
     }
 
     [Fact]
+    public void TheLocalLinkKeepsEverythingInTheFragment()
+    {
+        var link = PairingCodes.LocalLink("192.168.1.10", 8765, "Desk PC & co", "ab12", 8766, ["192.168.1.10", "100.64.0.7"], "CODE_x-1");
+        var uri = new Uri(link);
+        Assert.Equal("http", uri.Scheme);
+        Assert.Equal("192.168.1.10", uri.Host);
+        Assert.Equal(8765, uri.Port);
+        Assert.Equal("/pair/", uri.AbsolutePath);
+        Assert.Equal("", uri.Query);
+        Assert.Equal("#v=1&pc=Desk%20PC%20%26%20co&fp=ab12&port=8766&h=192.168.1.10,100.64.0.7&c=CODE_x-1", uri.Fragment);
+    }
+
+    [Fact]
     public void TheCheckCodeIsTheStartOfTheFingerprint() =>
         Assert.Equal("AB12 CD34", PairingCodes.Check("ab12cd34" + new string('0', 56)));
 

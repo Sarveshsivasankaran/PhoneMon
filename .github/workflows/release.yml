@@ -71,7 +71,7 @@ jobs:
           chmod +x gradlew
           ./gradlew assembleRelease --console=plain
           mkdir -p ../dist
-          cp app/build/outputs/apk/release/app-release.apk "../dist/PhoneBox-${{ needs.version.outputs.version }}.apk"
+          cp app/build/outputs/apk/release/app-release.apk "../dist/PhoneMon-${{ needs.version.outputs.version }}.apk"
       - name: Remove the signing key
         if: always()
         run: rm -f "$RUNNER_TEMP/release.keystore"

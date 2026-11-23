@@ -559,9 +559,15 @@ class AgentLink(private val context: Context) {
             fun parse(uri: Uri?): PairLink? {
                 if (uri == null) return null
                 val raw = when {
-                    uri.scheme == "https" && (uri.host == "Sarveshsivasankaran.github.io" || uri.host == "ersinkoc.github.io") &&
-                        (uri.path?.startsWith("/PhoneMon/pair", ignoreCase = true) == true || uri.path?.startsWith("/phonebox/pair", ignoreCase = true) == true) -> uri.encodedFragment
-                    (uri.scheme == "phonemon" || uri.scheme == "phonebox") && uri.host == "pair" -> uri.encodedQuery
+                    (uri.scheme == "https" || uri.scheme == "http") &&
+                        (uri.host.equals("sarveshsivasankaran.github.io", ignoreCase = true) ||
+                         uri.host.equals("ersinkoc.github.io", ignoreCase = true) ||
+                         isLocalAddress(uri.host.orEmpty())) &&
+                        (uri.path?.startsWith("/PhoneMon/pair", ignoreCase = true) == true ||
+                         uri.path?.startsWith("/phonemon/pair", ignoreCase = true) == true ||
+                         uri.path?.startsWith("/phonebox/pair", ignoreCase = true) == true ||
+                         uri.path?.startsWith("/pair", ignoreCase = true) == true) -> uri.encodedFragment ?: uri.encodedQuery
+                    (uri.scheme == "phonemon" || uri.scheme == "phonebox") && uri.host == "pair" -> uri.encodedQuery ?: uri.encodedFragment
                     else -> null
                 } ?: return null
                 val q = raw.split('&').mapNotNull { part ->

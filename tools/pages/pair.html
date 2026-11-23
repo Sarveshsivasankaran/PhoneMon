@@ -34,20 +34,20 @@ code { font-size: 13px; }
     <h2>Pair this phone with a computer?</h2>
     <p class="muted">“<span id="pc"></span>” at <span id="hosts"></span>. Check that the computer's pairing window shows the code
       <b id="check"></b>, and continue only if you started pairing there.</p>
-    <a class="btn primary" id="open" href="#">Open in PhoneBox</a>
+    <a class="btn primary" id="open" href="#">Open in PhoneMon</a>
     <p class="muted" id="plainWrap" hidden style="margin-top:10px">Did a store open instead? Some browsers send app links there;
       <a id="plain" href="#" style="color:var(--accent)">open the pairing link directly</a>. If Android then asks which app to
-      open it with, choose PhoneBox: another app that accepts these links would get the pairing code.</p>
+      open it with, choose PhoneMon: another app that accepts these links would get the pairing code.</p>
     <p class="muted" style="margin-top:10px">The pairing code works once, for 5 minutes. If it expired, start pairing again on the computer.</p>
   </div>
 
   <div class="card" id="bad" hidden>
     <h2 class="warn">This pairing link is incomplete</h2>
-    <p class="muted">Scan the QR code again from PhoneBox on the computer: Settings › General › Wi-Fi &amp; Tailscale › Pair a phone over Wi-Fi.</p>
+    <p class="muted">Scan the QR code again from PhoneMon on the computer: Settings › General › Wi-Fi &amp; Tailscale › Pair a phone over Wi-Fi.</p>
   </div>
 
   <div class="card">
-    <h2>No PhoneBox app yet?</h2>
+    <h2>No PhoneMon app yet?</h2>
     <p class="muted">Install it first (Android 5.0 or later), then scan the QR code again.</p>
     <a class="btn secondary" href="https://github.com/Sarveshsivasankaran/PhoneMon/releases/latest">Download the app</a>
   </div>
@@ -88,9 +88,9 @@ code { font-size: 13px; }
   const android = /Android/i.test(navigator.userAgent);
   const fallback = encodeURIComponent('https://github.com/Sarveshsivasankaran/PhoneMon/releases/latest');
   document.getElementById('open').href = android
-    ? `intent://pair?${query}#Intent;scheme=phonebox;package=net.oxog.phonebox.deskpanel;S.browser_fallback_url=${fallback};end`
-    : `phonebox://pair?${query}`;
-  document.getElementById('plain').href = `phonebox://pair?${query}`;
+    ? `intent://pair?${query}#Intent;scheme=phonemon;package=net.oxog.phonebox.deskpanel;S.browser_fallback_url=${fallback};end`
+    : `phonemon://pair?${query}`;
+  document.getElementById('plain').href = `phonemon://pair?${query}`;
   document.getElementById('plainWrap').hidden = !android;
   document.getElementById('ok').hidden = false;
 })();

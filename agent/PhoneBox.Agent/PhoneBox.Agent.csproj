@@ -62,6 +62,7 @@
     <EmbeddedResource Include="phonemon.ico" LogicalName="phonemon.ico" />
     <EmbeddedResource Include="logo.png" LogicalName="logo.png" />
     <EmbeddedResource Include="settings.html" LogicalName="settings.html" />
+    <EmbeddedResource Include="..\..\tools\pages\pair.html" LogicalName="pair.html" />
     <EmbeddedResource Include="widgets.json" LogicalName="widgets.json" />
     <EmbeddedResource Include="templates.json" LogicalName="templates.json" />
     <!-- the phone's panel, served at /panel/ for the live preview in the layout editor -->

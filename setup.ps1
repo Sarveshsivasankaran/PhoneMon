@@ -477,8 +477,13 @@ function Install-PhoneMon {
                     # The phone app is optional: a failed download or checksum skips it, and the agent (already
                     # installed and stopped for the update) still starts below.
                     try {
-                        $apk = Join-Path $temp "PhoneBox-$ver.apk"
-                        Get-Download "$base/PhoneBox-$ver.apk" $apk
+                        $apk = Join-Path $temp "PhoneMon-$ver.apk"
+                        try {
+                            Get-Download "$base/PhoneMon-$ver.apk" $apk
+                        } catch {
+                            $apk = Join-Path $temp "PhoneBox-$ver.apk"
+                            Get-Download "$base/PhoneBox-$ver.apk" $apk
+                        }
                         Assert-Checksum $apk $sums
                         $phoneDone = Install-PhoneApp $adb $apk $device
                     } catch {

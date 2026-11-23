@@ -147,7 +147,7 @@ if [ "$apk" = 1 ]; then
   built="$root/android/app/build/outputs/apk/release/app-release.apk"
   sources="$root/android/app/src"
   apkfile=""
-  for candidate in "$root"/dist/PhoneBox-*.apk "$built"; do
+  for candidate in "$root"/dist/PhoneMon-*.apk "$root"/dist/PhoneBox-*.apk "$built"; do
     if [ -f "$candidate" ] && { [ -z "$apkfile" ] || [ "$candidate" -nt "$apkfile" ]; }; then
       apkfile="$candidate"
     fi

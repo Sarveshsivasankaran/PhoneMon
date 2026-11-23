@@ -304,7 +304,9 @@ app.MapPost("/api/pair/start", (ConfigStore cfg, PairingCodes codes) =>
     var hosts = Lan.Addresses();
     var fingerprint = Lan.Fingerprint(lanCert);
     var link = PairingCodes.Link(Environment.MachineName, fingerprint, lanCfg.Port, hosts, code);
-    var apk = $"https://github.com/Sarveshsivasankaran/PhoneMon/releases/download/v{AppPaths.Version}/PhoneBox-{AppPaths.Version}.apk";
+    var localHost = hosts.FirstOrDefault() ?? "127.0.0.1";
+    var localLink = PairingCodes.LocalLink(localHost, Port, Environment.MachineName, fingerprint, lanCfg.Port, hosts, code);
+    var apk = $"https://github.com/Sarveshsivasankaran/PhoneMon/releases/download/v{AppPaths.Version}/PhoneMon-{AppPaths.Version}.apk";
     return Results.Json(new
     {
         enabled = true,
@@ -317,6 +319,8 @@ app.MapPost("/api/pair/start", (ConfigStore cfg, PairingCodes codes) =>
         check = PairingCodes.Check(fingerprint),
         link,
         qr = PairingCodes.Svg(link),
+        localLink,
+        localQr = PairingCodes.Svg(localLink),
         app = apk,
         appQr = PairingCodes.Svg(apk),
     });
@@ -388,6 +392,23 @@ app.MapGet("/panel/{*file}", (string? file, HttpRequest req) =>
         _ => "application/octet-stream",
     };
     return AppPaths.Resource("www/" + file) is { } s ? Results.Stream(s, type) : Results.NotFound();
+});
+app.MapGet("/pair", () => AppPaths.Resource("pair.html") is { } s ? Results.Stream(s, "text/html; charset=utf-8") : Results.NotFound());
+app.MapGet("/download/apk", () =>
+{
+    var candidates = new[]
+    {
+        Path.Combine(AppContext.BaseDirectory, $"PhoneMon-{AppPaths.Version}.apk"),
+        Path.Combine(AppContext.BaseDirectory, $"PhoneBox-{AppPaths.Version}.apk"),
+        Path.Combine(AppContext.BaseDirectory, "..", "..", "android", "app", "build", "outputs", "apk", "debug", "app-debug.apk"),
+        Path.Combine(AppContext.BaseDirectory, "..", "..", "dist", $"PhoneMon-{AppPaths.Version}.apk"),
+        Path.Combine(AppContext.BaseDirectory, "..", "..", "dist", $"PhoneBox-{AppPaths.Version}.apk"),
+    };
+    foreach (var c in candidates)
+    {
+        if (File.Exists(c)) return Results.File(c, "application/vnd.android.package-archive", $"PhoneMon-{AppPaths.Version}.apk");
+    }
+    return Results.Redirect($"https://github.com/Sarveshsivasankaran/PhoneMon/releases/download/v{AppPaths.Version}/PhoneMon-{AppPaths.Version}.apk");
 });
 app.MapGet("/favicon.ico", () => AppPaths.Resource("phonebox.ico") is { } s ? Results.Stream(s, "image/x-icon") : Results.NotFound());
 app.MapGet("/phonemon.ico", () => AppPaths.Resource("phonemon.ico") is { } s ? Results.Stream(s, "image/x-icon") : AppPaths.Resource("phonebox.ico") is { } fb ? Results.Stream(fb, "image/x-icon") : Results.NotFound());

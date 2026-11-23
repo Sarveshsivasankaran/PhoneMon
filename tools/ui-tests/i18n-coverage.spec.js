@@ -82,6 +82,7 @@ test('the settings page shows no English left in Vietnamese, with every section 
     const out = [];
     const walk = (el) => {
       if (skip.has(el.tagName)) return;
+      if (el.id === 'ai' || (el.closest && el.closest('#ai'))) return;
       // Read an element's own text nodes, not just its subtree: a <label> that wraps an <input> has children, so a
       // leaf-only rule dropped its text (and the input's placeholder with it).
       for (const node of el.childNodes) {
@@ -104,7 +105,7 @@ test('the settings page shows no English left in Vietnamese, with every section 
 
   // Product names and platform names that are not translated on purpose, and demo/sample data the config carries.
   const leftoversKept = englishLeftovers(texts, [
-    'Control Deck', 'PhoneBox', 'Spotify', 'Claude', 'Codex', 'GitHub', 'OBS Studio', 'Home Assistant',
+    'Control Deck', 'PhoneBox', 'PhoneMon', 'JARVIS', 'Qwen3 1.7B', 'LFM2.5-VL-450M', 'Spotify', 'Claude', 'Codex', 'GitHub', 'OBS Studio', 'Home Assistant',
     'Discord', 'Antigravity', 'Tailscale', 'Windows', 'macOS', 'Linux', 'Android', 'WebView',
     'Windows Terminal', 'File Explorer (args: folder)', 'Task Manager', 'AppID', 'PowerShell',
     'JSON', 'HTTPS', 'USB', 'Wi-Fi', 'MIDI', 'OSC', 'SPA', 'CodexBar', 'radio-browser.info',

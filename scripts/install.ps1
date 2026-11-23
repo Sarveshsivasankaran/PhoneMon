@@ -101,7 +101,8 @@ if ($Apk) {
     if (-not $adb) { throw 'adb not found: winget install Google.PlatformTools' }
 
     $built = Join-Path $root 'android\app\build\outputs\apk\release\app-release.apk'
-    $apkFile = @(Get-ChildItem (Join-Path $root 'dist') -Filter 'PhoneBox-*.apk' -ErrorAction SilentlyContinue) +
+    $apkFile = @(Get-ChildItem (Join-Path $root 'dist') -Filter 'PhoneMon-*.apk' -ErrorAction SilentlyContinue) +
+        @(Get-ChildItem (Join-Path $root 'dist') -Filter 'PhoneBox-*.apk' -ErrorAction SilentlyContinue) +
         @(Get-Item $built -ErrorAction SilentlyContinue) | Sort-Object LastWriteTime -Descending | Select-Object -First 1
     if (Test-Path (Join-Path $root 'android\gradlew.bat')) {
         # in a source checkout, an APK from an older release must not win over newer app sources

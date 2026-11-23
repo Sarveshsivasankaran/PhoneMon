@@ -399,7 +399,7 @@ public sealed class ImmichPhotoTests : IDisposable
         try
         {
             Serve(server, stop.Token, c => StallBody(c, stop.Token));
-            var frame = RealFrame(server.Prefixes.Single().TrimEnd('/'), TimeSpan.FromSeconds(1));
+            var frame = RealFrame(server.Prefixes.Single().TrimEnd('/'), TimeSpan.FromSeconds(3));
             await Task.Run(frame.ScanNow).WaitAsync(TimeSpan.FromSeconds(10)); // before the fix this waits for the 30 s cap and publishes nothing
             var (ids, error, scanning) = frame.List();
             Assert.Empty(ids);
@@ -427,7 +427,7 @@ public sealed class ImmichPhotoTests : IDisposable
                 }
                 else await StallBody(c, stop.Token, type: "image/webp");
             });
-            var frame = RealFrame(server.Prefixes.Single().TrimEnd('/'), TimeSpan.FromSeconds(1));
+            var frame = RealFrame(server.Prefixes.Single().TrimEnd('/'), TimeSpan.FromSeconds(3));
             frame.ScanNow();
             var id = Assert.Single(frame.List().Ids);
             var photo = await frame.Get(id, CancellationToken.None).WaitAsync(TimeSpan.FromSeconds(10));

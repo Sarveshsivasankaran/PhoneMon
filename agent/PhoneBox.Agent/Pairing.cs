@@ -89,6 +89,17 @@ public sealed class PairingCodes
         + "&c=" + code;
 
     /// <summary>
+    /// Direct LAN pairing link served by the agent itself on the local network (for offline or private environments).
+    /// </summary>
+    public static string LocalLink(string host, int httpPort, string pc, string fingerprint, int port, IEnumerable<string> hosts, string code) =>
+        $"http://{host}:{httpPort}/pair/#v=1"
+        + "&pc=" + Uri.EscapeDataString(pc)
+        + "&fp=" + fingerprint
+        + "&port=" + port
+        + "&h=" + string.Join(",", hosts.Select(Uri.EscapeDataString))
+        + "&c=" + code;
+
+    /// <summary>
     /// The start of the certificate fingerprint ("AB12 CD34"): the settings page shows it next to the QR code and the
     /// phone shows it in its confirmation, so a pairing link from anyone else is easy to spot.
     /// </summary>

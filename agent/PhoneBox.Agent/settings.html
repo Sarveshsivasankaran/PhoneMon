@@ -2168,8 +2168,9 @@ async function pairOverWifi() {
     h('p', { class: 'hint', style: 'margin:0' }, r.hosts.length
       ? t('s.pair.hosts', { hosts: r.hosts.join(', '), port: r.port })
       : t('s.pair.noHosts')),
-    h('div', { class: 'row', style: 'margin-top:8px' },
-      h('button', { class: 'btn sm', onclick: () => { navigator.clipboard?.writeText(r.link); toast(t('s.js.pairLinkCopied')); } }, t('s.pair.copy'))));
+    h('div', { class: 'row', style: 'margin-top:8px; gap:8px; flex-wrap:wrap' },
+      h('button', { class: 'btn sm', onclick: () => { navigator.clipboard?.writeText(r.link); toast(t('s.js.pairLinkCopied')); } }, t('s.pair.copy')),
+      r.localLink ? h('button', { class: 'btn sm secondary', onclick: () => { navigator.clipboard?.writeText(r.localLink); toast('Direct Wi-Fi link copied'); } }, 'Copy direct Wi-Fi link') : null));
   const tick = async () => {
     try {
       const s = await (await fetch('/api/pair/status')).json();

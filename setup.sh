@@ -608,13 +608,19 @@ main() {
       info 'revoke them under Developer options > "Revoke USB debugging authorisations".'
       device="$(select_phone)"
       if [ -n "$device" ]; then
-        apk="$tmp/PhoneBox-$ver.apk"
-        if ! download "$base/PhoneBox-$ver.apk" "$apk"; then
-          caution "Phone app skipped: the download failed ($base/PhoneBox-$ver.apk)."
-        elif ! check_sum "$apk" "$sums"; then
-          caution 'Phone app skipped: the APK could not be verified.'
-        elif install_phone_app "$apk" "$device"; then
-          phone_done=1
+        apk="$tmp/PhoneMon-$ver.apk"
+        if ! download "$base/PhoneMon-$ver.apk" "$apk" 2>/dev/null; then
+          apk="$tmp/PhoneBox-$ver.apk"
+          if ! download "$base/PhoneBox-$ver.apk" "$apk"; then
+            caution "Phone app skipped: the download failed ($base/PhoneMon-$ver.apk)."
+          fi
+        fi
+        if [ -f "$apk" ]; then
+          if ! check_sum "$apk" "$sums"; then
+            caution 'Phone app skipped: the APK could not be verified.'
+          elif install_phone_app "$apk" "$device"; then
+            phone_done=1
+          fi
         fi
       fi
     fi
