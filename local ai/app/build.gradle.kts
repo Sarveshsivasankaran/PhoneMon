@@ -6,6 +6,9 @@ plugins {
 }
 
 android {
+    packaging.jniLibs.useLegacyPackaging = true
+    packaging.jniLibs.keepDebugSymbols += "**/*.so"
+    sourceSets["main"].jniLibs.srcDir(layout.buildDirectory.dir("phoneRuntime/jni"))
     namespace = "com.phonebox.jarvis"
     compileSdk = 35
 
@@ -13,8 +16,8 @@ android {
         applicationId = "com.phonebox.jarvis"
         minSdk = 26 // Android 8.0 Oreo
         targetSdk = 35
-        versionCode = 2
-        versionName = "1.1.0"
+        versionCode = 3
+        versionName = "1.2.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -120,3 +123,12 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 }
 
+
+val packageRuntime by tasks.registering(Exec::class) {
+    val script = rootProject.file("scripts/package_runtime.py")
+    val output = layout.buildDirectory.dir("phoneRuntime/jni/arm64-v8a").get().asFile
+    inputs.file(script)
+    outputs.dir(output)
+    commandLine(if (System.getProperty("os.name").startsWith("Windows")) "python" else "python3", script, output)
+}
+tasks.named("preBuild") { dependsOn(packageRuntime) }

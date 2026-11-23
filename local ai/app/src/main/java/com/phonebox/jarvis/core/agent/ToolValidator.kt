@@ -31,7 +31,21 @@ object ToolValidator {
                 val target = params["target"]?.toString() ?: ""
                 return target.isNotBlank() && target.length <= 50
             }
-            "get_pc_metrics" -> return true
+            "list_controls", "list_shortcuts", "obs_status", "get_pc_metrics" -> return params.isEmpty()
+            "pause_rules" -> return params["minutes"]?.toString()?.toIntOrNull() in 0..1440
+            "set_brightness" -> return params["id"] is String && params["value"]?.toString()?.toIntOrNull() in 0..100
+            "spotify_status" -> return params.isEmpty()
+            "spotify_action" -> return params["action"] == "favorite" || (params["action"] in setOf("play-queued","playlist") && params["id"] is String)
+            "desk_command" -> return params["kind"] in setOf("action","profile","device","session","default","duck","sleep","desktop","power-plan","lock","monitor-off","sound-stop","panic")
+                && (params["value"] == null || params["value"]?.toString()?.toIntOrNull() in -1..360)
+                && (params["muted"] == null || params["muted"] is Boolean)
+            "obs_action" -> return when (params["action"]) {
+                "scene","transition" -> params["id"] is String
+                "volume" -> params["id"] is String && params["value"]?.toString()?.toIntOrNull() in 0..100
+                "mute","source" -> params["id"] is String && params["enabled"] is Boolean
+                "duration" -> params["value"]?.toString()?.toIntOrNull() in 50..10000
+                else -> params["action"] in setOf("record","pause","stream","replay","save-replay","camera")
+            }
             "execute_custom_command" -> {
                 val commandId = params["command_id"]?.toString() ?: ""
                 // Allow only alphanumeric identifiers

@@ -372,6 +372,26 @@ app.MapGet("/", () =>
 });
 
 // ---------------------------------------------------------------- JARVIS Local AI API
+JarvisSession? latestSession = null;
+app.MapPost("/api/jarvis/session", (JarvisSession message) =>
+{
+    if (message.State is not ("STANDBY" or "LISTENING" or "THINKING" or "VISION" or "EXECUTING" or "SPEAKING" or "ERROR")
+        || message.Text is null || message.Text.Length > 2000) return Results.BadRequest();
+    Interlocked.Exchange(ref latestSession, message with { Seen = DateTimeOffset.UtcNow });
+    return Results.NoContent();
+});
+app.MapGet("/api/jarvis/session", () =>
+{
+    var session = Volatile.Read(ref latestSession);
+    return Results.Json(session is not null && DateTimeOffset.UtcNow - session.Seen < TimeSpan.FromSeconds(20)
+        ? session : new JarvisSession("OFFLINE", ""));
+});
+app.MapGet("/api/jarvis/profile", () =>
+{
+    var file = Path.Combine(configDir, "jarvis-profile.json");
+    return File.Exists(file) ? Results.File(file, "application/json")
+        : Results.Json(new { assistantName = "JARVIS", personality = "", model = "qwen2.5-0.5b" });
+});
 app.MapGet("/api/ai/status", (AiService ai) => Results.Json(ai.GetStatus()));
 app.MapGet("/api/ai/models", (AiService ai) => Results.Json(ai.GetModels()));
 app.MapPost("/api/ai/swap", (AiSwapRequest req, AiService ai) => Results.Json(ai.SwapModel(req.Model)));
@@ -1102,6 +1122,7 @@ static void AddMonitor<T>(IServiceCollection s) where T : class, IHostedService
 }
 
 /// <summary>Body of POST /api/pair/claim.</summary>
+internal sealed record JarvisSession(string State, string Text, DateTimeOffset Seen = default);
 internal sealed record PairClaim(string? Code);
 
 public partial class Program

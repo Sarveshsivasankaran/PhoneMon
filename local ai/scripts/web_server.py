@@ -5,33 +5,61 @@ Runs locally at http://127.0.0.1:8780.
 Requires zero external dependencies (uses standard Python library).
 """
 import http.server
+import urllib.request
 import json
 import os
 import sys
 import time
+import threading
 from pathlib import Path
 
 PORT = 8780
 ROOT_DIR = Path(__file__).resolve().parents[1]
 WEB_DIR = ROOT_DIR / "web"
 MODELS_DIR = ROOT_DIR / "models"
+if sys.platform == "win32":
+    config_root = Path(os.environ["APPDATA"])
+elif sys.platform == "darwin":
+    config_root = Path.home() / "Library/Application Support"
+else:
+    config_root = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config"))
+profile_dir = config_root / "PhoneMon"
+if not profile_dir.exists() and (config_root / "PhoneBox").exists():
+    profile_dir = config_root / "PhoneBox"
+PROFILE_PATH = profile_dir / "jarvis-profile.json"
+PROFILE_LOCK = threading.Lock()
+DEFAULT_PROFILE = {"assistantName": "JARVIS", "personality": "Be concise, helpful, and operate the PhoneMon desk panel using its available controls.", "model": "qwen2.5-0.5b"}
 
-# Active State Representation
-state = {
-    "active_model_id": "qwen3",
-    "active_model_name": "Qwen3 1.7B Instruct",
-    "state": "STANDBY",
-    "ram_used_mb": 1364,
-    "ram_max_mb": 1800,
-    "thermal_status": "NOMINAL",
-    "temperature_c": 42.5,
-    "subsystems": {
-        "voice": "Listening for \"JARVIS\" (16kHz)",
-        "vision": "Back Lens (Ask & See Active)",
-        "memory": "SQLite Memory Verified (32 facts)",
-        "phonemon": "Port 8765 Loopback OK"
-    }
-}
+
+def load_profile():
+    try:
+        profile = json.loads(PROFILE_PATH.read_text(encoding="utf-8"))
+        return validate_profile(profile) or DEFAULT_PROFILE.copy()
+    except (OSError, json.JSONDecodeError):
+        return DEFAULT_PROFILE.copy()
+
+
+def validate_profile(profile):
+    if not isinstance(profile, dict):
+        return None
+    name = profile.get("assistantName")
+    personality = profile.get("personality")
+    model = profile.get("model")
+    if not isinstance(name, str) or not name.strip() or len(name) > 40:
+        return None
+    if not isinstance(personality, str) or len(personality) > 2000:
+        return None
+    if model not in {"qwen2.5-0.5b", "lfm2.5-vl-450m"}:
+        return None
+    return {"assistantName": name.strip(), "personality": personality.strip(), "model": model}
+
+
+def save_profile(profile):
+    with PROFILE_LOCK:
+        PROFILE_PATH.parent.mkdir(parents=True, exist_ok=True)
+        temporary = PROFILE_PATH.with_suffix(".tmp")
+        temporary.write_text(json.dumps(profile, indent=2), encoding="utf-8")
+        temporary.replace(PROFILE_PATH)
 
 
 class JarvisHandler(http.server.SimpleHTTPRequestHandler):
@@ -39,8 +67,17 @@ class JarvisHandler(http.server.SimpleHTTPRequestHandler):
         super().__init__(*args, directory=str(WEB_DIR), **kwargs)
 
     def do_GET(self):
+        if self.path == "/api/profile":
+            self.send_json_response(load_profile())
+            return
         if self.path == "/api/status":
-            self.send_json_response(state)
+            try:
+                with urllib.request.urlopen("http://127.0.0.1:8765/api/jarvis/session", timeout=1) as reply:
+                    session = json.load(reply)
+            except (OSError, ValueError):
+                session = {"state": "OFFLINE"}
+            self.send_json_response(session)
+            return
         elif self.path == "/api/ping":
             self.send_json_response({"status": "ok", "timestamp": int(time.time() * 1000)})
         elif self.path == "/api/models":
@@ -53,6 +90,9 @@ class JarvisHandler(http.server.SimpleHTTPRequestHandler):
             super().do_GET()
 
     def do_POST(self):
+        if self.headers.get("Host") not in {f"localhost:{PORT}", f"127.0.0.1:{PORT}"} or self.headers.get("Origin") not in {None, f"http://localhost:{PORT}", f"http://127.0.0.1:{PORT}"} or self.headers.get_content_type() != "application/json":
+            self.send_error(403)
+            return
         content_len = int(self.headers.get("Content-Length", 0))
         body = self.rfile.read(content_len).decode("utf-8") if content_len > 0 else "{}"
         try:
@@ -60,55 +100,28 @@ class JarvisHandler(http.server.SimpleHTTPRequestHandler):
         except Exception:
             data = {}
 
-        if self.path == "/api/swap":
-            target = data.get("model", "qwen3")
-            if target == "lfm":
-                state["active_model_id"] = "lfm"
-                state["active_model_name"] = "LFM2.5-VL 450M Vision"
-                state["ram_used_mb"] = 460
-            else:
-                state["active_model_id"] = "qwen3"
-                state["active_model_name"] = "Qwen3 1.7B Instruct"
-                state["ram_used_mb"] = 1364
-            self.send_json_response(state)
-
-        elif self.path == "/api/verify":
-            model = data.get("model", "qwen3")
-            self.send_json_response({
-                "status": "verified",
-                "model": model,
-                "message": f"SHA-256 verification passed for {model} weights."
-            })
+        if self.path == "/api/profile":
+            profile = validate_profile(data)
+            if profile is None:
+                self.send_error(400, "Invalid profile")
+                return
+            save_profile(profile)
+            self.send_json_response(profile)
+        elif self.path in {"/api/swap", "/api/verify"}:
+            self.send_error(503, "Model management runs in the paired phone app")
 
         elif self.path == "/api/inference":
-            prompt = data.get("prompt", "")
-            response = self.simulate_local_response(prompt, state["active_model_id"])
-            self.send_json_response({"prompt": prompt, "response": response})
+            self.send_error(503, "Inference runs in the paired phone app")
 
         else:
             self.send_error(404, "Endpoint not found")
-
-    def simulate_local_response(self, prompt: str, model_id: str) -> str:
-        prompt_lower = prompt.lower()
-        if "status" in prompt_lower or "check" in prompt_lower:
-            return (
-                "JARVIS on-device status: All systems nominal. "
-                f"Model: {state['active_model_name']}, RAM: {state['ram_used_mb']} MB, "
-                "Cores pinned: 4x Cortex-A73, Local PhoneMon loopback active."
-            )
-        elif "cpu" in prompt_lower or "metric" in prompt_lower:
-            return "Invoking tool 'get_pc_metrics': CPU load 18%, GPU load 12%, RAM 4.2GB / 16GB, Temperature 48°C."
-        elif "camera" in prompt_lower or "see" in prompt_lower or "look" in prompt_lower:
-            return "LFM2.5-VL frame analysis: Visual sensor captures desktop workstation with active monitors and development terminal."
-        else:
-            return f"[{state['active_model_name']}] Analyzed input: '{prompt}'. Local inference processed with zero cloud transmission."
 
     def send_json_response(self, data: dict):
         response_bytes = json.dumps(data, indent=2).encode("utf-8")
         self.send_response(200)
         self.send_header("Content-Type", "application/json")
         self.send_header("Content-Length", str(len(response_bytes)))
-        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Cache-Control", "no-store")
         self.end_headers()
         self.wfile.write(response_bytes)
 

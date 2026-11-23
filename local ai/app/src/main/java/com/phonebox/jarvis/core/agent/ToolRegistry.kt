@@ -35,8 +35,8 @@ object ToolRegistry {
 
     val SEND_NOTIFICATION = ToolDefinition(
         name = "send_notification",
-        description = "Sends a visual notification banner to the desktop screen.",
-        requiresApproval = false,
+        description = "Sends a notification to the panel.",
+        requiresApproval = true,
         parametersSchemaJson = "{\"title\": \"string\", \"message\": \"string\"}"
     )
 
@@ -48,6 +48,15 @@ object ToolRegistry {
     )
 
     val ALL_TOOLS = listOf(
+        ToolDefinition("list_controls", "List desk controls and their state", false, "{}"),
+        ToolDefinition("list_shortcuts", "Read the public panel configuration and shortcut IDs", false, "{}"),
+        ToolDefinition("obs_status", "Read OBS state", false, "{}"),
+        ToolDefinition("obs_action", "OBS scene, transition, duration, volume, mute, source, record, pause, stream, replay, save-replay or camera", true, """{"action":"string","id":"optional OBS ID","value":"optional integer","enabled":"optional boolean"}"""),
+        ToolDefinition("pause_rules", "Pause rules for minutes, zero resumes", true, """{"minutes":"integer"}"""),
+        ToolDefinition("set_brightness", "Adjust a listed monitor brightness from 0 to 100", false, """{"id":"monitor ID","value":"integer"}"""),
+        ToolDefinition("desk_command", "Operate a configured action or profile, device/session volume, audio duck, sleep timer, desktop switch, power plan, screen lock, monitor off, or stop sound", true, """{"kind":"action|profile|device|session|default|duck|sleep|desktop|power-plan|lock|monitor-off|sound-stop|panic","id":"optional control ID","op":"optional operation","value":"optional integer","muted":"optional boolean"}"""),
+        ToolDefinition("spotify_status", "Read the Spotify queue and active track", false, "{}"),
+        ToolDefinition("spotify_action", "Favorite the current track, play a queued track or configured playlist", true, """{"action":"favorite|play-queued|playlist","id":"optional ID"}"""),
         GET_PC_METRICS,
         CONTROL_MEDIA,
         SWITCH_PANEL_PAGE,

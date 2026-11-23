@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.2.0 — 2026-11-23
+
+- Bundle the ARM64 llama.cpp runtime and install verified text and vision models on the phone.
+- Sync the assistant profile and live dashboard state through the paired panel. Add named desk controls with confirmation for sensitive actions.
+
 ## 1.1.0 — 2026-11-23
 
 - Added a separate JARVIS Android APK with offline English wake recognition on supported devices, glowing screen edges, and a bottom-center assistant badge.

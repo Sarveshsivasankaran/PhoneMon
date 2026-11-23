@@ -26,12 +26,12 @@ class LlamaBridge private constructor() {
             isNativeLoaded.set(true)
             Log.i(TAG, "Native jarvis_llama runtime successfully loaded.")
         } catch (e: UnsatisfiedLinkError) {
-            Log.w(TAG, "Native jarvis_llama shared library not present. Initializing managed emulator engine.")
+            Log.w(TAG, "Native jarvis_llama shared library not present.")
             isNativeLoaded.set(false)
         }
     }
 
-    fun isLoaded(): Boolean = nativeContextPtr != 0L || !isNativeLoaded.get()
+    fun isLoaded(): Boolean = nativeContextPtr != 0L && isNativeLoaded.get()
 
     /**
      * Initializes the model context using memory-mapping.
@@ -57,12 +57,7 @@ class LlamaBridge private constructor() {
                 Log.e(TAG, "Error initializing native llama context", t)
                 return false
             }
-        } else {
-            // Managed execution mode
-            nativeContextPtr = 1L
-            Log.i(TAG, "Loaded Qwen3 1.7B in managed mode: ${modelFile.name}")
-            return true
-        }
+        } else return false
     }
 
     /**
@@ -73,8 +68,8 @@ class LlamaBridge private constructor() {
         spec: ReasoningModelSpec,
         onToken: ((String) -> Unit)? = null
     ): Flow<String> = flow {
-        if (!isLoaded()) {
-            emit("Error: Model is not loaded into memory.")
+        if (!isNativeLoaded.get() || nativeContextPtr == 0L || nativeContextPtr == 1L) {
+            emit("On-device inference runtime is unavailable. Install a native model runtime and load a model first.")
             return@flow
         }
 
@@ -100,16 +95,6 @@ class LlamaBridge private constructor() {
                     }
                 )
                 emit(fullResponse.toString())
-            } else {
-                // Managed inference fallback engine (for unit tests and headless environments)
-                val response = simulateInference(prompt)
-                for (chunk in response.split(" ")) {
-                    if (cancelRequested.get()) break
-                    val token = "$chunk "
-                    emit(token)
-                    onToken?.invoke(token)
-                    kotlinx.coroutines.delay(40) // Simulates 25 tokens/sec
-                }
             }
         } finally {
             isInferring.set(false)
@@ -131,25 +116,6 @@ class LlamaBridge private constructor() {
         nativeContextPtr = 0L
         isInferring.set(false)
         Log.i(TAG, "Model unloaded from RAM.")
-    }
-
-    /**
-     * Fallback reasoning engine for test fixtures.
-     */
-    private fun simulateInference(prompt: String): String {
-        val lower = prompt.lowercase()
-        return when {
-            "hello" in lower || "hi" in lower ->
-                "Hello, sir. All core systems are nominal. How may I assist you today?"
-            "who are you" in lower ->
-                "I am JARVIS, your fully local on-device AI assistant, running directly on your phone."
-            "pc" in lower || "cpu" in lower || "status" in lower ->
-                "Checking your computer status now via local PhoneMon link... {\"tool\": \"get_pc_metrics\", \"parameters\": {}}"
-            "camera" in lower || "see" in lower || "look" in lower ->
-                "Activating camera sensor. Scanning environmental visuals with LFM2.5-VL vision model."
-            else ->
-                "Understood. Analyzing request through Qwen3 local neural reasoning engine and preparing task plan."
-        }
     }
 
     interface TokenCallback {

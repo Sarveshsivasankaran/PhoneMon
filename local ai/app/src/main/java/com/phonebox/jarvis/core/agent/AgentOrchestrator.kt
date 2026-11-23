@@ -91,27 +91,10 @@ class AgentOrchestrator(
 
     private suspend fun executeTool(toolName: String, params: Map<String, Any?>, isVoice: Boolean) {
         _currentState.value = JarvisState.EXECUTING
-        var resultText = ""
-
-        when (toolName) {
-            "get_pc_metrics" -> {
-                val metrics = phoneMonAdapter.getSystemMetrics()
-                resultText = "Computer metrics retrieved: $metrics"
-            }
-            "control_media" -> {
-                val action = params["action"]?.toString() ?: "play_pause"
-                val ok = phoneMonAdapter.triggerMediaAction(action)
-                resultText = if (ok) "Media command '$action' executed." else "Failed sending media action."
-            }
-            "send_notification" -> {
-                val title = params["title"]?.toString() ?: "JARVIS"
-                val msg = params["message"]?.toString() ?: ""
-                val ok = phoneMonAdapter.sendNotification(title, msg)
-                resultText = if (ok) "Notification sent to PC." else "Could not dispatch notification."
-            }
-            else -> {
-                resultText = "Tool $toolName is unavailable."
-            }
+        val resultText = try {
+            phoneMonAdapter.call(toolName, params).ifBlank { "Completed $toolName." }
+        } catch (e: Exception) {
+            "Could not complete $toolName: ${e.message}"
         }
 
         permissionManager.logToolExecution(toolName, JSONObject(params).toString(), resultText, true)
@@ -131,7 +114,7 @@ class AgentOrchestrator(
     }
 
     private fun extractToolCall(text: String): Pair<String, Map<String, Any?>>? {
-        val start = text.indexOf("{\"tool\":")
+        val start = text.indexOf('{')
         if (start == -1) return null
         return try {
             val obj = org.json.JSONTokener(text.substring(start)).nextValue() as? JSONObject ?: return null

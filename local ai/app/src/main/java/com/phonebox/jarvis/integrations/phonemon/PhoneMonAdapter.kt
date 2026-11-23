@@ -1,81 +1,24 @@
 package com.phonebox.jarvis.integrations.phonemon
 
-import android.util.Log
+import android.content.pm.PackageManager
+import android.net.Uri
+import com.phonebox.jarvis.JarvisApplication
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.RequestBody.Companion.toRequestBody
-import java.util.concurrent.TimeUnit
+import org.json.JSONObject
 
-/**
- * Standalone PhoneMon adapter communicating over documented local HTTP/WebSocket endpoints.
- * Operates strictly over authenticated external APIs without modifying any host PhoneMon code.
- */
-class PhoneMonAdapter(
-    private var host: String = "127.0.0.1",
-    private var port: Int = 8765
-) {
-    private val client = OkHttpClient.Builder()
-        .connectTimeout(3, TimeUnit.SECONDS)
-        .readTimeout(5, TimeUnit.SECONDS)
-        .build()
-
-    fun updateConnection(host: String, port: Int) {
-        this.host = host
-        this.port = port
-    }
-
-    suspend fun getSystemMetrics(): String = withContext(Dispatchers.IO) {
-        try {
-            val url = "http://$host:$port/api/status"
-            val request = Request.Builder().url(url).get().build()
-            client.newCall(request).execute().use { response ->
-                if (response.isSuccessful) {
-                    response.body?.string() ?: "{}"
-                } else {
-                    "{\"error\": \"Desktop agent responded with HTTP ${response.code}\"}"
-                }
-            }
-        } catch (e: Exception) {
-            Log.e(TAG, "Error querying PhoneMon agent status", e)
-            "{\"error\": \"Could not reach desktop agent at $host:$port\"}"
+class PhoneMonAdapter {
+    suspend fun call(tool: String, params: Map<String, Any?> = emptyMap()): String = withContext(Dispatchers.IO) {
+        val app = JarvisApplication.instance
+        val authority = "net.oxog.phonebox.deskpanel.jarvis"
+        val provider = app.packageManager.resolveContentProvider(authority, 0) ?: error("Install the updated PhoneMon panel")
+        check(app.packageManager.checkSignatures(app.packageName, provider.packageName) == PackageManager.SIGNATURE_MATCH) {
+            "Install both apps from the same PhoneMon release"
         }
-    }
-
-    suspend fun sendNotification(title: String, message: String): Boolean = withContext(Dispatchers.IO) {
-        try {
-            val url = "http://$host:$port/api/push"
-            val json = "{\"type\": \"notification\", \"title\": \"$title\", \"message\": \"$message\"}"
-            val body = json.toRequestBody("application/json".toMediaType())
-            val request = Request.Builder().url(url).post(body).build()
-            client.newCall(request).execute().use { response ->
-                response.isSuccessful
-            }
-        } catch (e: Exception) {
-            Log.e(TAG, "Failed sending push notification", e)
-            false
-        }
-    }
-
-    suspend fun triggerMediaAction(action: String): Boolean = withContext(Dispatchers.IO) {
-        try {
-            val url = "http://$host:$port/api/action"
-            val json = "{\"action\": \"$action\"}"
-            val body = json.toRequestBody("application/json".toMediaType())
-            val request = Request.Builder().url(url).post(body).build()
-            client.newCall(request).execute().use { response ->
-                response.isSuccessful
-            }
-        } catch (e: Exception) {
-            Log.e(TAG, "Failed triggering media action", e)
-            false
-        }
-    }
-
-    companion object {
-        private const val TAG = "PhoneMonAdapter"
+        val reply = app.contentResolver.call(Uri.parse("content://$authority"), tool, JSONObject(params).toString(), null)
+            ?: error("Pair the desk panel with the computer")
+        val code = reply.getInt("code")
+        check(code in 200..299) { "PhoneMon returned HTTP $code" }
+        reply.getString("body").orEmpty()
     }
 }
-

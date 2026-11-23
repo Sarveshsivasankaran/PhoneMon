@@ -1,5 +1,6 @@
 package com.phonebox.jarvis.ui.screens
 
+import kotlinx.coroutines.launch
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -43,6 +44,23 @@ fun JarvisMainScreen(
     val isThrottled by modelManager.thermalThrottled.collectAsState()
 
     var textInput by remember { mutableStateOf("") }
+    val assistantName by com.phonebox.jarvis.core.ai.AssistantProfile.name.collectAsState()
+    val setupStatus by com.phonebox.jarvis.core.ai.PhoneRuntime.status.collectAsState()
+    val scope = rememberCoroutineScope()
+    var setup by remember { mutableStateOf(false) }
+    if (setup) AlertDialog(onDismissRequest = { setup = false }, title = { Text("On-device models") },
+        text = { Text(setupStatus) }, confirmButton = {
+            TextButton(onClick = { scope.launch { com.phonebox.jarvis.core.ai.PhoneRuntime.install("lfm2.5-vl-450m") } }) { Text("Install vision") }
+        }, dismissButton = {
+            TextButton(onClick = { scope.launch { com.phonebox.jarvis.core.ai.PhoneRuntime.install("qwen2.5-0.5b") } }) { Text("Install chat") }
+        })
+    LaunchedEffect(state, streamingText) {
+        val panel = com.phonebox.jarvis.integrations.phonemon.PhoneMonAdapter()
+        while (true) {
+            runCatching { panel.call("session", mapOf("state" to state.name, "text" to streamingText.take(2000))) }
+            kotlinx.coroutines.delay(5000)
+        }
+    }
     val glowColor = Color(state.glowColorHex)
 
     var showFace by remember { mutableStateOf(false) }
@@ -82,12 +100,13 @@ fun JarvisMainScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "JARVIS",
+                    text = assistantName,
                     color = CyanGlow,
                     fontSize = 13.sp,
                     fontFamily = FontFamily.Monospace,
                     fontWeight = FontWeight.Bold
                 )
+                TextButton(onClick = { setup = true }) { Text("Set up model") }
                 Text(
                     text = if (isThrottled) "THROTTLED" else state.displayName,
                     color = if (isThrottled) Color.Yellow else TextMuted,

@@ -23,7 +23,11 @@ class CameraManager(private val context: Context) {
                 val capture = ImageCapture.Builder()
                     .setTargetResolution(android.util.Size(640, 480))
                     .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY).build()
-                cameras.bindToLifecycle(owner, CameraSelector.DEFAULT_BACK_CAMERA, capture)
+                if (!cameras.hasCamera(CameraSelector.DEFAULT_FRONT_CAMERA)) {
+                    onFrame(null)
+                    return@addListener
+                }
+                cameras.bindToLifecycle(owner, CameraSelector.DEFAULT_FRONT_CAMERA, capture)
                 capture.takePicture(executor, object : ImageCapture.OnImageCapturedCallback() {
                     override fun onCaptureSuccess(image: ImageProxy) {
                         val bitmap = try { image.toBitmap() } catch (_: RuntimeException) { null }

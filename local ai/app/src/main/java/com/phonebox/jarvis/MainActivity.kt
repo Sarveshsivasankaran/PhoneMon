@@ -38,6 +38,7 @@ class MainActivity : ComponentActivity() {
     ) { permissions ->
         val recordAudioGranted = permissions[Manifest.permission.RECORD_AUDIO] == true
         if (permissions[Manifest.permission.CAMERA] == true) triggerVisionAnalysis()
+        if (permissions[Manifest.permission.CAMERA] == false) orchestrator.showVisionResult("Camera access was denied.")
         if (recordAudioGranted) {
             startListening()
         }
@@ -73,6 +74,11 @@ class MainActivity : ComponentActivity() {
             onUnavailable = { android.widget.Toast.makeText(this, "Offline English voice recognition unavailable. Use text input.", android.widget.Toast.LENGTH_LONG).show() },
             onWakeWordDetected = {
                 wakeCount++
+                orchestrator.setState(JarvisState.LISTENING)
+                lifecycleScope.launch {
+                    kotlinx.coroutines.delay(8000)
+                    if (orchestrator.currentState.value == JarvisState.LISTENING) orchestrator.setState(JarvisState.STANDBY)
+                }
             },
             onAmplitudeChanged = { amp ->
                 micAmplitude = amp
@@ -82,6 +88,12 @@ class MainActivity : ComponentActivity() {
         setContent {
             JarvisTheme {
                 val isMicActive by wakeWordDetector.isMicActive.collectAsState()
+                LaunchedEffect(Unit) {
+                    while (true) {
+                        runCatching { com.phonebox.jarvis.core.ai.AssistantProfile.sync() }
+                        kotlinx.coroutines.delay(10000)
+                    }
+                }
                 JarvisMainScreen(
                     wakeCount = wakeCount,
                     orchestrator = orchestrator,

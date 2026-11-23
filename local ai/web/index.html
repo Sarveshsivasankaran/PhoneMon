@@ -3,10 +3,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>JARVIS Local AI — Model Management & Activeness</title>
-  <link rel="icon" type="image/png" href="logo.png">
+  <title>JARVIS Local AI — Assistant dashboard</title>
+  <link rel="icon" href="favicon.ico">
   <link rel="alternate icon" href="favicon.ico">
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="animation.css">
 </head>
 <body>
   <div class="hud-container">
@@ -17,164 +18,29 @@
         <h1>JARVIS <span>LOCAL AI CONSOLE</span></h1>
       </div>
       <div class="header-right">
-        <span class="device-badge">Demo telemetry</span>
+
         <span class="status-badge" id="activenessBadge">CHECKING...</span>
       </div>
     </header>
 
-    <!-- System Telemetry Bar -->
-    <div class="telemetry-bar">
-      <div class="telemetry-item">
-        <span class="label">CURRENT STATE</span>
-        <span class="val highlight" id="currentState">STANDBY</span>
-      </div>
-      <div class="telemetry-item">
-        <span class="label">ACTIVE MODEL</span>
-        <span class="val" id="activeModelName">Qwen3 1.7B Instruct</span>
-      </div>
-      <div class="telemetry-item">
-        <span class="label">RAM RESIDENT</span>
-        <span class="val" id="ramResident">1,364 MB / 1,800 MB</span>
-      </div>
-      <div class="telemetry-item">
-        <span class="label">CPU PINNING</span>
-        <span class="val" id="cpuPinning">4 demo threads</span>
-      </div>
-      <div class="telemetry-item">
-        <span class="label">THERMAL STATUS</span>
-        <span class="val ok" id="thermalStatus">NOMINAL (42°C)</span>
-      </div>
-      <div class="telemetry-item">
-        <span class="label">PHONEMON LINK</span>
-        <span class="val ok" id="phonemonLink">CONNECTED (8765)</span>
-      </div>
-    </div>
-
-    <main class="grid-layout">
-      <!-- Section 1: AI Model Management -->
-      <section class="card">
-        <div class="card-header">
-          <h2>AI MODEL MANAGEMENT</h2>
-          <span class="badge">ON-DEVICE RUNTIME</span>
-        </div>
-        <p class="card-desc">Manage local GGUF models running directly on the phone. Memory arbitration sequentially pages models to fit the 1,800 MB RAM budget.</p>
-
-        <div class="model-list">
-          <!-- Model A: Qwen3 1.7B -->
-          <div class="model-row active" id="modelRowQwen">
-            <div class="model-info">
-              <div class="model-title">
-                <strong>Qwen3 1.7B Instruct</strong>
-                <span class="model-tag">REASONING LLM</span>
-                <span class="status-pill loaded" id="qwenStatusPill">LOADED IN RAM</span>
-              </div>
-              <div class="model-specs">
-                <span>Format: GGUF Q4_K_M</span> &bull;
-                <span>Context: 2048 tokens</span> &bull;
-                <span>Size: 1.12 GB</span> &bull;
-                <span>Threads: 4 (ARM NEON)</span>
-              </div>
-            </div>
-            <div class="model-actions">
-              <button class="btn btn-secondary" onclick="verifyChecksum('qwen3')">Verify SHA-256</button>
-              <button class="btn btn-primary" id="btnLoadQwen" onclick="loadModel('qwen3')" disabled>Loaded</button>
-            </div>
-          </div>
-
-          <!-- Model B: LFM2.5-VL 450M -->
-          <div class="model-row" id="modelRowLfm">
-            <div class="model-info">
-              <div class="model-title">
-                <strong>LFM2.5-VL 450M</strong>
-                <span class="model-tag">VISION-LANGUAGE</span>
-                <span class="status-pill ready" id="lfmStatusPill">READY ON DISK</span>
-              </div>
-              <div class="model-specs">
-                <span>Format: GGUF Q4_K_M</span> &bull;
-                <span>Resolution: 384&times;384</span> &bull;
-                <span>Size: 360 MB + 95 MB Projector</span> &bull;
-                <span>CameraX Direct</span>
-              </div>
-            </div>
-            <div class="model-actions">
-              <button class="btn btn-secondary" onclick="verifyChecksum('lfm')">Verify SHA-256</button>
-              <button class="btn btn-primary" id="btnLoadLfm" onclick="loadModel('lfm')">Load in RAM</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Sequential Swapping & RAM Budget Gauge -->
-        <div class="ram-budget-wrap">
-          <div class="ram-labels">
-            <span>Working memory budget: 1,800 MB</span>
-            <span id="ramPercentText">75% Utilized</span>
-          </div>
-          <div class="progress-track">
-            <div class="progress-bar" id="ramProgressBar" style="width: 75.7%;"></div>
-          </div>
-        </div>
+    <section class="assistant-preview" aria-label="Animated JARVIS home preview">
+      <img class="preview-home" src="home.png" alt="PhoneMon home dashboard">
+      <div class="preview-edge" id="previewEdge"></div>
+      <section class="preview-agent" id="previewAgent">
+        <img src="logo.png" alt="" class="preview-mascot">
+        <header><strong id="assistantName">JARVIS</strong><span id="assistantState">STANDBY</span></header>
+        <div class="preview-wave" aria-hidden="true"></div>
+        <div class="preview-transcript" id="assistantTranscript">Ready when you are.</div>
       </section>
-
-      <!-- Section 2: Activeness Heartbeat & Subsystem Monitor -->
-      <section class="card">
-        <div class="card-header">
-          <h2>SUBSYSTEM ACTIVENESS</h2>
-          <span class="badge" id="pingBadge">PING: 24ms</span>
-        </div>
-        <p class="card-desc">Live health checks for offline voice, vision, memory, and local PhoneMon agent interfaces.</p>
-
-        <div class="subsystem-grid">
-          <div class="subsystem-card ok" id="subVoice">
-            <div class="icon">🎙</div>
-            <div class="sub-name">Wake-Word & VAD</div>
-            <div class="sub-desc" id="subVoiceDesc">Listening for "JARVIS" (16kHz)</div>
-          </div>
-
-          <div class="subsystem-card ok" id="subVision">
-            <div class="icon">📷</div>
-            <div class="sub-name">CameraX Vision</div>
-            <div class="sub-desc" id="subVisionDesc">Back Lens (Ask & See Active)</div>
-          </div>
-
-          <div class="subsystem-card ok" id="subMemory">
-            <div class="icon">🧠</div>
-            <div class="sub-name">Persistent Room DB</div>
-            <div class="sub-desc" id="subMemoryDesc">SQLite Memory Verified</div>
-          </div>
-
-          <div class="subsystem-card ok" id="subPhoneMon">
-            <div class="icon">🖥</div>
-            <div class="sub-name">PhoneMon Link</div>
-            <div class="sub-desc" id="subPhoneMonDesc">Port 8765 Loopback OK</div>
-          </div>
-        </div>
-
-        <!-- Live Inference Test Console -->
-        <div class="inference-tester">
-          <h3>TEST LOCAL REASONING ACTIVENESS</h3>
-          <div class="tester-input-row">
-            <input type="text" id="testPromptInput" placeholder="Enter prompt (e.g. 'Status check' or 'What is my CPU usage?')" value="JARVIS, system status check">
-            <button class="btn btn-primary" id="btnRunInference" onclick="runInferenceTest()">Send Prompt</button>
-          </div>
-          <div class="tester-output" id="testOutputBox">
-            <span class="terminal-prefix">&gt; </span><span id="testOutputText">Standing by. Press 'Send Prompt' to test on-device token generation.</span>
-          </div>
-        </div>
-      </section>
-    </main>
-
-    <!-- Footer Controls -->
-    <footer class="hud-footer">
-      <div class="footer-left">
-        <span>JARVIS Local AI Module &bull; Strict PhoneMon Project Isolation Verified</span>
-      </div>
-      <div class="footer-right">
-        <button class="btn btn-secondary" onclick="checkActiveness()">Refresh Activeness</button>
-      </div>
-    </footer>
+    </section>
+    <section class="card assistant-settings">
+      <div class="card-header"><h2>ASSISTANT PROFILE</h2><span class="badge" id="profileSync">Saved on this computer</span></div>
+      <label>Assistant name<input id="profileName" maxlength="40" value="JARVIS"></label>
+      <label>Personality instructions<textarea id="profilePersonality" maxlength="2000" rows="4">Be concise, helpful, and operate the PhoneMon desk panel using its available controls.</textarea></label>
+      <label>AI model<select id="profileModel"><option value="qwen2.5-0.5b">Qwen2.5 0.5B Instruct</option><option value="lfm2.5-vl-450m">LFM2.5-VL 450M Vision</option></select></label>
+      <button class="btn btn-primary" id="saveProfile">Save assistant profile</button>
+    </section>
   </div>
-
   <script src="dashboard.js"></script>
 </body>
 </html>
-
