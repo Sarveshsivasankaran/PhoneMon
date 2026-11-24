@@ -573,7 +573,7 @@ function Install-PhoneMon {
     }
 }
 
-function Install-PhoneMon { Install-PhoneMon }
+function Install-PhoneBox { Install-PhoneMon }
 
 # Everything runs from here, so a download cut off half way cannot run half a script.
 try {
