@@ -1,0 +1,5 @@
+Offline English recognition uses Vosk 0.3.75 and vosk-model-small-en-us-0.15.
+Copyright 2020 Alpha Cephei Inc. Licensed under Apache License 2.0.
+Model source https://github.com/alphacep/vosk-android-demo/tree/a5e58ec399135f78325bd3e289849fc3fb57ce96/models/src/main/assets/model-en-us
+Model license https://alphacephei.com/vosk/models
+The bundled voice-en.zip retains the upstream model files and README.

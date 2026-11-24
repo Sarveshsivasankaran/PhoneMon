@@ -1,0 +1,17 @@
+# yaml-language-server: $schema=https://aka.ms/winget-manifest.installer.1.6.0.schema.json
+PackageIdentifier: Sarveshsivasankaran.PhoneMon
+PackageVersion: 1.2.0
+InstallerType: zip
+NestedInstallerType: portable
+NestedInstallerFiles:
+- RelativeFilePath: PhoneBoxAgent.exe
+  PortableCommandAlias: phonemon
+Dependencies:
+  PackageDependencies:
+  - PackageIdentifier: Google.PlatformTools
+Installers:
+- Architecture: x64
+  InstallerUrl: https://github.com/Sarveshsivasankaran/PhoneMon/releases/download/v1.2.0/PhoneBoxAgent-1.2.0-win-x64.zip
+  InstallerSha256: BE74B7C8E599E357DFB799E859A1EAB76C347DB12FFFF04CC2FC2E63FFEB0EDB
+ManifestType: installer
+ManifestVersion: 1.6.0
