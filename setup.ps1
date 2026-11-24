@@ -433,6 +433,14 @@ function Install-PhoneMon {
             throw "Installing failed and the previous version was put back: $($_.Exception.Message). Close PhoneMon (tray icon > Exit) and run setup again."
         }
         Remove-Item $old -Recurse -Force -ErrorAction SilentlyContinue
+        foreach ($dir in @($configDir, (Join-Path $env:APPDATA 'PhoneBox'))) {
+            $cfgPath = Join-Path $dir 'config.json'
+            if (Test-Path -LiteralPath $cfgPath) {
+                $rawCfg = [IO.File]::ReadAllText($cfgPath)
+                $fixedCfg = [regex]::Replace($rawCfg, '("repo"\s*:\s*)"ersinkoc/phonebox"', '$1"' + $Repo + '"', 'IgnoreCase')
+                if ($fixedCfg -ne $rawCfg) { [IO.File]::WriteAllText($cfgPath, $fixedCfg) }
+            }
+        }
         Write-Ok "PhoneMon $displayVersion installed; settings are in $configDir"
 
         $programs = [Environment]::GetFolderPath('Programs')

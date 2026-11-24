@@ -593,6 +593,16 @@ main() {
   fi
   rm -rf "$app.old"
   ok "PhoneMon $display installed"
+  local cfg_root cfg_dir cfg_file
+  if [ "$os" = osx ]; then cfg_root="$HOME/Library/Application Support"
+  else cfg_root="${XDG_CONFIG_HOME:-$HOME/.config}"; fi
+  for cfg_dir in "$cfg_root/PhoneMon" "$cfg_root/PhoneBox"; do
+    cfg_file="$cfg_dir/config.json"
+    if [ -f "$cfg_file" ] && grep -q '"repo"[[:space:]]*:[[:space:]]*"ersinkoc/phonebox"' "$cfg_file"; then
+      sed 's/\("repo"[[:space:]]*:[[:space:]]*\)"ersinkoc\/phonebox"/\1"'"$repo"'"/g' "$cfg_file" > "$tmp/config.json" \
+        && chmod 600 "$tmp/config.json" && mv "$tmp/config.json" "$cfg_file"
+    fi
+  done
 
   if [ "$autostart" = 1 ]; then
     step 'Start at login'

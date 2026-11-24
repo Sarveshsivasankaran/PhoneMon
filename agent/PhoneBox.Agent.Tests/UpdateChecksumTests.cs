@@ -19,47 +19,47 @@ public class UpdateChecksumTests
 {
   "assets": [
     {
-      "browser_download_url": "https://github.com/ersinkoc/phonebox/releases/download/v0.9.9/PhoneBox-0.9.9.apk",
+      "browser_download_url": "https://github.com/Sarveshsivasankaran/PhoneMon/releases/download/v0.9.9/PhoneBox-0.9.9.apk",
       "name": "PhoneBox-0.9.9.apk",
-      "url": "https://api.github.com/repos/ersinkoc/phonebox/releases/assets/752008188"
+      "url": "https://api.github.com/repos/Sarveshsivasankaran/PhoneMon/releases/assets/752008188"
     },
     {
-      "browser_download_url": "https://github.com/ersinkoc/phonebox/releases/download/v0.9.9/PhoneBox-0.9.9.intoto.jsonl",
+      "browser_download_url": "https://github.com/Sarveshsivasankaran/PhoneMon/releases/download/v0.9.9/PhoneBox-0.9.9.intoto.jsonl",
       "name": "PhoneBox-0.9.9.intoto.jsonl",
-      "url": "https://api.github.com/repos/ersinkoc/phonebox/releases/assets/752008185"
+      "url": "https://api.github.com/repos/Sarveshsivasankaran/PhoneMon/releases/assets/752008185"
     },
     {
-      "browser_download_url": "https://github.com/ersinkoc/phonebox/releases/download/v0.9.9/PhoneBoxAgent-0.9.9-linux-arm64.zip",
+      "browser_download_url": "https://github.com/Sarveshsivasankaran/PhoneMon/releases/download/v0.9.9/PhoneBoxAgent-0.9.9-linux-arm64.zip",
       "name": "PhoneBoxAgent-0.9.9-linux-arm64.zip",
-      "url": "https://api.github.com/repos/ersinkoc/phonebox/releases/assets/752008190"
+      "url": "https://api.github.com/repos/Sarveshsivasankaran/PhoneMon/releases/assets/752008190"
     },
     {
-      "browser_download_url": "https://github.com/ersinkoc/phonebox/releases/download/v0.9.9/PhoneBoxAgent-0.9.9-linux-x64.zip",
+      "browser_download_url": "https://github.com/Sarveshsivasankaran/PhoneMon/releases/download/v0.9.9/PhoneBoxAgent-0.9.9-linux-x64.zip",
       "name": "PhoneBoxAgent-0.9.9-linux-x64.zip",
-      "url": "https://api.github.com/repos/ersinkoc/phonebox/releases/assets/752008184"
+      "url": "https://api.github.com/repos/Sarveshsivasankaran/PhoneMon/releases/assets/752008184"
     },
     {
-      "browser_download_url": "https://github.com/ersinkoc/phonebox/releases/download/v0.9.9/PhoneBoxAgent-0.9.9-osx-arm64.zip",
+      "browser_download_url": "https://github.com/Sarveshsivasankaran/PhoneMon/releases/download/v0.9.9/PhoneBoxAgent-0.9.9-osx-arm64.zip",
       "name": "PhoneBoxAgent-0.9.9-osx-arm64.zip",
-      "url": "https://api.github.com/repos/ersinkoc/phonebox/releases/assets/752008193"
+      "url": "https://api.github.com/repos/Sarveshsivasankaran/PhoneMon/releases/assets/752008193"
     },
     {
-      "browser_download_url": "https://github.com/ersinkoc/phonebox/releases/download/v0.9.9/PhoneBoxAgent-0.9.9-osx-x64.zip",
+      "browser_download_url": "https://github.com/Sarveshsivasankaran/PhoneMon/releases/download/v0.9.9/PhoneBoxAgent-0.9.9-osx-x64.zip",
       "name": "PhoneBoxAgent-0.9.9-osx-x64.zip",
-      "url": "https://api.github.com/repos/ersinkoc/phonebox/releases/assets/752008208"
+      "url": "https://api.github.com/repos/Sarveshsivasankaran/PhoneMon/releases/assets/752008208"
     },
     {
-      "browser_download_url": "https://github.com/ersinkoc/phonebox/releases/download/v0.9.9/PhoneBoxAgent-0.9.9-win-x64.zip",
+      "browser_download_url": "https://github.com/Sarveshsivasankaran/PhoneMon/releases/download/v0.9.9/PhoneBoxAgent-0.9.9-win-x64.zip",
       "name": "PhoneBoxAgent-0.9.9-win-x64.zip",
-      "url": "https://api.github.com/repos/ersinkoc/phonebox/releases/assets/752008218"
+      "url": "https://api.github.com/repos/Sarveshsivasankaran/PhoneMon/releases/assets/752008218"
     },
     {
-      "browser_download_url": "https://github.com/ersinkoc/phonebox/releases/download/v0.9.9/SHA256SUMS-0.9.9.txt",
+      "browser_download_url": "https://github.com/Sarveshsivasankaran/PhoneMon/releases/download/v0.9.9/SHA256SUMS-0.9.9.txt",
       "name": "SHA256SUMS-0.9.9.txt",
-      "url": "https://api.github.com/repos/ersinkoc/phonebox/releases/assets/752008305"
+      "url": "https://api.github.com/repos/Sarveshsivasankaran/PhoneMon/releases/assets/752008305"
     }
   ],
-  "html_url": "https://github.com/ersinkoc/phonebox/releases/tag/v0.9.9",
+  "html_url": "https://github.com/Sarveshsivasankaran/PhoneMon/releases/tag/v0.9.9",
   "tag_name": "v0.9.9"
 }
 """;
@@ -128,7 +128,7 @@ b47da3d09583268d7bacef2d4375555313bf455af8a3ab16fd4d7ee95082826e  PhoneBoxAgent-
     public void TheAssetNameComesFromTheLinkNotTheCachedName()
     {
         Assert.Equal("PhoneBoxAgent-0.9.9-win-x64.zip",
-            UpdateService.AssetName("https://github.com/ersinkoc/phonebox/releases/download/v0.9.9/PhoneBoxAgent-0.9.9-win-x64.zip"));
+            UpdateService.AssetName("https://github.com/Sarveshsivasankaran/PhoneMon/releases/download/v0.9.9/PhoneBoxAgent-0.9.9-win-x64.zip"));
     }
 
     [Fact]
@@ -334,11 +334,53 @@ b47da3d09583268d7bacef2d4375555313bf455af8a3ab16fd4d7ee95082826e  PhoneBoxAgent-
         }
     }
 
-    private sealed class FakeReleaseHandler(string relJson, byte[] apk, string sums, Action? onApk = null) : HttpMessageHandler
+    [Fact]
+    public async Task LegacyForkRepoInConfigNormalizesAndChecksPhoneMonOnly()
+    {
+        var dir = Path.Combine(Path.GetTempPath(), "pb-upd-repo-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(dir);
+        try
+        {
+            var cfgPath = Path.Combine(dir, "config.json");
+            File.WriteAllText(cfgPath, """{ "updates": { "auto": true, "repo": "ersinkoc/phonebox" } }""");
+            var cfg = new ConfigStore(cfgPath);
+            Assert.Equal("Sarveshsivasankaran/PhoneMon", cfg.Get().Updates.Repo);
+
+            var adb = new AdbReverse(cfg, NullLogger<AdbReverse>.Instance);
+            var seenUris = new List<string>();
+            const string relJson = """
+                {
+                  "tag_name": "v1.2.2-stable",
+                  "html_url": "https://github.com/Sarveshsivasankaran/PhoneMon/releases/tag/v1.2.2-stable",
+                  "assets": [
+                    { "name": "PhoneMon-1.2.3.apk", "browser_download_url": "https://github.com/Sarveshsivasankaran/PhoneMon/releases/download/v1.2.2-stable/PhoneMon-1.2.3.apk" },
+                    { "name": "PhoneBoxAgent-1.2.3-win-x64.zip", "browser_download_url": "https://github.com/Sarveshsivasankaran/PhoneMon/releases/download/v1.2.2-stable/PhoneBoxAgent-1.2.3-win-x64.zip" },
+                    { "name": "SHA256SUMS-1.2.3.txt", "browser_download_url": "https://github.com/Sarveshsivasankaran/PhoneMon/releases/download/v1.2.2-stable/SHA256SUMS-1.2.3.txt" }
+                  ]
+                }
+                """;
+            var httpField = typeof(UpdateService).GetField("_http", BindingFlags.Instance | BindingFlags.NonPublic)!;
+            var svc = new UpdateService(cfg, adb, new NoopLifetime(), NullLogger<UpdateService>.Instance) { DownloadsDir = Path.Combine(dir, "dl") };
+            httpField.SetValue(svc, new HttpClient(new FakeReleaseHandler(relJson, [], "", onRequest: uri => seenUris.Add(uri))));
+
+            await svc.CheckAsync();
+            var uri = Assert.Single(seenUris);
+            Assert.Equal("https://api.github.com/repos/Sarveshsivasankaran/PhoneMon/releases/latest", uri);
+            Assert.Equal("1.2.2 (stable)", svc.Status().Latest);
+            Assert.Equal("https://github.com/Sarveshsivasankaran/PhoneMon/releases/tag/v1.2.2-stable", svc.Status().ReleaseUrl);
+        }
+        finally
+        {
+            try { Directory.Delete(dir, true); } catch { }
+        }
+    }
+
+    private sealed class FakeReleaseHandler(string relJson, byte[] apk, string sums, Action? onApk = null, Action<string>? onRequest = null) : HttpMessageHandler
     {
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken ct)
         {
             var u = request.RequestUri!.AbsoluteUri;
+            onRequest?.Invoke(u);
             if (u.EndsWith("/releases/latest"))
                 return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(relJson, Encoding.UTF8, "application/json") });
             if (u.EndsWith(".txt"))

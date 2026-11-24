@@ -3667,7 +3667,7 @@ $('openPhone').onclick = async () => {
 $('cityBtn').onclick = searchCity;
 function renderUpdate(u) {
   const s = u.status;
-  $('updRepo').textContent = cfg.updates?.repo || 'Sarveshsivasankaran/PhoneMon';
+  $('updRepo').textContent = 'Sarveshsivasankaran/PhoneMon';
   const line = (k, v) => [h('dt', {}, k), h('dd', {}, v)];
   $('updInfo').replaceChildren(
     ...line(t('s.adv.agent'), s.agentVersion + (s.agentUpdate ? ` → ${s.latest}` : ' ' + t('s.adv.upToDate')) + (u.installed ? '' : ' · ' + t('s.adv.notInstalledCopy'))),

@@ -110,7 +110,7 @@ public sealed class UpdateService(ConfigStore cfg, AdbReverse adb, IHostApplicat
         try
         {
             _state = "checking";
-            var repo = cfg.Get().Updates.Repo;
+            var repo = UpdateConfig.DefaultRepo;
             using var doc = JsonDocument.Parse(await ApiStringAsync($"https://api.github.com/repos/{repo}/releases/latest", ct));
             var r = doc.RootElement;
             foreach (var a in r.GetProperty("assets").EnumerateArray())
