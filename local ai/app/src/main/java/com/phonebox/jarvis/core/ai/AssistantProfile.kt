@@ -15,6 +15,7 @@ internal object AssistantProfile {
         val profile = JSONObject(PhoneMonAdapter().call("profile"))
         require(profile.getString("assistantName").length in 1..40 && profile.getString("personality").length <= 2000)
         require(profile.getString("model") in setOf("qwen2.5-0.5b", "lfm2.5-vl-450m"))
+        require(profile.optString("voice", "slt") in setOf("slt", "rms", "awb"))
         prefs.edit().putString("profile",profile.toString()).apply()
         name.value = profile.getString("assistantName")
     }

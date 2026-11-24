@@ -80,7 +80,7 @@ public sealed class Tray : IHostedService
         autostart.Click += (_, _) => { ToggleAutostart(UiCulture()); autostart.Checked = File.Exists(AppPaths.StartupShortcut); };
 
         var menu = new ContextMenuStrip();
-        menu.Items.Add(new ToolStripMenuItem($"PhoneMon {AppPaths.Version}") { Enabled = false });
+        menu.Items.Add(new ToolStripMenuItem($"PhoneMon {AppPaths.Display(AppPaths.Version)}") { Enabled = false });
         menu.Items.Add(status);
         menu.Items.Add(new ToolStripSeparator());
         var settings = new ToolStripMenuItem("", null, (_, _) => OpenUrl(SettingsUrl)) { Font = new Font(menu.Font, FontStyle.Bold) };

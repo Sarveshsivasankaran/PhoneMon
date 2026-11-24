@@ -315,7 +315,7 @@ class MainActivity : Activity(), SensorEventListener {
     override fun onDestroy() {
         destroyed = true
         resumed = false
-        dictation.cancel(0)
+        dictation.close()
         sensors?.unregisterListener(this)
         stream.stop()
         try {
@@ -404,7 +404,7 @@ class MainActivity : Activity(), SensorEventListener {
                 }
                 return "{}"
             }
-            if (operation !in setOf("status","voice","text","install","listening","idle","approve","deny")) return "{}"
+            if (operation !in setOf("status","voice","text","install","listening","idle","approve","deny","previewVoice","clearThumbnail")) return "{}"
             return try {
                 contentResolver.call(Uri.parse("content://$app.session"), operation, argument, null)
                     ?.getString("session") ?: "{}"
@@ -598,6 +598,9 @@ class MainActivity : Activity(), SensorEventListener {
         fun version(key: String): String = if (ok(key)) packageManager.getPackageInfo(packageName, 0).versionName ?: "" else ""
 
         /** Dictation widget: true when the phone has a speech recognizer. */
+        @JavascriptInterface
+        fun jarvisListen(key: String): Int = if (ok(key)) dictation.start("en-US", true, jarvis = true) else 0
+
         @JavascriptInterface
         fun canListen(key: String): Boolean = ok(key) && dictation.available()
 

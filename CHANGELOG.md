@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.2.1 (stable) — 2026-11-24
+
+- Speak to the offline assistant through a caption popout based on the supplied animation. Vosk handles local English recognition and CMU Flite supplies three selectable spoken reply voices.
+- Configure the JARVIS name, personality, model and speaking voice in PhoneMon desktop settings. The phone caches the profile for offline use.
+- Published by Solo-P-Leveller. The desktop package version is 1.2.2. Android uses version code 8 for PhoneMon and 5 for JARVIS.
+- To upgrade an existing 1.2.1 desktop agent, rerun the quick-start installer or update through your package manager. The previous desktop updater only recognizes numeric release tags.
+
 ## 1.2.1 — 2026-11-24
 
 - Open JARVIS over the live PhoneMon home screen. The supplied floating mascot, animated edge, waveform and conversation card follow real assistant activity.

@@ -163,22 +163,25 @@
 })();
 </script>
 
-<button id="jarvisTrigger" type="button" aria-label="Open JARVIS assistant" aria-expanded="false"><img src="jarvis-mascot.png" alt=""></button>
+<button id="jarvisTrigger" type="button" aria-controls="jarvisOverlay" aria-expanded="false" aria-label="Talk to JARVIS">
+  <span class="j-wave" aria-hidden="true"></span><span id="jPillText">JARVIS Ready</span><span class="j-chevron" aria-hidden="true">⌄</span>
+</button>
 <div id="jarvisOverlay" hidden>
   <div class="j-edge"></div>
-  <section class="j-card" aria-label="PhoneMon assistant">
+  <section class="j-card" aria-label="Assistant captions">
     <img class="j-mascot" src="jarvis-mascot.png" alt="">
-    <header class="j-head"><strong id="jName">JARVIS</strong><span class="j-state" id="jState">STANDBY</span>
-      <button id="jClose" aria-label="Close assistant">×</button></header>
-    <div class="j-wave" aria-hidden="true"></div>
-    <div class="j-exchange" aria-live="polite">
-      <div id="jQuestion" hidden><small>YOU</small><p id="jUser"></p></div>
-      <small id="jSpeaker">JARVIS</small><p id="jReply"></p>
+    <header class="j-head"><span class="j-wave" aria-hidden="true"></span><strong id="jName">JARVIS</strong><span id="jState">Ready</span>
+      <button id="jClose" type="button" aria-label="Collapse captions">⌄</button></header>
+    <div class="j-content">
+      <figure id="jCapture" hidden><img id="jThumbnail" alt="Captured front-camera frame"><figcaption>Captured</figcaption></figure>
+      <div class="j-captions" aria-live="polite" aria-atomic="true">
+        <p id="jQuestion" hidden><b>You</b> <span id="jUser"></span></p>
+        <p><b id="jSpeaker">JARVIS</b> <span id="jReply"></span></p>
+      </div>
     </div>
     <div id="jConfirm" hidden><p id="jAction"></p><button id="jDeny">Cancel</button> <button id="jApprove">Confirm action</button></div>
-    <form class="j-input"><input id="jPrompt" maxlength="2000" placeholder="Ask a question…" aria-label="Message to assistant" autocomplete="off"><button id="jSend">Send</button></form>
     <footer><button id="jVoice" type="button">Speak</button><button id="jCamera" type="button">Camera</button><button id="jSettings" type="button" aria-expanded="false">Setup</button></footer>
-    <div class="j-setup" hidden><label><input type="checkbox" id="jWake"> Listen for “Jarvis” on this panel</label><div><button id="jChat">Install chat</button> <button id="jVision">Install vision</button></div><small id="jDownload"></small></div>
+    <div class="j-setup" hidden><label><input type="checkbox" id="jWake"> Listen for “Jarvis”</label><div><button id="jChat">Install chat model</button> <button id="jVision">Install vision model</button> <button id="jSample">Hear voice</button></div><small id="jDownload"></small></div>
   </section>
 </div>
 <script src="compat.js"></script>

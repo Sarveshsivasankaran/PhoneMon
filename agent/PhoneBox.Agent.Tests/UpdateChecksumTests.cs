@@ -132,6 +132,22 @@ b47da3d09583268d7bacef2d4375555313bf455af8a3ab16fd4d7ee95082826e  PhoneBoxAgent-
     }
 
     [Fact]
+    public void StableTagUpdatesPreviousPanelAndSkipsAlreadyStablePanel()
+    {
+        using var doc = JsonDocument.Parse("""
+            { "tag_name": "v1.2.1-stable", "html_url": "https://example.invalid", "assets": [
+              { "name": "PhoneMon-1.2.2.apk", "browser_download_url": "https://example.invalid/panel" },
+              { "name": "JARVIS-1.2.2.apk", "browser_download_url": "https://example.invalid/jarvis" } ] }
+            """);
+        var release = UpdateService.SelectAssets(doc.RootElement, "win-x64");
+        Assert.Equal("https://example.invalid/panel", release.Apk);
+        Assert.Equal("1.2.2", release.Version);
+        Assert.False(UpdateService.AppCurrentOn("versionName=1.2.1", release.Version));
+        Assert.True(UpdateService.AppCurrentOn("versionName=1.2.1 (stable)", release.Version));
+        Assert.False(UpdateService.AppCurrentOn("versionName=1.2.1 (stable)", "1.2.3"));
+    }
+
+    [Fact]
     public void AReleaseWithoutAChecksumFileHasNoSums()
     {
         using var doc = JsonDocument.Parse("""

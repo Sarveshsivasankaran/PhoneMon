@@ -25,11 +25,13 @@ internal object PanelSession {
     private val agent: AgentOrchestrator by lazy {
         val app = JarvisApplication.instance
         val dao = app.database.jarvisDao()
-        val speech = TextToSpeechEngine(app, { setState(JarvisState.SPEAKING) }, { setState(JarvisState.STANDBY) })
+        val speech = TextToSpeechEngine(app, { setState(JarvisState.SPEAKING) },
+            { setState(JarvisState.STANDBY) }, { setState(JarvisState.ERROR) })
         AgentOrchestrator(scope, MemoryManager(dao), PermissionManager(dao), adapter, speech)
     }
     private fun setState(state: JarvisState) { agent.setState(state) }
     private var user = ""
+    private var thumbnail = ""
     private var nextSync = 0L
     private var sync: Job? = null
     private var install: Job? = null
@@ -39,6 +41,11 @@ internal object PanelSession {
 
     fun capture(frame: Bitmap?, error: String?) {
         if (frame == null) { agent.showVisionResult(error ?: "Front camera unavailable."); return }
+        val preview = Bitmap.createScaledBitmap(frame, 160, maxOf(1, frame.height * 160 / frame.width), true)
+        val bytes = java.io.ByteArrayOutputStream()
+        preview.compress(Bitmap.CompressFormat.JPEG, 65, bytes)
+        thumbnail = "data:image/jpeg;base64," + android.util.Base64.encodeToString(bytes.toByteArray(), android.util.Base64.NO_WRAP)
+        if (preview !== frame) preview.recycle()
         user = "Describe the scene in view."
         setState(JarvisState.VISION)
         scope.launch {
@@ -55,6 +62,7 @@ internal object PanelSession {
         }
         val busy = agent.currentState.value.isBusy() || agent.pendingApprovalTool.value != null
         when (method) {
+            "previewVoice" -> if (!busy) agent.previewVoice(value.ifBlank { AssistantProfile.current().optString("voice", "slt") })
             "text", "voice" -> if (!busy && value.isNotBlank() && value.length <= 2000) {
                 user = value
                 agent.handleUserInput(value, method == "voice")
@@ -67,6 +75,7 @@ internal object PanelSession {
             "install" -> if (value in setOf("qwen2.5-0.5b","lfm2.5-vl-450m") && install?.isActive != true) {
                 install = scope.launch { PhoneRuntime.install(value) }
             }
+            "clearThumbnail" -> thumbnail = ""
             "status" -> Unit
         }
         val state = agent.currentState.value.name
@@ -78,7 +87,7 @@ internal object PanelSession {
             heartbeat = scope.launch { runCatching { adapter.call("session", mapOf("state" to state, "text" to reply.take(2000), "user" to user)) } }
         }
         return JSONObject().put("name", AssistantProfile.name.value).put("state",state)
-            .put("user",user).put("text",reply).put("pending",pending())
+            .put("thumbnail",thumbnail).put("user",user).put("text",reply).put("pending",pending())
             .put("setup",PhoneRuntime.status.value).put("installing",install?.isActive == true).toString()
     }
 

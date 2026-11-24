@@ -57,3 +57,6 @@ local ai/.gradle/
 local ai/build/
 local ai/app/build/
 local ai/.kotlin/
+local ai/app/.cxx/
+!local ai/app/src/main/cpp/CMakeLists.txt
+!android/app/src/main/assets/licenses/*.txt

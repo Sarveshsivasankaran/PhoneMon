@@ -1,14 +1,15 @@
-# Releasing PhoneBox
+# Releasing PhoneMon
 
 Pushing a change to the root `VERSION` file on `main` starts the release workflow and publishes after checks and signing succeed. For a release update, bump both Android version names and codes, the agent version, and the dated changelog together with `VERSION`. Routine changes leave `VERSION` alone. Manual dispatch remains available for retries before publication.
 
+The release titled **1.2.1 (stable)** uses the distinct Git tag `v1.2.1-stable` and numeric package version `1.2.2`. Filenames, desktop binary versions, Scoop and WinGet all use the numeric package version. Both Android apps show the release title and use increasing version codes. The next ordinary release can use `1.2.3` or higher with its normal numeric title and tag.
 
 1. Update `agent/PhoneBox.Agent/PhoneBox.Agent.csproj`, Android `versionName` and its increasing `versionCode`.
 2. Add dated release notes to `CHANGELOG.md`; update README and demo catalog counts when widgets/templates change.
 3. Run `python tools/check-release.py`, `./gradlew lintDebug assembleDebug` in `android`, the agent tests, `npm test` in `tools/ui-tests`, and
    `pwsh tools/test-install-apk.ps1` on Windows. Build and verify the release-signed APK.
 4. Commit the reviewed scope, push `main`, and wait for the build and Pages workflows to pass.
-5. Run the **release** workflow on that commit. Use a draft for artifact review, or publish after the gates pass.
+5. Monitor the automatically triggered **release** workflow. Use manual dispatch to retry a failed build before publication.
 
 The release workflow reuses the build checks, then tests and smoke-runs the agent on native Windows x64,
 Linux x64/ARM64, and macOS ARM64/Intel runners. It builds the signed APK, signs the macOS agent with PhoneBox's own certificate, creates

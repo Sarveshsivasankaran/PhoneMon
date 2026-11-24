@@ -305,7 +305,7 @@ app.MapPost("/api/pair/start", (ConfigStore cfg, PairingCodes codes) =>
     var link = PairingCodes.Link(Environment.MachineName, fingerprint, lanCfg.Port, hosts, code);
     var localHost = hosts.FirstOrDefault() ?? "127.0.0.1";
     var localLink = PairingCodes.LocalLink(localHost, Port, Environment.MachineName, fingerprint, lanCfg.Port, hosts, code);
-    var apk = $"https://github.com/Sarveshsivasankaran/PhoneMon/releases/download/v{AppPaths.Version}/PhoneMon-{AppPaths.Version}.apk";
+    var apk = $"https://github.com/Sarveshsivasankaran/PhoneMon/releases/download/{AppPaths.ReleaseTag}/PhoneMon-{AppPaths.Version}.apk";
     return Results.Json(new
     {
         enabled = true,
@@ -394,11 +394,13 @@ app.MapGet("/api/jarvis/catalog", (ConfigStore store, HttpRequest req) =>
         rules = config.Rules.Select(r => new { r.Id, r.Name, r.Enabled })
     });
 });
-app.MapGet("/api/jarvis/profile", () =>
+var jarvisProfiles = new JarvisProfileStore(configDir);
+app.MapGet("/api/jarvis/profile", () => Results.Json(jarvisProfiles.Read()));
+app.MapPut("/api/jarvis/profile", (JarvisProfile profile, HttpContext ctx) =>
 {
-    var file = Path.Combine(configDir, "jarvis-profile.json");
-    return File.Exists(file) ? Results.File(file, "application/json")
-        : Results.Json(new { assistantName = "JARVIS", personality = "", model = "qwen2.5-0.5b" });
+    if (ctx.Connection.LocalPort != Port) return Results.StatusCode(403);
+    return profile.Valid ? Results.Json(jarvisProfiles.Save(profile))
+        : Results.BadRequest(new { error = "Invalid assistant name, instructions, model or voice." });
 });
 app.MapGet("/api/ai/status", () => Results.Redirect("/api/jarvis/session"));
 app.MapMethods("/api/ai/{action}", ["GET", "POST"], () =>
@@ -434,7 +436,7 @@ app.MapGet("/download/apk", () =>
     {
         if (File.Exists(c)) return Results.File(c, "application/vnd.android.package-archive", $"PhoneMon-{AppPaths.Version}.apk");
     }
-    return Results.Redirect($"https://github.com/Sarveshsivasankaran/PhoneMon/releases/download/v{AppPaths.Version}/PhoneMon-{AppPaths.Version}.apk");
+    return Results.Redirect($"https://github.com/Sarveshsivasankaran/PhoneMon/releases/download/{AppPaths.ReleaseTag}/PhoneMon-{AppPaths.Version}.apk");
 });
 app.MapGet("/favicon.ico", () => AppPaths.Resource("phonebox.ico") is { } s ? Results.Stream(s, "image/x-icon") : Results.NotFound());
 app.MapGet("/phonemon.ico", () => AppPaths.Resource("phonemon.ico") is { } s ? Results.Stream(s, "image/x-icon") : AppPaths.Resource("phonebox.ico") is { } fb ? Results.Stream(fb, "image/x-icon") : Results.NotFound());

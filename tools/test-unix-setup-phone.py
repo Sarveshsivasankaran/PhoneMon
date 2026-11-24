@@ -13,16 +13,18 @@ SETUP = Path(__file__).resolve().parents[1] / 'setup.sh'
 
 
 class SetupPhoneTests(unittest.TestCase):
-    def install(self, mode, root, expected_code=0):
+    def install(self, mode, root, expected_code=0, stable=False):
         bin_dir = root / 'bin'
         bin_dir.mkdir()
-        agent = root / 'PhoneBox/app'
-        archive = root / 'PhoneBoxAgent-0.0.1-linux-x64.zip'
-        apk = root / 'PhoneBox-0.0.1.apk'
+        version = '1.2.2' if stable else '0.0.1'
+        tag = 'v1.2.1-stable' if stable else 'v0.0.1'
+        agent = root / ('PhoneMon/app' if stable else 'PhoneBox/app')
+        archive = root / f'PhoneBoxAgent-{version}-linux-x64.zip'
+        apk = root / (f'PhoneMon-{version}.apk' if stable else f'PhoneBox-{version}.apk')
         apk.write_bytes(b'fixture APK')
         with ZipFile(archive, 'w') as bundle:
             bundle.writestr('PhoneBoxAgent', '#!/bin/sh\nprintf "%s\\n" "$PHONEBOX_TEST_AGENT"\n')
-        (root / 'SHA256SUMS-0.0.1.txt').write_text(
+        (root / f'SHA256SUMS-{version}.txt').write_text(
             ''.join(f'{hashlib.sha256(p.read_bytes()).hexdigest()}  {p.name}\n'
                     for p in (archive, apk)),
             encoding='utf-8',
@@ -40,6 +42,8 @@ args = sys.argv[1:]
 url = args[-1]
 if url == 'http://127.0.0.1:8765/api/info':
     sys.exit(0)
+if '/releases/download/' + os.environ['PHONEBOX_TEST_TAG'] + '/' not in url:
+    sys.exit(22)
 root = pathlib.Path(os.environ['PHONEBOX_TEST_ROOT'])
 source = root / url.rsplit('/', 1)[-1]
 dest = pathlib.Path(args[args.index('-o') + 1])
@@ -68,10 +72,10 @@ esac''')
             stub(name, 'exit 0')
         env = dict(os.environ, PATH=str(bin_dir) + os.pathsep + os.environ['PATH'],
                    HOME=str(root), TMPDIR=str(root), PHONEBOX_TEST_ROOT=str(root),
-                   PHONEBOX_TEST_AGENT=str(agent), PHONEBOX_TEST_MODE=mode,
+                   PHONEBOX_TEST_TAG=tag, PHONEBOX_TEST_AGENT=str(agent), PHONEBOX_TEST_MODE=mode,
                    DISPLAY='', WAYLAND_DISPLAY='')
         result = subprocess.run(
-            ['/bin/bash', str(SETUP), '--yes', '--no-autostart', '--no-extras', '--version', '0.0.1'],
+            ['/bin/bash', str(SETUP), '--yes', '--no-autostart', '--no-extras', '--version', tag],
             env=env, capture_output=True, text=True, timeout=20,
         )
         self.assertEqual(result.returncode, expected_code, result.stdout + result.stderr)
@@ -97,7 +101,7 @@ esac''')
     def test_verified_apk_still_reaches_the_phone(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
-            self.install('valid', root)
+            self.install('valid', root, stable=True)
             self.assertTrue((root / 'phone-installed').exists())
 
 

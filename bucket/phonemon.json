@@ -29,11 +29,14 @@
             "PhoneMon"
         ]
     ],
-    "checkver": "github",
+    "checkver": {
+        "url": "https://api.github.com/repos/Sarveshsivasankaran/PhoneMon/releases/latest",
+        "regex": "/releases/download/(?<tag>v[0-9A-Za-z.-]+)/PhoneBoxAgent-(?<version>[0-9]+\\.[0-9]+\\.[0-9]+)-win-x64\\.zip"
+    },
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://github.com/Sarveshsivasankaran/PhoneMon/releases/download/v$version/PhoneBoxAgent-$version-win-x64.zip",
+                "url": "https://github.com/Sarveshsivasankaran/PhoneMon/releases/download/$matchTag/PhoneBoxAgent-$version-win-x64.zip",
                 "hash": {
                     "url": "$baseurl/SHA256SUMS-$version.txt"
                 }

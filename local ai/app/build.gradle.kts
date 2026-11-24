@@ -7,17 +7,24 @@ plugins {
 
 android {
     packaging.jniLibs.useLegacyPackaging = true
-    packaging.jniLibs.keepDebugSymbols += "**/*.so"
+    packaging.jniLibs.keepDebugSymbols += listOf("**/libjarvis-server.so", "**/libllama*.so", "**/libggml*.so", "**/libmtmd.so")
     sourceSets["main"].jniLibs.srcDir(layout.buildDirectory.dir("phoneRuntime/jni"))
     namespace = "com.phonebox.jarvis"
     compileSdk = 35
+    ndkVersion = "28.2.13676358"
+    externalNativeBuild {
+        cmake {
+            path = file("src/main/cpp/CMakeLists.txt")
+            version = "3.22.1"
+        }
+    }
 
     defaultConfig {
         applicationId = "com.phonebox.jarvis"
         minSdk = 26 // Android 8.0 Oreo
         targetSdk = 35
-        versionCode = 4
-        versionName = "1.2.1"
+        versionCode = 5
+        versionName = "1.2.1 (stable)"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {

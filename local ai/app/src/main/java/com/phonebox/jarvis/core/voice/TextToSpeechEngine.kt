@@ -1,86 +1,85 @@
 package com.phonebox.jarvis.core.voice
 
 import android.content.Context
-import android.speech.tts.TextToSpeech
-import android.speech.tts.UtteranceProgressListener
+import android.media.AudioAttributes
+import android.media.MediaPlayer
 import android.util.Log
-import java.util.Locale
-import java.util.concurrent.atomic.AtomicBoolean
+import com.phonebox.jarvis.core.ai.AssistantProfile
+import java.io.File
+import java.io.IOException
+import kotlinx.coroutines.*
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
-/**
- * Native Android Text-to-Speech wrapper configured for local offline synthesis.
- */
+internal object Flite {
+    init { System.loadLibrary("phonebox_speech") }
+    external fun synthesize(voice: String, text: String, wavePath: String): Boolean
+}
+
 class TextToSpeechEngine(
     private val context: Context,
     private val onSpeakingStarted: () -> Unit,
-    private val onSpeakingFinished: () -> Unit
-) : TextToSpeech.OnInitListener {
+    private val onSpeakingFinished: () -> Unit,
+    private val onError: () -> Unit
+) {
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
+    private var utterance: Job? = null
 
-    private var tts: TextToSpeech? = null
-    private val isReady = AtomicBoolean(false)
-
-    init {
-        tts = TextToSpeech(context, this)
-    }
-
-    override fun onInit(status: Int) {
-        if (status == TextToSpeech.SUCCESS) {
-            val result = tts?.setLanguage(Locale.US)
-            if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                Log.w(TAG, "US English offline language data missing.")
-            } else {
-                val voice = tts?.voices?.firstOrNull { it.locale.language == "en" && !it.isNetworkConnectionRequired }
-                if (voice == null || tts?.setVoice(voice) != TextToSpeech.SUCCESS) return
-                tts?.setPitch(0.95f)
-                tts?.setSpeechRate(1.05f)
-                setupListener()
-                isReady.set(true)
-                Log.i(TAG, "Local Text-to-Speech engine initialized.")
-            }
-        } else {
-            Log.e(TAG, "TextToSpeech initialization failed with code $status")
-        }
-    }
-
-    private fun setupListener() {
-        tts?.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
-            override fun onStart(utteranceId: String?) {
+    fun speak(text: String, voice: String = AssistantProfile.current().optString("voice", "slt")) {
+        stop()
+        utterance = scope.launch {
+            try {
                 onSpeakingStarted()
-            }
-
-            override fun onDone(utteranceId: String?) {
+                // Keep synthesis latency and native memory bounded for longer replies.
+                val words = text.trim().split(Regex("\\s+"))
+                val chunk = StringBuilder()
+                for (word in words) {
+                    if (chunk.length + word.length > 300 && chunk.isNotEmpty()) {
+                        sayChunk(voice, chunk.toString())
+                        chunk.clear()
+                    }
+                    if (chunk.isNotEmpty()) chunk.append(' ')
+                    chunk.append(word)
+                }
+                if (chunk.isNotEmpty()) sayChunk(voice, chunk.toString())
                 onSpeakingFinished()
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (failure: Exception) {
+                Log.e("TextToSpeechEngine", "Offline speech failed", failure)
+                onError()
             }
-
-            @Deprecated("Deprecated in Java")
-            override fun onError(utteranceId: String?) {
-                onSpeakingFinished()
-            }
-        })
-    }
-
-    fun speak(text: String, utteranceId: String = "jarvis_response") {
-        if (isReady.get()) {
-            tts?.speak(text, TextToSpeech.QUEUE_FLUSH, null, utteranceId)
-        } else {
-            Log.w(TAG, "TTS not ready yet; skipping vocalization.")
-            onSpeakingFinished()
         }
     }
 
-    fun stop() {
-        tts?.stop()
+    private suspend fun sayChunk(voice: String, text: String) {
+        val file = File.createTempFile("speech-", ".wav", context.cacheDir)
+        try {
+            withContext(Dispatchers.Default) {
+                check(Flite.synthesize(voice, text, file.absolutePath)) { "Flite could not synthesize speech" }
+            }
+            val player = MediaPlayer()
+            try {
+                suspendCancellableCoroutine<Unit> { done ->
+                    player.setAudioAttributes(AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_MEDIA)
+                        .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH).build())
+                    player.setOnCompletionListener { if (done.isActive) done.resume(Unit) }
+                    player.setOnErrorListener { _, what, extra ->
+                        if (done.isActive) done.resumeWithException(IOException("Playback failed ($what/$extra)"))
+                        true
+                    }
+                    player.setOnPreparedListener { if (done.isActive) it.start() }
+                    player.setDataSource(file.absolutePath)
+                    player.prepareAsync()
+                }
+            } finally {
+                player.release()
+            }
+        } finally {
+            file.delete()
+        }
     }
 
-    fun shutdown() {
-        tts?.stop()
-        tts?.shutdown()
-        tts = null
-        isReady.set(false)
-    }
-
-    companion object {
-        private const val TAG = "TextToSpeechEngine"
-    }
+    fun stop() { utterance?.cancel() }
+    fun shutdown() { scope.cancel() }
 }
-

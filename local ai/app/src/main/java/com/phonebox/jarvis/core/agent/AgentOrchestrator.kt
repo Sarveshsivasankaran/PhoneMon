@@ -34,11 +34,17 @@ class AgentOrchestrator(
     val pendingApprovalTool: StateFlow<Pair<String, Map<String, Any?>>?> = _pendingApprovalTool.asStateFlow()
 
     fun showVisionResult(description: String) {
-        _currentStreamingText.value = description
-        _currentState.value = JarvisState.STANDBY
+        scope.launch { finishTurn(description) }
+    }
+
+    fun previewVoice(voice: String) {
+        if (voice in setOf("slt", "rms", "awb")) {
+            ttsEngine.speak("Hello. This is my offline voice.", voice)
+        }
     }
 
     fun setState(state: JarvisState) {
+        if (state == JarvisState.LISTENING || state == JarvisState.VISION) ttsEngine.stop()
         _currentState.value = state
     }
 
@@ -46,6 +52,7 @@ class AgentOrchestrator(
         if (input.isBlank()) return
 
         scope.launch {
+            ttsEngine.stop()
             _currentState.value = JarvisState.THINKING
             _currentStreamingText.value = ""
             memoryManager.recordTurn("USER", input, isSpoken = isVoice)
@@ -57,28 +64,28 @@ class AgentOrchestrator(
                 "spotify status" -> "spotify_status"
                 else -> null
             }
-            if (direct != null) executeTool(direct, emptyMap(), isVoice)
-            else processModelOutput(PhoneInference.answer(input), isVoice)
+            if (direct != null) executeTool(direct, emptyMap())
+            else processModelOutput(PhoneInference.answer(input))
         }
     }
 
-    private suspend fun processModelOutput(output: String, isVoice: Boolean) {
+    private suspend fun processModelOutput(output: String) {
         val toolCall = extractToolCall(output)
         if (toolCall != null) {
             val (toolName, params) = toolCall
             if (ToolValidator.validateToolCall(toolName, params)) {
                 if (permissionManager.requiresExplicitUserApproval(toolName)) {
-                    _currentState.value = JarvisState.STANDBY
                     _pendingApprovalTool.value = Pair(toolName, params)
+                    finishTurn("Approve the requested action, " + toolName.replace('_', ' ') + "?")
                 } else {
-                    executeTool(toolName, params, isVoice)
+                    executeTool(toolName, params)
                 }
             } else {
                 val errorMsg = "Tool call rejected by security validator."
-                finishTurn(errorMsg, isVoice)
+                finishTurn(errorMsg)
             }
         } else {
-            finishTurn(output, isVoice)
+            finishTurn(output)
         }
     }
 
@@ -86,17 +93,18 @@ class AgentOrchestrator(
         val pending = _pendingApprovalTool.value ?: return
         _pendingApprovalTool.value = null
         scope.launch {
-            executeTool(pending.first, pending.second, isVoice = true)
+            executeTool(pending.first, pending.second)
         }
     }
 
     fun rejectPendingTool() {
+        if (_pendingApprovalTool.value == null) return
         _pendingApprovalTool.value = null
-        _currentState.value = JarvisState.STANDBY
-        _currentStreamingText.value = "Action cancelled by user."
+        scope.launch { finishTurn("Action cancelled.") }
     }
 
-    private suspend fun executeTool(toolName: String, params: Map<String, Any?>, isVoice: Boolean) {
+    private suspend fun executeTool(toolName: String, params: Map<String, Any?>) {
+        ttsEngine.stop()
         _currentState.value = JarvisState.EXECUTING
         val resultText = try {
             phoneMonAdapter.call(toolName, params).ifBlank { "Completed $toolName." }
@@ -105,19 +113,13 @@ class AgentOrchestrator(
         }
 
         permissionManager.logToolExecution(toolName, JSONObject(params).toString(), resultText, true)
-        finishTurn(resultText, isVoice)
+        finishTurn(resultText)
     }
 
-    private suspend fun finishTurn(reply: String, isVoice: Boolean) {
+    private suspend fun finishTurn(reply: String) {
         _currentStreamingText.value = reply
-        memoryManager.recordTurn("ASSISTANT", reply, isSpoken = isVoice)
-
-        if (isVoice) {
-            _currentState.value = JarvisState.SPEAKING
-            ttsEngine.speak(reply)
-        } else {
-            _currentState.value = JarvisState.STANDBY
-        }
+        ttsEngine.speak(reply)
+        memoryManager.recordTurn("ASSISTANT", reply, isSpoken = true)
     }
 
     private fun extractToolCall(text: String): Pair<String, Map<String, Any?>>? {

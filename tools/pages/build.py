@@ -10,8 +10,9 @@ PAGES = Path(__file__).resolve().parent
 
 
 def version():
-    """The agent's version: the demo reports it as the installed one, and the landing page shows it."""
-    return re.search(r'<Version>([^<]+)</Version>', (AGENT / 'PhoneBox.Agent.csproj').read_text(encoding='utf-8'))[1]
+    """The release display version: the demo reports it as the installed one, and the landing page shows it."""
+    gradle = (ROOT / 'android/app/build.gradle.kts').read_text(encoding='utf-8')
+    return re.search(r'versionName = "([^"]+)"', gradle)[1]
 
 
 def demo_tag(panel=False, relay=False):

@@ -35,17 +35,19 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.v.outputs.version }}
+      tag: ${{ steps.v.outputs.tag }}
+      display: ${{ steps.v.outputs.display }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - id: v
-        name: Read and check the version
-        run: |
-          v=$(sed -n 's:.*<Version>\(.*\)</Version>.*:\1:p' agent/PhoneBox.Agent/PhoneBox.Agent.csproj | head -n1)
-          grep -q "versionName = \"$v\"" android/app/build.gradle.kts || { echo "::error::android versionName does not match $v"; exit 1; }
-          if git ls-remote --exit-code --tags origin "refs/tags/v$v" >/dev/null; then echo "::error::v$v is already released; bump the version first"; exit 1; fi
-          echo "version=$v" >> "$GITHUB_OUTPUT"
-      - name: Check release metadata
+        name: Check release metadata
         run: python3 tools/check-release.py
+      - name: Check tag availability
+        env:
+          TAG: ${{ steps.v.outputs.tag }}
+        run: |
+          existing=$(git ls-remote --tags origin "refs/tags/$TAG")
+          if [ -n "$existing" ]; then echo "::error::$TAG is already released"; exit 1; fi
 
   apk:
     needs: version
@@ -183,12 +185,9 @@ jobs:
           cat "SHA256SUMS-${{ needs.version.outputs.version }}.txt"
       - name: Release notes from CHANGELOG.md
         run: |
-          v="${{ needs.version.outputs.version }}"
-          # the section for this version, else the "Unreleased" one
-          section() { awk -v v="$1" '/^## /{ if (on) exit; on = ($2 == v); next } on' CHANGELOG.md; }
-          section "$v" > notes.md
-          [ -s notes.md ] || section Unreleased > notes.md
-          [ -s notes.md ] || echo "PhoneMon $v" > notes.md
+          display="${{ needs.version.outputs.display }}"
+          awk -v title="## $display — " '/^## / { if (on) exit; on = index($0, title) == 1; next } on' CHANGELOG.md > notes.md
+          test -s notes.md
           cat >> notes.md <<'EOF'
 
           ---
@@ -198,29 +197,27 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          v="${{ needs.version.outputs.version }}"
-          gh release create "v$v" dist/* --title "PhoneMon $v" --notes-file notes.md --target "${{ github.sha }}" ${{ inputs.draft && '--draft' || '' }}
+          gh release create "${{ needs.version.outputs.tag }}" dist/* --title "${{ needs.version.outputs.display }}" --notes-file notes.md --target "${{ github.sha }}" ${{ inputs.draft && '--draft' || '--latest' }}
       # a draft's downloads are not public yet, so the package manifests follow only published releases
       - name: Update the Scoop bucket and the winget manifests
         if: ${{ !inputs.draft }}
         run: |
           v="${{ needs.version.outputs.version }}"
           sha=$(sha256sum "dist/PhoneBoxAgent-$v-win-x64.zip" | cut -d' ' -f1)
-          python3 - "$v" "$sha" <<'PY'
+          tag="${{ needs.version.outputs.tag }}"
+          python3 - "$v" "$sha" "$tag" <<'PY'
           import json, sys
-          v, sha = sys.argv[1], sys.argv[2]
-          p = 'bucket/phonebox.json'
-          m = json.load(open(p, encoding='utf-8'))
-          m['version'] = v
-          m['architecture']['64bit']['url'] = f'https://github.com/Sarveshsivasankaran/PhoneMon/releases/download/v{v}/PhoneBoxAgent-{v}-win-x64.zip'
-          m['architecture']['64bit']['hash'] = sha
-          # the agent is self-contained since 0.9.7: no .NET runtime to suggest
-          m.get('suggest', {}).pop('.NET Desktop Runtime 10', None)
-          open(p, 'w', encoding='utf-8').write(json.dumps(m, indent=4, ensure_ascii=False) + '\n')
+          v, sha, tag = sys.argv[1:]
+          for p in ('bucket/phonemon.json', 'bucket/phonebox.json'):
+              m = json.load(open(p, encoding='utf-8'))
+              m['version'] = v
+              m['architecture']['64bit']['url'] = f'https://github.com/Sarveshsivasankaran/PhoneMon/releases/download/{tag}/PhoneBoxAgent-{v}-win-x64.zip'
+              m['architecture']['64bit']['hash'] = sha
+              open(p, 'w', encoding='utf-8').write(json.dumps(m, indent=4, ensure_ascii=False) + '\n')
           PY
-          python3 packaging/winget/make-manifests.py "$v" "$sha"
+          python3 packaging/winget/make-manifests.py "$v" "$sha" "$tag"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add bucket/phonebox.json packaging/winget/manifests
+          git add bucket/phonebox.json bucket/phonemon.json packaging/winget/manifests
           git commit -m "Scoop and winget manifests for $v"
           git push origin HEAD:main

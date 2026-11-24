@@ -152,9 +152,6 @@ latest_version() {
   if [ -z "$v" ] && have curl; then
     v="$(curl -fsSLI -o /dev/null -w '%{url_effective}' "https://github.com/$repo/releases/latest" 2>/dev/null | sed -n 's#.*/tag/##p')" || v=""
   fi
-  if [ -z "$v" ]; then
-    v="v1.0.0"
-  fi
   printf '%s' "$v"
 }
 
@@ -498,18 +495,21 @@ main() {
   ok "$( [ "$os" = osx ] && echo "macOS $(sw_vers -productVersion 2>/dev/null)" || echo "Linux $(uname -r)"), $arch${pm:+, package manager: $pm}"
 
   step 'Finding the release'
-  local tag ver base
+  local tag ver base display
   tag="${version:-$(latest_version)}"
   [ -n "$tag" ] || die "could not find the latest release on GitHub. Check the internet connection, or pass --version 1.0.0."
   ver="${tag#v}"
+  tag="v$ver"
+  display="$ver"
+  case "$tag" in v1.2.1-stable|v1.2.2) tag=v1.2.1-stable; ver=1.2.2; display="1.2.1 (stable)" ;; esac
   printf '%s' "$ver" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$' || die "unexpected version '$tag'."
-  base="https://github.com/$repo/releases/download/v$ver"
-  ok "PhoneMon $ver ($rid)"
+  base="https://github.com/$repo/releases/download/$tag"
+  ok "PhoneMon $display ($rid)"
 
   tmp="$(mktemp -d "${TMPDIR:-/tmp}/phonebox-setup.XXXXXX")"
   trap 'rm -rf "$tmp"' EXIT
 
-  step "Downloading PhoneMon $ver"
+  step "Downloading PhoneMon $display"
   local zip_name="PhoneBoxAgent-$ver-$rid.zip" sums
   sums="$tmp/SHA256SUMS-$ver.txt"
   download "$base/SHA256SUMS-$ver.txt" "$sums" || die "release $ver was not found ($base)."
@@ -530,7 +530,7 @@ main() {
     die "this system cannot run the PhoneBox $rid build: $out"
   fi
   app="$(printf '%s\n' "$out" | tail -n1)"
-  case "$app" in /*/PhoneBox/app) ;; *) die "unexpected install folder from the agent: $app" ;; esac
+  case "$app" in /*/PhoneMon/app|/*/PhoneBox/app) ;; *) die "unexpected install folder from the agent: $app" ;; esac
   local installed=""
   if [ -x "$app/PhoneBoxAgent" ]; then installed="present"; fi
   if [ -f "$app/PhoneBoxAgent.dll" ]; then
@@ -571,7 +571,7 @@ main() {
 
   if [ "$dry" = 1 ]; then
     step 'Dry run finished'
-    info "Would stop the running agent and install PhoneBox $ver to $app (settings stay)."
+    info "Would stop the running agent and install PhoneMon $display to $app (settings stay)."
     [ "$autostart" = 0 ] || info 'Would ask to start PhoneBox at login.'
     [ "$phone" = 0 ] || info 'Would offer to install the app on a phone connected over USB.'
     info 'Nothing was changed.'
@@ -589,7 +589,7 @@ main() {
     die "installing failed; the previous version was restored."
   fi
   rm -rf "$app.old"
-  ok "PhoneBox $ver installed"
+  ok "PhoneMon $display installed"
 
   if [ "$autostart" = 1 ]; then
     step 'Start at login'

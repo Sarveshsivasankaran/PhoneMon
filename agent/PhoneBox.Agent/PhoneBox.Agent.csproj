@@ -11,9 +11,10 @@
     <AssemblyName>PhoneBoxAgent</AssemblyName>
     <RootNamespace>PhoneBox.Agent</RootNamespace>
     <Product>PhoneMon</Product>
-    <Company>PhoneMon</Company>
+    <Company>Solo-P-Leveller</Company>
+    <Authors>Solo-P-Leveller</Authors>
     <Description>PhoneMon desktop agent: feeds the PhoneMon Android desk panel over USB or Wi-Fi.</Description>
-    <Version>1.2.1</Version>
+    <Version>1.2.2</Version>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
   </PropertyGroup>
 

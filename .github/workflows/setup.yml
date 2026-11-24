@@ -53,7 +53,7 @@ jobs:
           $info = Invoke-RestMethod http://127.0.0.1:8765/api/info
           "version $($info.version), adb $($info.adb)"
           if (-not $info.adb) { throw 'setup did not install adb' }
-          if (-not (Test-Path "$env:LOCALAPPDATA\PhoneBox\app\PhoneBoxAgent.exe")) { throw 'agent not in the install folder' }
+          if (-not (Test-Path "$env:LOCALAPPDATA\PhoneMon\app\PhoneBoxAgent.exe")) { throw 'agent not in the install folder' }
           if (-not (Test-Path ([Environment]::GetFolderPath('Startup') + '\PhoneMon.lnk')) -and -not (Test-Path ([Environment]::GetFolderPath('Startup') + '\PhoneBox.lnk'))) { throw 'no Startup shortcut' }
       - name: Second run replaces a running agent
         shell: powershell

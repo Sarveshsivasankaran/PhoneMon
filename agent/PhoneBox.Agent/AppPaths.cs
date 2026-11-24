@@ -54,6 +54,13 @@ public static class AppPaths
         Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion.Split('+')[0]
         ?? "0.0.0";
 
+    internal const string StablePackageVersion = "1.2.2";
+    internal const string StableTag = "v1.2.1-stable";
+    internal const string StableDisplay = "1.2.1 (stable)";
+    internal static string? Display(string? version) => version == StablePackageVersion ? StableDisplay : version;
+    internal static string PackageVersion(string name) => name == StableDisplay ? StablePackageVersion : name;
+    public static string ReleaseTag => Version == StablePackageVersion ? StableTag : "v" + Version;
+
     /// <summary>Writes the default settings file on first run.</summary>
     public static void EnsureConfig()
     {

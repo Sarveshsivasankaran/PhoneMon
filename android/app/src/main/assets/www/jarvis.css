@@ -1,41 +1,42 @@
-#jarvisTrigger {
-  appearance:none; position:fixed; z-index:1000; right:max(12px,env(safe-area-inset-right)); bottom:8px;
-  width:40px; height:40px; padding:4px; border-radius:14px; cursor:pointer;
-  background:#181429e8; border:1px solid #a78dff88; box-shadow:0 3px 14px #080511aa;
-}
-#jarvisTrigger img { width:100%; height:100%; object-fit:contain }
-#jarvisOverlay { position:fixed; inset:0; z-index:1001; pointer-events:none; font:14px/1.4 system-ui,sans-serif; color:#f7f9ff }
+#jarvisTrigger, #jarvisOverlay { font: 14px/1.4 system-ui,sans-serif; color:#f5f3ff }
+#jarvisTrigger { appearance:none; position:fixed; z-index:1000; left:50%; bottom:max(21px,env(safe-area-inset-bottom)); transform:translateX(-50%);
+  display:flex; gap:9px; align-items:center; justify-content:center; min-height:34px; max-width:70vw; padding:5px 13px;
+  border:1px solid #a69bbb; border-radius:999px; background:linear-gradient(#181b36f5,#090a1ff5);
+  box-shadow:inset 0 1px 4px #a5aae033,0 4px 12px #050411b3; cursor:pointer }
+#jPillText,.j-head strong {overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.j-chevron {color:#d5ccf3}
+#jarvisOverlay {position:fixed;inset:0;z-index:1001;pointer-events:none}
 #jarvisOverlay [hidden],#jarvisOverlay[hidden],#jarvisTrigger[hidden]{display:none!important}
-.j-edge {position:absolute;inset:0;pointer-events:none;border-radius:16px;opacity:0;transition:opacity .3s;
-  box-shadow:inset 0 0 25px #7160ff90}
-.j-edge::before {content:"";position:absolute;inset:0;padding:4px;border-radius:inherit;
-  background:linear-gradient(120deg,#23ccff,#7659ff,#ae54ff,#2ba3ff);
+.j-edge {position:absolute;inset:1px;border-radius:12px;opacity:0;transition:opacity .25s;box-shadow:inset 0 0 12px #306dff,inset -3px -1px 10px #a237ff}
+.j-edge::before,.j-card::before {content:"";position:absolute;inset:0;border-radius:inherit;padding:2px;pointer-events:none;
+  background:linear-gradient(110deg,#44bfff 3%,#6968ff 42%,#d66aff 82%,#a64cff);
   -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
-#jarvisOverlay[data-active=true] .j-edge {opacity:1;animation:j-glow 1.45s ease-in-out infinite alternate}
-.j-card {box-sizing:border-box;pointer-events:auto;position:absolute;right:max(4%,env(safe-area-inset-right));bottom:max(7%,env(safe-area-inset-bottom));
-  width:clamp(288px,40%,440px);border-radius:24px;border:1px solid #d5dcff60;
-  padding:14px 16px 10px;background:linear-gradient(145deg,#080c18f2,#171d31eb);
-  box-shadow:0 18px 65px #000a,0 0 32px #785cff38;backdrop-filter:blur(18px);
-  animation:j-enter .32s ease-out;display:flex;flex-direction:column;gap:8px;max-height:80%;text-align:left}
-.j-card *{box-sizing:border-box}
-.j-mascot {width:62px;height:62px;object-fit:contain;position:absolute;left:15px;top:-28px;padding:5px;border-radius:18px;background:#161329;border:1px solid #a78dff88;box-shadow:0 0 0 4px #7052db33,0 0 22px #765bff99;animation:j-float 2.5s ease-in-out infinite}
-.j-head{display:flex;align-items:center;gap:7px;padding-left:70px;min-width:0;letter-spacing:.07em}
-.j-head strong{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.j-state{color:#b4a4ff;font-size:10px;font-weight:700;margin-left:auto}
-.j-card button{color:#edf0ff;background:#232237;border:1px solid #666281;border-radius:9px;cursor:pointer;font:inherit;padding:4px 10px}
-.j-card button:disabled{opacity:.55}.j-card button:focus-visible,#jarvisTrigger:focus-visible{outline:2px solid #91ddff}
-.j-card #jClose{font-size:20px;line-height:1;border:0;background:transparent;padding:4px}
-.j-wave{height:23px;display:flex;align-items:center;justify-content:center;gap:3px;flex-shrink:0}
-.j-wave i{display:block;height:4px;width:4px;border-radius:4px;background:linear-gradient(#68d7ff,#9c60ff)}
-#jarvisOverlay[data-active=true] .j-wave i{animation:j-wave .65s ease-in-out alternate infinite;animation-delay:var(--delay)}
-.j-exchange{min-height:42px;overflow:auto;overflow-wrap:anywhere;border:1px solid #ffffff30;border-radius:14px;background:linear-gradient(155deg,#f3f6ff19,#ffffff08);padding:9px 12px}
-.j-card p{margin:2px 0 5px;white-space:pre-wrap}.j-exchange small,.j-card #jSpeaker{font-size:9px;letter-spacing:.14em;font-weight:750;color:#76d4ff}
-.j-card #jQuestion small{color:#beadff}.j-input{display:flex;gap:6px;margin:0}
-.j-input input{min-width:0;flex:1;color:white;background:#101321;border:1px solid #474555;border-radius:9px;padding:6px 8px;font:inherit}
-.j-card footer{display:flex;gap:6px}.j-card footer button{border:0;background:transparent;color:#bdc7e7;padding:4px 6px;font-size:12px}
-.j-card footer button:last-child{margin-left:auto}.j-setup,#jConfirm{overflow:auto;flex-shrink:1}.j-setup label,.j-setup small{display:block;margin:4px 0;color:#c1c9e0}
-@keyframes j-enter{from{opacity:0;transform:translateY(22px) scale(.97)}}
-@keyframes j-wave{to{height:23px}}@keyframes j-float{50%{transform:translateY(-5px)}}@keyframes j-glow{to{filter:brightness(1.6)}}
-@media(orientation:portrait){.j-card{width:88%;right:6%;bottom:max(8%,env(safe-area-inset-bottom))}}
-@media(max-height:310px){.j-card{max-height:98%;bottom:1%;gap:3px;padding:5px 10px}.j-wave,.j-mascot{display:none}.j-head{padding-left:0}.j-exchange{min-height:22px}}
+#jarvisOverlay[data-active=true] .j-edge {opacity:1;animation:j-glow 1.6s ease-in-out infinite alternate}
+.j-card {box-sizing:border-box;pointer-events:auto;position:absolute;left:50%;transform:translateX(-50%);bottom:max(7%,22px);
+  width:min(365px,86vw);max-height:calc(100% - 70px);padding:10px 14px 8px;border-radius:24px;
+  background:linear-gradient(140deg,#152241f5,#0e112af7 55%,#271440f7);color:#f6f2ff;
+  box-shadow:inset 0 0 11px #8c6bff66,-3px 3px 13px #327cfa6b,3px -2px 15px #be53ff85,0 10px 36px #030411b3;
+  display:flex;flex-direction:column;gap:7px;animation:j-enter .27s ease-out;text-align:left}
+.j-card * {box-sizing:border-box}
+.j-mascot {width:50px;height:50px;object-fit:contain;position:absolute;bottom:calc(100% - 6px);left:50%;transform:translateX(-50%);
+ filter:drop-shadow(0 0 2px #ebc9ff) drop-shadow(0 0 7px #9f40ff);image-rendering:pixelated}
+.j-head {display:flex;align-items:center;justify-content:center;gap:5px;padding:0 20px;min-height:20px}
+.j-head strong,.j-head #jState {font:600 13px/1.25 system-ui,sans-serif}
+.j-head #jClose {position:absolute;top:5px;right:10px;background:none;border:0;padding:3px 8px}
+.j-wave {height:18px;display:inline-flex;align-items:center;justify-content:center;gap:2px;flex-shrink:0}
+.j-wave i {width:2px;height:var(--bar);border-radius:3px;background:linear-gradient(#f89fff,#8c65ff);box-shadow:0 0 4px #a674ff66}
+#jarvisOverlay[data-active=true] .j-wave i {animation:j-wave .5s ease-in-out alternate infinite;animation-delay:var(--delay)}
+.j-content {min-height:32px;display:flex;align-items:stretch;gap:9px;overflow:auto;padding:6px 4px}
+.j-captions {flex:1;min-width:0;overflow:auto;overflow-wrap:anywhere;white-space:pre-wrap;font-size:14px}
+.j-captions p,#jConfirm p {margin:0 0 4px}.j-captions p:last-child{margin-bottom:0}
+.j-captions b {color:#75ecef;font-size:12px;margin-right:3px}.j-captions #jQuestion b{color:#e4a0fe}
+#jCapture {position:relative;flex:0 0 30%;margin:0;align-self:flex-start;border:1px solid #c099e2;border-radius:9px;overflow:hidden}
+#jCapture img{display:block;width:100%;height:80px;object-fit:cover}#jCapture figcaption{position:absolute;bottom:3px;left:4px;border-radius:4px;background:#111b;padding:1px 4px;font-size:10px}
+.j-card footer {display:flex;gap:5px;justify-content:center}.j-card button {font:inherit;color:#f1eaff;border:1px solid #635975;border-radius:8px;background:#211b36;cursor:pointer;padding:4px 9px}
+.j-card footer button{border-color:transparent;background:#ffffff09;font-size:12px}
+.j-card button:disabled {opacity:.5}.j-card button:focus-visible,#jarvisTrigger:focus-visible{outline:2px solid #87dfff}
+.j-setup,#jConfirm{overflow:auto}.j-setup small,.j-setup label {display:block;margin:4px 0}.j-setup button{font-size:12px}
+@keyframes j-enter{from{opacity:0;transform:translate(-50%,18px) scale(.94)}}
+@keyframes j-wave{from{transform:scaleY(.34)}to{transform:scaleY(1.15)}}@keyframes j-glow{to{filter:brightness(1.35)}}
+@media(max-height:320px){.j-mascot{height:32px;width:32px}.j-card{max-height:calc(100% - 48px);gap:3px;bottom:15px}}
 @media(prefers-reduced-motion:reduce){#jarvisOverlay *,#jarvisOverlay *::before{animation:none!important;transition:none!important}}

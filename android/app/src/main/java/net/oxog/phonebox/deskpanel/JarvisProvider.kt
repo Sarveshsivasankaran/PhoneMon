@@ -104,7 +104,17 @@ class JarvisProvider : ContentProvider() {
                 return@use buildString {
                     append("CPU ").append(pc.optString("cpu", "unavailable")).append("%")
                     append(" · RAM ").append(pc.optString("ramUsedGb", "?")).append(" / ").append(pc.optString("ramTotalGb", "?")).append(" GB")
-                    if (!pc.isNull("gpu")) append(" · GPU ").append(pc.optString("gpu")).append("%")
+                    when (val gpu = pc.opt("gpu")) {
+                        is Number -> append(" · GPU ").append(gpu).append("%")
+                        is JSONObject -> {
+                            val details = listOfNotNull(
+                                gpu.optString("name").takeIf { !gpu.isNull("name") && it.isNotBlank() },
+                                (gpu.opt("util") as? Number)?.let { "$it% utilization" },
+                                (gpu.opt("temp") as? Number)?.let { "$it degrees Celsius" }
+                            )
+                            if (details.isNotEmpty()) append(" · GPU ").append(details.joinToString(", "))
+                        }
+                    }
                 }
             }
             val chars = CharArray(16000)

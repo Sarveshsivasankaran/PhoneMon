@@ -70,7 +70,7 @@ public sealed class UpdateService(ConfigStore cfg, AdbReverse adb, IHostApplicat
     {
         var latest = _latest?.Version;
         var retry = PhoneRetryPending;
-        return new UpdateStatus(AppPaths.Version, AppVersion, latest, _latest?.Url,
+        return new UpdateStatus(AppPaths.Display(AppPaths.Version)!, AppPaths.Display(AppVersion), AppPaths.Display(latest), _latest?.Url,
             latest is not null && Newer(latest, AppPaths.Version) && _latest!.AgentZip is not null,
             latest is not null && _latest!.Apk is not null && (AppVersion is not null && Newer(latest, AppVersion) || retry),
             _lastCheck, _state, _error);
@@ -418,7 +418,7 @@ public sealed class UpdateService(ConfigStore cfg, AdbReverse adb, IHostApplicat
     }
 
     private static bool Newer(string candidate, string current) =>
-        Version.TryParse(candidate, out var a) && Version.TryParse(current.Split('-')[0], out var b) && a > b;
+        Version.TryParse(candidate, out var a) && Version.TryParse(AppPaths.PackageVersion(current).Split('-')[0], out var b) && a > b;
 
     /// <summary>
     /// Runs adb for the updater, bounded and reaped like every other tool (<see cref="ToolProcess"/>): an install that
@@ -447,12 +447,13 @@ public sealed class UpdateService(ConfigStore cfg, AdbReverse adb, IHostApplicat
         {
             var name = a.GetProperty("name").GetString() ?? "";
             var url = a.GetProperty("browser_download_url").GetString();
-            if (name.StartsWith("PhoneBox-", StringComparison.OrdinalIgnoreCase) && name.EndsWith(".apk", StringComparison.OrdinalIgnoreCase)) apk = url;
+            if ((name.StartsWith("PhoneMon-", StringComparison.OrdinalIgnoreCase) || name.StartsWith("PhoneBox-", StringComparison.OrdinalIgnoreCase)) && name.EndsWith(".apk", StringComparison.OrdinalIgnoreCase)) apk = url;
             if (name.StartsWith("PhoneBoxAgent-", StringComparison.OrdinalIgnoreCase) && name.EndsWith($"-{rid}.zip", StringComparison.OrdinalIgnoreCase)) zip = url;
             if (name.StartsWith("SHA256SUMS-", StringComparison.OrdinalIgnoreCase) && name.EndsWith(".txt", StringComparison.OrdinalIgnoreCase)) sums = url;
         }
         var tag = release.GetProperty("tag_name").GetString() ?? "";
-        return new Release(tag.TrimStart('v', 'V'), release.GetProperty("html_url").GetString(), apk, zip, sums);
+        var version = tag == AppPaths.StableTag ? AppPaths.StablePackageVersion : tag.TrimStart('v', 'V');
+        return new Release(version, release.GetProperty("html_url").GetString(), apk, zip, sums);
     }
 
     /// <summary>
@@ -490,8 +491,8 @@ public sealed class UpdateService(ConfigStore cfg, AdbReverse adb, IHostApplicat
     /// <summary>The app's version in "dumpsys package" output is the latest release or newer.</summary>
     internal static bool AppCurrentOn(string dumpsys, string latest) =>
         // the whole versionName field, and only a version that compares: 0.9.25+local or 0.9.26_local installs as before
-        System.Text.RegularExpressions.Regex.Match(dumpsys, @"versionName=(\S+)") is { Success: true } m
-        && Version.TryParse(latest, out var l) && Version.TryParse(m.Groups[1].Value.Split('-')[0], out var i) && i >= l;
+        UsbLink.ParseVersionName(dumpsys) is { } name
+        && Version.TryParse(latest, out var l) && Version.TryParse(AppPaths.PackageVersion(name).Split('-')[0], out var i) && i >= l;
 
     internal static string[] PhoneTargets(string[] connected, bool appCurrent, string[] retry) =>
         appCurrent ? connected.Where(retry.Contains).ToArray() : connected;

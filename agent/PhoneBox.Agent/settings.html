@@ -904,7 +904,21 @@ nav a.on::before { color: var(--accent); }
     <section id="ai">
       <h2>JARVIS Local AI</h2>
       <p class="lead">Open the assistant on your desk panel to talk, use the front camera, or install local models.</p>
-      <a class="btn" href="http://127.0.0.1:8780/" target="_blank" rel="noopener">Open assistant profile</a>
+      <form class="card" id="jarvisForm">
+        <h3>Assistant profile</h3>
+        <fieldset id="jarvisFields" disabled style="border:0;padding:0;margin:0;display:grid;gap:12px">
+          <div class="field"><label for="jarvisName">Assistant name</label><input type="text" id="jarvisName" maxlength="40" required></div>
+          <div class="field"><label for="jarvisPersonality">Personality instructions</label><textarea id="jarvisPersonality" maxlength="2000" rows="4"></textarea></div>
+          <div class="field"><label for="jarvisModel">AI model</label><select id="jarvisModel">
+            <option value="qwen2.5-0.5b">Qwen2.5 0.5B Instruct</option><option value="lfm2.5-vl-450m">LFM2.5-VL 450M Vision</option>
+          </select></div>
+          <div class="field"><label for="jarvisVoice">Speaking voice</label><select id="jarvisVoice">
+            <option value="slt">SLT · US English, female</option><option value="rms">RMS · US English, male</option><option value="awb">AWB · Scottish English, male</option>
+          </select></div>
+          <div><button class="btn primary" type="submit">Save assistant profile</button></div>
+        </fieldset>
+        <p id="jarvisStatus" role="status" aria-live="polite"></p>
+      </form>
     </section>
 
     <section id="advanced">
@@ -3756,11 +3770,46 @@ function fitLeads() {
 }
 window.addEventListener('resize', fitLeads);
 
+const jarvisFields = { assistantName: $('jarvisName'), personality: $('jarvisPersonality'), model: $('jarvisModel'), voice: $('jarvisVoice') };
+let jarvisLoaded = false, jarvisLoading = false;
+async function loadJarvisProfile() {
+  if (jarvisLoaded || jarvisLoading) return;
+  jarvisLoading = true;
+  try {
+    const response = await fetch('/api/jarvis/profile', {cache:'no-store'});
+    if (!response.ok) throw new Error('HTTP ' + response.status);
+    const profile = await response.json();
+    for (const [key, field] of Object.entries(jarvisFields)) field.value = profile[key];
+    $('jarvisFields').disabled = false;
+    $('jarvisStatus').textContent = '';
+    jarvisLoaded = true;
+  } catch (error) {
+    $('jarvisStatus').textContent = 'Could not load assistant profile. ' + error.message;
+  } finally { jarvisLoading = false; }
+}
+$('jarvisForm').onsubmit = async event => {
+  event.preventDefault();
+  if (!jarvisLoaded || $('jarvisFields').disabled) return;
+  const profile = Object.fromEntries(Object.entries(jarvisFields).map(([key, field]) => [key, field.value.trim()]));
+  if (!profile.assistantName) { $('jarvisStatus').textContent = 'Enter an assistant name.'; $('jarvisName').focus(); return; }
+  $('jarvisFields').disabled = true;
+  $('jarvisStatus').textContent = 'Saving…';
+  try {
+    const response = await fetch('/api/jarvis/profile', {method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(profile)});
+    if (!response.ok) throw new Error('HTTP ' + response.status);
+    const saved = await response.json();
+    for (const [key, field] of Object.entries(jarvisFields)) field.value = saved[key];
+    $('jarvisStatus').textContent = 'Saved. The paired assistant picks up changes when connected.';
+  } catch (error) {
+    $('jarvisStatus').textContent = 'Could not save assistant profile. ' + error.message;
+  } finally { $('jarvisFields').disabled = false; }
+};
 function route() {
   const id = (location.hash || '#pages').slice(1);
   document.querySelectorAll('section').forEach((s) => s.classList.toggle('on', s.id === id));
   document.querySelectorAll('nav a').forEach((a) => a.classList.toggle('on', a.getAttribute('href') === '#' + id));
   if (id === 'webhooks') loadPushed();
+  if (id === 'ai') loadJarvisProfile();
 
   fitLeads();
 }

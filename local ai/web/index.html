@@ -2,46 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>JARVIS Local AI — Assistant dashboard</title>
-  <link rel="icon" href="favicon.ico">
-  <link rel="alternate icon" href="favicon.ico">
-  <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="/panel-visuals/jarvis.css">
-  <link rel="stylesheet" href="animation.css">
+  <meta http-equiv="refresh" content="0; url=http://127.0.0.1:8765/#ai">
+  <title>JARVIS Local AI settings</title>
 </head>
-<body>
-  <div class="hud-container">
-    <header class="hud-header">
-      <div class="header-left">
-        <img src="logo.png" alt="PhoneMon" style="width: 38px; height: 38px; border-radius: 8px; margin-right: 12px; border: 1px solid #7c3aed; object-fit: contain;">
-        <div class="reactor-dot" id="systemDot"></div>
-        <h1>JARVIS <span>LOCAL AI CONSOLE</span></h1>
-      </div>
-      <div class="header-right">
-
-        <span class="status-badge" id="activenessBadge">CHECKING...</span>
-      </div>
-    </header>
-
-    <section class="assistant-preview" aria-label="Animated JARVIS home preview">
-      <img class="preview-home" src="home.png" alt="PhoneMon home dashboard">
-      <button id="jarvisTrigger" aria-label="Show assistant"><img src="/panel-visuals/jarvis-mascot.png" alt=""></button>
-      <div id="jarvisOverlay" hidden><div class="j-edge"></div><section class="j-card">
-        <img class="j-mascot" src="/panel-visuals/jarvis-mascot.png" alt="">
-        <header class="j-head"><strong id="assistantName">JARVIS</strong><span class="j-state" id="assistantState">STANDBY</span><button id="jClose" aria-label="Close assistant">×</button></header>
-        <div class="j-wave" aria-hidden="true"></div>
-        <div class="j-exchange" aria-live="polite"><div id="jQuestion" hidden><small>YOU</small><p id="jUser"></p></div><small id="jSpeaker">JARVIS</small><p id="assistantTranscript"></p></div>
-      </section></div>
-    </section>
-    <section class="card assistant-settings">
-      <div class="card-header"><h2>ASSISTANT PROFILE</h2><span class="badge" id="profileSync">Saved on this computer</span></div>
-      <label>Assistant name<input id="profileName" maxlength="40" value="JARVIS"></label>
-      <label>Personality instructions<textarea id="profilePersonality" maxlength="2000" rows="4">Be concise, helpful, and operate the PhoneMon desk panel using its available controls.</textarea></label>
-      <label>AI model<select id="profileModel"><option value="qwen2.5-0.5b">Qwen2.5 0.5B Instruct</option><option value="lfm2.5-vl-450m">LFM2.5-VL 450M Vision</option></select></label>
-      <button class="btn btn-primary" id="saveProfile">Save assistant profile</button>
-    </section>
-  </div>
-  <script src="dashboard.js"></script>
-</body>
+<body><a href="http://127.0.0.1:8765/#ai">Open JARVIS Local AI settings</a></body>
 </html>

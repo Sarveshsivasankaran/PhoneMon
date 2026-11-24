@@ -8,9 +8,10 @@ microsoft/winget-pkgs). The release workflow runs this script and attaches the r
 import sys
 from pathlib import Path
 
-if len(sys.argv) != 3:
+if len(sys.argv) not in (3, 4):
     sys.exit(__doc__)
 version, sha = sys.argv[1], sys.argv[2].upper()
+tag = sys.argv[3] if len(sys.argv) == 4 else f'v{version}'
 pkg = 'Sarveshsivasankaran.PhoneMon'
 out = Path(__file__).resolve().parent / 'manifests' / 's' / 'Sarveshsivasankaran' / 'PhoneMon' / version
 out.mkdir(parents=True, exist_ok=True)
@@ -38,7 +39,7 @@ Dependencies:
   - PackageIdentifier: Google.PlatformTools
 Installers:
 - Architecture: x64
-  InstallerUrl: https://github.com/Sarveshsivasankaran/PhoneMon/releases/download/v{version}/PhoneBoxAgent-{version}-win-x64.zip
+  InstallerUrl: https://github.com/Sarveshsivasankaran/PhoneMon/releases/download/{tag}/PhoneBoxAgent-{version}-win-x64.zip
   InstallerSha256: {sha}
 ManifestType: installer
 ManifestVersion: {schema}
@@ -48,13 +49,13 @@ ManifestVersion: {schema}
 PackageIdentifier: {pkg}
 PackageVersion: {version}
 PackageLocale: en-US
-Publisher: Sarveshsivasankaran
-PublisherUrl: https://github.com/Sarveshsivasankaran
+Publisher: Solo-P-Leveller
+PublisherUrl: https://github.com/Sarveshsivasankaran/PhoneMon
 PackageName: PhoneMon
 PackageUrl: https://github.com/Sarveshsivasankaran/PhoneMon
 License: MIT
 LicenseUrl: https://github.com/Sarveshsivasankaran/PhoneMon/blob/main/LICENSE
-ReleaseNotesUrl: https://github.com/Sarveshsivasankaran/PhoneMon/releases/tag/v{version}
+ReleaseNotesUrl: https://github.com/Sarveshsivasankaran/PhoneMon/releases/tag/{tag}
 ShortDescription: Turn an old Android phone into a desk panel for your PC.
 Description: |-
   PhoneMon has two parts: an Android app that runs full screen on an old phone, and this agent, which lives in the

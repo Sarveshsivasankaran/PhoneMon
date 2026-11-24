@@ -26,19 +26,20 @@ import java.util.concurrent.atomic.AtomicInteger
  */
 class Dictation(private val activity: Activity, private val js: (String) -> Unit) {
     private val main = Handler(Looper.getMainLooper())
+    private val panelVoice = PanelVoice(activity.applicationContext, ::send)
     private val ids = AtomicInteger()
     private var recognizer: SpeechRecognizer? = null
     private var session = 0
     private var waitingFor: Request? = null
     private val timeLimit = Runnable { recognizer?.stopListening() }
 
-    private data class Request(val id: Int, val lang: String, val offline: Boolean)
+    private data class Request(val id: Int, val lang: String, val offline: Boolean, val jarvis: Boolean)
 
     fun available(): Boolean = SpeechRecognizer.isRecognitionAvailable(activity)
 
     /** Starts a session and returns its id; asks for the microphone first if needed. [lang] is BCP 47 or "". */
-    fun start(lang: String, offline: Boolean): Int {
-        val request = Request(ids.incrementAndGet(), lang, offline)
+    fun start(lang: String, offline: Boolean, jarvis: Boolean = false): Int {
+        val request = Request(ids.incrementAndGet(), lang, offline, jarvis)
         main.post {
             if (!granted()) {
                 // a newer request replaces one still waiting for the permission prompt
@@ -69,19 +70,24 @@ class Dictation(private val activity: Activity, private val js: (String) -> Unit
     }
 
     /** Stops listening and delivers what was heard so far, if [id] is the session running. */
-    fun stop(id: Int) = main.post { if (id == session) recognizer?.stopListening() }
+    fun stop(id: Int) = main.post { panelVoice.stop(id); if (id == session) recognizer?.stopListening() }
 
     /**
      * Drops the session without a result, if [id] is the one running or waiting. 0 = whatever runs (the panel paused):
      * a request waiting for the permission prompt stays, as that prompt itself pauses the panel.
      */
     fun cancel(id: Int) = main.post {
+        panelVoice.cancel(id)
         waitingFor?.takeIf { id != 0 && it.id == id }?.let { waitingFor = null; send("error", "cancelled", it.id) }
         if (recognizer != null && (id == 0 || id == session)) { val was = session; end(); send("error", "cancelled", was) }
     }
 
+    fun close() { cancel(0); main.post { panelVoice.close() } }
+
     private fun begin(request: Request) {
+        panelVoice.cancel(0)
         if (recognizer != null) { val was = session; end(); send("error", "cancelled", was) }
+        if (request.jarvis) { panelVoice.start(request.id); return }
         if (!available()) { send("error", "unavailable", request.id); return }
         // "on the phone only" is a promise: only Android 12's on-device recognizer keeps it
         if (request.offline && Build.VERSION.SDK_INT < 31) { send("error", "offline-unsupported", request.id); return }

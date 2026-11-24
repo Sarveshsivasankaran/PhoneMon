@@ -94,9 +94,9 @@ public sealed partial class UsbLink(int port, string pin)
 
     /// <summary>The app's versionName in "dumpsys package" output, or null.</summary>
     internal static string? ParseVersionName(string output) =>
-        VersionName().Match(output) is { Success: true } m ? m.Groups[1].Value : null;
+        VersionName().Match(output) is { Success: true } m ? m.Groups[1].Value.Trim() : null;
 
-    [GeneratedRegex(@"versionName=([0-9][0-9A-Za-z.+-]{0,30})")]
+    [GeneratedRegex(@"(?m)^\s*versionName=([^\r\n]+)")]
     private static partial Regex VersionName();
 
     [GeneratedRegex(@"\bkey=([A-Za-z0-9_-]{32,128})\s*$", RegexOptions.Multiline)]

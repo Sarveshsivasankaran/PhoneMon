@@ -113,7 +113,7 @@ function Get-LatestVersion {
         try { $location = [string]$response.Headers['Location'] } finally { $response.Close() }
         if ($location -match '/tag/([^/?#]+)$') { return $Matches[1] }
     } catch { }
-    return 'v1.0.0'
+    throw 'Could not resolve the latest release. Check connectivity or pass -Version with the release tag.'
 }
 
 function Assert-Checksum([string]$File, [string]$SumsFile) {
@@ -293,6 +293,14 @@ function Install-PhoneApp([string]$Adb, [string]$Apk, [string]$Device) {
     $true
 }
 
+# Match AppPaths.ResolveDir so an existing installation keeps its configuration and updater location.
+function Get-PhoneMonDirectory([string]$Parent) {
+    $current = Join-Path $Parent 'PhoneMon'
+    $legacy = Join-Path $Parent 'PhoneBox'
+    if (-not (Test-Path -LiteralPath $current -PathType Container) -and (Test-Path -LiteralPath $legacy -PathType Container)) { return $legacy }
+    return $current
+}
+
 function Install-PhoneMon {
     $ErrorActionPreference = 'Stop'
     $ProgressPreference = 'SilentlyContinue'   # the progress bar makes downloads in Windows PowerShell 5.1 many times slower
@@ -321,7 +329,9 @@ function Install-PhoneMon {
     if (Test-Path (Join-Path $scoop 'apps\phonebox')) {
         throw 'PhoneMon/PhoneBox is installed with Scoop. Update it with "scoop update phonebox". To switch to this setup instead, run "scoop uninstall phonebox" first (your settings stay) and then setup again; two copies would fight over the same port.'
     }
-    $app = Join-Path $env:LOCALAPPDATA 'PhoneBox\app'
+    $localDir = Get-PhoneMonDirectory $env:LOCALAPPDATA
+    $configDir = Get-PhoneMonDirectory $env:APPDATA
+    $app = Join-Path $localDir 'app'
     $exe = Join-Path $app 'PhoneBoxAgent.exe'
     $installed = $null
     if (Test-Path $exe) { $installed = ("$((Get-Item $exe).VersionInfo.ProductVersion)" -split '\+')[0] }
@@ -342,16 +352,19 @@ function Install-PhoneMon {
     Write-Step 'Finding the release'
     $tag = if ($Version) { $Version } else { Get-LatestVersion }
     $ver = $tag.Trim().TrimStart('v')
+    $tag = "v$ver"
+    if ($tag -in 'v1.2.1-stable', 'v1.2.2') { $tag = 'v1.2.1-stable'; $ver = '1.2.2' }
     if ($ver -notmatch '^\d+\.\d+\.\d+$') { throw "Unexpected version '$tag'." }
-    $base = "https://github.com/$Repo/releases/download/v$ver"
-    if ($installed -eq $ver) { Write-Ok "PhoneMon $ver (already installed; it will be reinstalled, settings stay)" }
-    elseif ($installed) { Write-Ok "PhoneMon $ver (updating from $installed; settings stay)" }
-    else { Write-Ok "PhoneMon $ver" }
+    $base = "https://github.com/$Repo/releases/download/$tag"
+    $displayVersion = if ($tag -eq 'v1.2.1-stable') { '1.2.1 (stable)' } else { $ver }
+    if ($installed -eq $ver) { Write-Ok "PhoneMon $displayVersion (already installed; it will be reinstalled, settings stay)" }
+    elseif ($installed) { Write-Ok "PhoneMon $displayVersion (updating from $installed; settings stay)" }
+    else { Write-Ok "PhoneMon $displayVersion" }
 
     $temp = Join-Path ([IO.Path]::GetTempPath()) ('phonemon-setup-' + [guid]::NewGuid().ToString('N').Substring(0, 8))
     New-Item -ItemType Directory -Force $temp | Out-Null
     try {
-        Write-Step "Downloading PhoneMon $ver"
+        Write-Step "Downloading PhoneMon $displayVersion"
         $zipName = "PhoneBoxAgent-$ver-win-x64.zip"
         $sums = Join-Path $temp "SHA256SUMS-$ver.txt"
         $zip = Join-Path $temp $zipName
@@ -391,7 +404,7 @@ function Install-PhoneMon {
 
         if ($DryRun) {
             Write-Step 'Dry run finished'
-            Write-Info "Would stop the running agent and install PhoneMon $ver to $app (settings in $env:APPDATA\PhoneBox stay)."
+            Write-Info "Would stop the running agent and install PhoneMon $displayVersion to $app (settings in $configDir stay)."
             Write-Info 'Would add a PhoneMon shortcut to the Start Menu.'
             if (-not $NoAutostart) { Write-Info 'Would ask to start PhoneMon with Windows.' }
             if (-not $NoPhone) { Write-Info 'Would offer to install the app on a phone connected over USB.' }
@@ -419,7 +432,7 @@ function Install-PhoneMon {
             throw "Installing failed and the previous version was put back: $($_.Exception.Message). Close PhoneMon (tray icon > Exit) and run setup again."
         }
         Remove-Item $old -Recurse -Force -ErrorAction SilentlyContinue
-        Write-Ok "PhoneMon $ver installed; settings are in $env:APPDATA\PhoneBox"
+        Write-Ok "PhoneMon $displayVersion installed; settings are in $configDir"
 
         $programs = [Environment]::GetFolderPath('Programs')
         if ($programs -and (Test-Path $programs)) {
@@ -536,7 +549,7 @@ function Install-PhoneMon {
             } elseif (-not (Test-Path $exe)) {
                 Write-Caution "PhoneBoxAgent.exe was removed, probably by an antivirus. See https://github.com/$Repo/issues/69."
             } else {
-                Write-Caution "The agent did not answer. Its log: $env:LOCALAPPDATA\PhoneBox\agent.log"
+                Write-Caution "The agent did not answer. Its log: $localDir\agent.log"
                 if ($smartAppControl -eq 1) {
                     Write-Caution 'Smart App Control may have blocked it: see Windows Security > App & browser control, and the warning above.'
                 }

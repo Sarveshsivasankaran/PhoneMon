@@ -7,7 +7,6 @@
         <package android:name="net.oxog.phonebox.deskpanel" />
         <provider android:authorities="net.oxog.phonebox.deskpanel.jarvis" />
         <intent><action android:name="android.speech.RecognitionService" /></intent>
-        <intent><action android:name="android.intent.action.TTS_SERVICE" /></intent>
     </queries>
 
     <!-- Hardware Permissions -->
