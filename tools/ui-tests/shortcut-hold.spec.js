@@ -27,12 +27,8 @@ async function open(page) {
 }
 
 /** A finger held on the key for `ms`. */
-async function press(page, locator, ms) {
-  const box = await locator.boundingBox();
-  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
-  await page.mouse.down();
-  await page.waitForTimeout(ms);
-  await page.mouse.up();
+async function press(locator, ms) {
+  await locator.click({ delay: ms });
 }
 
 test('a tap on a key with a long press still runs the key', async ({ page }) => {
@@ -43,7 +39,7 @@ test('a tap on a key with a long press still runs the key', async ({ page }) => 
 
 test('holding a key with a long press runs the long-press shortcut once, not the key', async ({ page }) => {
   const key = await open(page);
-  await press(page, key(0), 700);
+  await press(key(0), 700);
   await expect.poll(() => runs(page)).toEqual(['tap?hold=true']);
   await page.waitForTimeout(300);
   expect(await runs(page)).toEqual(['tap?hold=true']);
@@ -51,7 +47,7 @@ test('holding a key with a long press runs the long-press shortcut once, not the
 
 test('a short press does not count as a hold, and the tap after a hold works again', async ({ page }) => {
   const key = await open(page);
-  await press(page, key(0), 700);
+  await press(key(0), 700);
   await expect.poll(async () => (await runs(page)).length).toBe(1);
   await key(0).click();
   await expect.poll(() => runs(page)).toEqual(['tap?hold=true', 'tap']);
@@ -59,7 +55,7 @@ test('a short press does not count as a hold, and the tap after a hold works aga
 
 test('a key without a long press is untouched by holding it', async ({ page }) => {
   const key = await open(page);
-  await press(page, key(2), 700);
+  await press(key(2), 700);
   await expect.poll(() => runs(page)).toEqual(['plain']);
 });
 
