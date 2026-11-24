@@ -1,6 +1,6 @@
 # GitHub Copilot CLI status
 
-PhoneBox can show whether a [GitHub Copilot CLI](https://docs.github.com/en/copilot/how-tos/copilot-cli) session is
+PhoneMon can show whether a [GitHub Copilot CLI](https://docs.github.com/en/copilot/how-tos/copilot-cli) session is
 **Working**, has **Turn finished** or **Needs attention** (a permission prompt or a question waiting for you), and how
 long ago that changed. Copilot CLI runs a small script from its hooks, and the script sends the state to the agent's
 [webhook API](GUIDE.md#webhooks). A **Pushed value** widget shows it; the **Notifications** widget keeps the recent
@@ -9,7 +9,7 @@ changes as a short history.
 It is read-only: nothing on the phone can answer Copilot CLI or send it anything.
 
 Requirements: Copilot CLI with hooks, and Python 3.8 or later where Copilot CLI runs (no extra packages). It works
-wherever Copilot CLI runs: on the computer with the PhoneBox agent (Windows, macOS or Linux) and in WSL2 on that
+wherever Copilot CLI runs: on the computer with the PhoneMon agent (Windows, macOS or Linux) and in WSL2 on that
 computer.
 
 ## What it sends
@@ -62,11 +62,11 @@ change. Then start a new Copilot CLI session.
 When Copilot CLI runs on Windows, give each entry a `powershell` field next to `bash`, for example
 `"powershell": "python \"$HOME/.copilot/hooks/copilot-cli-bridge.py\" working"`.
 
-## 3. Connect it to PhoneBox
+## 3. Connect it to PhoneMon
 
 | Where Copilot CLI runs | `PHONEBOX_URL` | Webhook key |
 |---|---|---|
-| The computer with the PhoneBox agent (Windows, macOS, Linux) | `http://127.0.0.1:8765` (the default) | Not needed |
+| The computer with the PhoneMon agent (Windows, macOS, Linux) | `http://127.0.0.1:8765` (the default) | Not needed |
 | WSL2 with mirrored networking | `http://127.0.0.1:8765` (the default) | Not needed |
 | WSL2 with NAT networking (WSL's default) | `https://<windows-host>:8766` | Needed |
 
@@ -77,7 +77,7 @@ nothing to set up.
 In NAT mode `127.0.0.1` in WSL is WSL's own loopback, not Windows, so the script goes through the agent's Wi-Fi port,
 over HTTPS and with the webhook key. That key opens only the webhook endpoints, never the phone API.
 
-1. In the PhoneBox settings, turn on **Wi-Fi & Tailscale** under **General**, click **Save**, then **Restart to apply**
+1. In the PhoneMon settings, turn on **Wi-Fi & Tailscale** under **General**, click **Save**, then **Restart to apply**
    at the top.
 2. Under **Webhooks**, click **Copy key**. In WSL, save it in a file only you can read (paste, press Enter, then
    Ctrl+D):
@@ -121,7 +121,7 @@ the two widgets to a page of your own.
 |---|---|
 | The widget says it has no data yet | Run the `--check` command above; it names the problem. Restart Copilot CLI after adding the hook file |
 | `--check` works but Copilot CLI sends nothing | With the session sandbox on, hooks run inside it: allow the connection (and reading `~/.config/phonebox`, or set `PHONEBOX_WEBHOOK_KEY` instead) in the sandbox settings. See [Using hooks](https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/use-hooks) |
-| NAT mode: `timed out` | Windows Firewall may treat the WSL network as public while PhoneBox is allowed on private networks only. Mirrored networking avoids this |
+| NAT mode: `timed out` | Windows Firewall may treat the WSL network as public while PhoneMon is allowed on private networks only. Mirrored networking avoids this |
 | `does not match PHONEBOX_CERT_SHA256` | The agent has a new certificate: copy the fingerprint from `/api/lan` again |
 | **Needs attention** stays after you answered | It changes with the next state: when the turn ends or you send a new prompt. If you deny the request, Copilot CLI cancels the turn without running `agentStop`, so it changes with your next prompt |
 | **Working** disappears during a very long turn | A state of **Working** expires after 4 hours, so a session closed mid-turn does not show it forever |

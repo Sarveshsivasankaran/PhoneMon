@@ -381,12 +381,20 @@ class MainActivity : Activity(), SensorEventListener {
             }
             if (operation == "camera") {
                 runOnUiThread {
-                    if (resumed) startActivity(Intent(this@MainActivity, CaptureActivity::class.java))
+                    if (resumed) {
+                        try { startActivity(Intent(this@MainActivity, CaptureActivity::class.java)) }
+                        catch (e: Exception) { Log.w("PhoneMon", "Camera launch failed", e) }
+                    }
                 }
                 return "{}"
             }
             if (operation !in setOf("status", "voice", "text", "install", "listening", "idle", "approve", "deny", "previewVoice", "clearThumbnail")) return "{}"
-            return PanelSession.request(operation, argument)
+            return try {
+                PanelSession.request(operation, argument)
+            } catch (e: Throwable) {
+                Log.e("PhoneMon", "Assistant request failed", e)
+                JSONObject().put("error", e.message ?: "Phone assistant unavailable.").toString()
+            }
         }
 
         private fun ok(key: String) = key == bridgeKey

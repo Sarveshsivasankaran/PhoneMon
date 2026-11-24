@@ -29,6 +29,7 @@
         android:localeConfig="@xml/locales_config"
         android:theme="@style/Theme.DeskPanel">
 
+        <meta-data android:name="publisher" android:value="Solo-P-Leveller" />
         <activity android:name=".jarvis.CaptureActivity" android:exported="false" />
 
         <!-- The USB key (UsbKey.kt) for the computer's "adb shell content query". DUMP is held by the adb shell and can't

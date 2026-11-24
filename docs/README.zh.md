@@ -1,6 +1,6 @@
 <p align="center"><img src="logo.png" width="160" alt="PhoneMon logo"></p>
 
-<h1 align="center">PhoneBox</h1>
+<h1 align="center">PhoneMon</h1>
 
 <p align="center">
   <a href="../README.md">English</a> ·
@@ -30,7 +30,7 @@
 
 <p align="center"><b>将闲置的 Android 手机变成电脑的桌面控制面板。</b><br>
 通过 USB 或 Wi-Fi 查看电脑状态、AI 编程会话、音乐与触控操作。<br>
-支持 Windows、Linux 和 macOS。无需 Root、无需 PhoneBox 账号、无需云服务。</p>
+支持 Windows、Linux 和 macOS。无需 Root、无需 PhoneMon 账号、无需云服务。</p>
 
 <p align="center">
   <a href="https://sarveshsivasankaran.github.io/PhoneMon/"><b>在线演示</b></a> ·
@@ -46,10 +46,10 @@
   <a href="../LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="MIT 许可证"></a>
 </p>
 
-<p align="center"><img src="hero-0.6.png" width="900" alt="三部手机上的 PhoneBox 示例"><br>
+<p align="center"><img src="hero-0.6.png" width="900" alt="三部手机上的 PhoneMon 示例"><br>
 <sub>使用演示数据的示例布局。</sub></p>
 
-PhoneBox 将全屏 **Android 应用**与轻量级**桌面代理**配对。通过浏览器可视化编辑器打造专属面板：**123 个小组件**、**30 个模板**、多页面以及实时预览。
+PhoneMon 将全屏 **Android 应用**与轻量级**桌面代理**配对。通过浏览器可视化编辑器打造专属面板：**123 个小组件**、**30 个模板**、多页面以及实时预览。
 
 ## 主要功能
 

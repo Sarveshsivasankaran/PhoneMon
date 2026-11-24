@@ -1,6 +1,6 @@
 <p align="center"><img src="logo.png" width="160" alt="PhoneMon logo"></p>
 
-<h1 align="center">PhoneBox</h1>
+<h1 align="center">PhoneMon</h1>
 
 <p align="center">
   <a href="../README.md">English</a> ·
@@ -30,7 +30,7 @@
 
 <p align="center"><b>Trasforma un vecchio smartphone Android in un pannello da scrivania per il tuo computer.</b><br>
 Statistiche del PC, sessioni di coding IA, musica e controlli touch via USB o Wi-Fi.<br>
-Windows, Linux e macOS. Nessun root, nessun account PhoneBox e nessun servizio cloud.</p>
+Windows, Linux e macOS. Nessun root, nessun account PhoneMon e nessun servizio cloud.</p>
 
 <p align="center">
   <a href="https://sarveshsivasankaran.github.io/PhoneMon/"><b>Prova la demo live</b></a> ·
@@ -46,10 +46,10 @@ Windows, Linux e macOS. Nessun root, nessun account PhoneBox e nessun servizio c
   <a href="../LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="Licenza MIT"></a>
 </p>
 
-<p align="center"><img src="hero-0.6.png" width="900" alt="PhoneBox su tre telefoni"><br>
+<p align="center"><img src="hero-0.6.png" width="900" alt="PhoneMon su tre telefoni"><br>
 <sub>Layout di esempio con dati dimostrativi.</sub></p>
 
-PhoneBox abbina un'**app Android** a schermo intero a un piccolo **agente desktop**. Progetta il tuo pannello nell'editor visivo browser: **124 widget**, **30 modelli**, più pagine e anteprima live.
+PhoneMon abbina un'**app Android** a schermo intero a un piccolo **agente desktop**. Progetta il tuo pannello nell'editor visivo browser: **124 widget**, **30 modelli**, più pagine e anteprima live.
 
 ## Cosa puoi fare
 

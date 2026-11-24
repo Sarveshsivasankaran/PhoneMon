@@ -16,7 +16,7 @@ class BundledSpeechTest {
         val completed = CountDownLatch(1)
         val engine = TextToSpeechEngine(context, {}, { completed.countDown() }, {})
         try {
-            instrumentation.runOnMainSync { engine.speak("Phone Box voice test.", "slt") }
+            instrumentation.runOnMainSync { engine.speak("PhoneMon voice test.", "slt") }
             assertTrue("Offline preview did not finish playback", completed.await(20, TimeUnit.SECONDS))
         } finally {
             instrumentation.runOnMainSync { engine.shutdown() }
@@ -28,7 +28,7 @@ class BundledSpeechTest {
         for (voice in listOf("slt", "rms", "awb")) {
             val wave = File.createTempFile("voice-test", ".wav", context.cacheDir)
             try {
-                assertTrue(voice, Flite.synthesize(voice, "Welcome to Phone Box.", wave.absolutePath))
+                assertTrue(voice, Flite.synthesize(voice, "Welcome to PhoneMon.", wave.absolutePath))
                 val bytes = wave.readBytes()
                 assertEquals("RIFF", String(bytes, 0, 4, Charsets.US_ASCII))
                 assertEquals("WAVE", String(bytes, 8, 4, Charsets.US_ASCII))

@@ -53,7 +53,7 @@ public static class ClaudeHook
                 // "always" (Allow always, an OpenCode answer) has no Claude Code equivalent and allows once like "allow"
                 decision = decision is "allow" or "always"
                     ? (object)new { behavior = "allow" }
-                    : new { behavior = "deny", message = "Denied from the PhoneBox panel." },
+                    : new { behavior = "deny", message = "Denied from the PhoneMon panel." },
             },
         };
     }

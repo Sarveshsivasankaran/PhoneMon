@@ -1,6 +1,6 @@
 <p align="center"><img src="logo.png" width="160" alt="PhoneMon logo"></p>
 
-<h1 align="center">PhoneBox</h1>
+<h1 align="center">PhoneMon</h1>
 
 <p align="center">
   <a href="../README.md">English</a> ·
@@ -36,7 +36,7 @@ USB 또는 Wi-Fi로 연결해 PC 상태, AI 코딩 세션, 음악을 확인하�
   <a href="https://github.com/Sarveshsivasankaran/PhoneMon/releases/latest"><b>다운로드</b></a>
 </p>
 
-<p align="center"><img src="hero-0.6.png" width="900" alt="PhoneBox 3개의 Android 전화기에서 자동화, 홈 및 플래너 페이지를 보여주는 모습"></p>
+<p align="center"><img src="hero-0.6.png" width="900" alt="PhoneMon 3개의 Android 전화기에서 자동화, 홈 및 플래너 페이지를 보여주는 모습"></p>
 
 ## 할 수 있는 일
 
@@ -46,7 +46,7 @@ USB 또는 Wi-Fi로 연결해 PC 상태, AI 코딩 세션, 음악을 확인하�
 - 시계, 날씨, 일정, 노트, 미디어 및 Home Assistant 컨트롤을 보여줍니다.
 - 시각적 편집기에서 페이지와 위젯을 배치하고 저장하기 전에 미리 봅니다.
 
-<p align="center"><a href="tour-0.6.mp4"><img src="tour-0.6.gif" width="780" alt="알림, 권한 프롬프트 및 자동 페이지 전환을 보여주는 PhoneBox 투어"></a><br>
+<p align="center"><a href="tour-0.6.mp4"><img src="tour-0.6.gif" width="780" alt="알림, 권한 프롬프트 및 자동 페이지 전환을 보여주는 PhoneMon 투어"></a><br>
 <sub>데모 데이터: 알림, 권한 프롬프트 및 자동 페이지 전환. <a href="tour-0.6.mp4">MP4를 보세요</a></sub></p>
 
 ## 빠른 시작
@@ -92,4 +92,4 @@ PhoneBox는 휴대전화와 컴퓨터를 직접 연결합니다. 계정이 필�
 
 ## 라이선스
 
-[PhoneBox MIT 라이선스로 배포됩니다.](../LICENSE)
+[PhoneMon MIT 라이선스로 배포됩니다.](../LICENSE)

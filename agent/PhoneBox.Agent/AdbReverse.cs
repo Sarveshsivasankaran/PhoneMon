@@ -195,7 +195,7 @@ public sealed class AdbReverse(ConfigStore cfg, ILogger<AdbReverse> log, AgentEn
             // is the app there at all? (the agent may have been installed on its own, with winget or Scoop)
             var installed = (await Adb(adb, $"-s {d} shell pm path net.oxog.phonebox.deskpanel", ct, anyExit: true)).Contains("package:");
             _missingApp = installed ? _missingApp.Where(x => x != d).ToArray() : _missingApp.Union([d]).ToArray();
-            if (!installed) { Report($"{d}: the PhoneBox app is not installed (Settings › General › Install the phone app)"); continue; }
+            if (!installed) { Report($"{d}: the PhoneMon app is not installed (Settings › General › Install the phone app)"); continue; }
             if (!keyed) await ReadKeyAsync(adb, d, ct);
             if (ruled) continue;
             // the phone had a rule already: this agent restarted (its USB port changed), the phone was not plugged in now
@@ -227,7 +227,7 @@ public sealed class AdbReverse(ConfigStore cfg, ILogger<AdbReverse> log, AgentEn
                 var r = await Adb(adb, $"-s {d} shell cmd package set-home-activity {HomeAlias}", ct, anyExit: true);
                 if (!r.Contains("Success")) continue; // the app has not enabled its home entry yet; try again shortly
                 _homeSet.Add(d);
-                log.LogInformation("{Device}: PhoneBox is now the home app", d);
+                log.LogInformation("{Device}: PhoneMon is now the home app", d);
             }
         }
         else _homeSet.Clear();
@@ -271,7 +271,7 @@ public sealed class AdbReverse(ConfigStore cfg, ILogger<AdbReverse> log, AgentEn
         }
         usb.Forget(d);
         if (!_oldApp.Add(d)) return;
-        log.LogWarning("{Device}: the PhoneBox app on the phone is too old for this agent's USB connection; update it from the settings page", d);
+        log.LogWarning("{Device}: the PhoneMon app on the phone is too old for this agent's USB connection; update it from the settings page", d);
         // it can't report its version over USB any more, so the update check takes it from here
         if (UsbLink.ParseVersionName(dump) is { } version) UpdateService.AppVersion ??= version;
     }

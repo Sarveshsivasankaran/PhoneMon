@@ -1,6 +1,6 @@
-# Contributing to PhoneBox
+# Contributing to PhoneMon
 
-Thanks for helping. PhoneBox runs on someone's computer all day, can start programs and talks to a phone over the
+Thanks for helping. PhoneMon runs on someone's computer all day, can start programs and talks to a phone over the
 network, so reviews focus on what a change lets the phone (or anyone else) do, and on what leaves the machine. This
 page lists what reviews keep asking for; following it gets a pull request merged much faster.
 
@@ -36,7 +36,7 @@ page lists what reviews keep asking for; following it gets a pull request merged
 
 ## Privacy
 
-- PhoneBox has no telemetry, accounts or servers of its own, and that stays so.
+- PhoneMon has no telemetry, accounts or servers of its own, and that stays so.
 - **Every new outbound connection** (a public API, a cloud provider, a download) needs a row in
   [PRIVACY.md](PRIVACY.md): the host, what is sent, and how to turn it off. Sending the user's data (audio, text,
   location, files) somewhere must be opt-in and say so where it is switched on.

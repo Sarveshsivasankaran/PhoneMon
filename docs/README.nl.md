@@ -1,6 +1,6 @@
 <p align="center"><img src="logo.png" width="160" alt="PhoneMon logo"></p>
 
-<h1 align="center">PhoneBox</h1>
+<h1 align="center">PhoneMon</h1>
 
 <p align="center">
   <a href="../README.md">English</a> ·
@@ -30,7 +30,7 @@
 
 <p align="center"><b>Verander een oude Android-telefoon in een bureaupaneel voor je computer.</b><br>
 Pc-statistieken, AI-codeersessies, muziek en aanraakbediening via USB of Wi-Fi.<br>
-Windows, Linux en macOS. Geen root, geen PhoneBox-account en geen clouddienst nodig.</p>
+Windows, Linux en macOS. Geen root, geen PhoneMon-account en geen clouddienst nodig.</p>
 
 <p align="center">
   <a href="https://sarveshsivasankaran.github.io/PhoneMon/"><b>Live demo proberen</b></a> ·
@@ -46,10 +46,10 @@ Windows, Linux en macOS. Geen root, geen PhoneBox-account en geen clouddienst no
   <a href="../LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="MIT-licentie"></a>
 </p>
 
-<p align="center"><img src="hero-0.6.png" width="900" alt="PhoneBox op drie telefoons"><br>
+<p align="center"><img src="hero-0.6.png" width="900" alt="PhoneMon op drie telefoons"><br>
 <sub>Voorbeeldindelingen met demogegevens.</sub></p>
 
-PhoneBox koppelt een schermvullende **Android-app** aan een lichte **desktop-agent**. Ontwerp je paneel in de visuele editor in je browser: **124 widgets**, **30 sjablonen**, meerdere pagina's en een live voorbeeld.
+PhoneMon koppelt een schermvullende **Android-app** aan een lichte **desktop-agent**. Ontwerp je paneel in de visuele editor in je browser: **124 widgets**, **30 sjablonen**, meerdere pagina's en een live voorbeeld.
 
 ## Wat je kunt doen
 

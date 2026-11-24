@@ -1,12 +1,12 @@
 # Installation and connections
 
-[Back to PhoneBox](../README.md) · [User guide](GUIDE.md) · [Development](DEVELOPMENT.md)
+[Back to PhoneMon](../README.md) · [User guide](GUIDE.md) · [Development](DEVELOPMENT.md)
 
 [Quick start](#quick-start) · [Wi-Fi & Tailscale](#wi-fi--tailscale) · [Updates](#updates) · [FAQ & troubleshooting](#faq--troubleshooting)
 
 ## Quick start
 
-### 1. Install PhoneBox on the computer
+### 1. Install PhoneMon on the computer
 
 **Windows 10/11**: open PowerShell (a normal window, not *Run as administrator*) and paste:
 
@@ -34,18 +34,18 @@ Setup installs the [latest release](https://github.com/Sarveshsivasankaran/Phone
 
    | | Program | Settings (kept on reinstall) |
    |---|---|---|
-   | Windows | `%LOCALAPPDATA%\PhoneBox\app` | `%APPDATA%\PhoneBox` |
-   | Linux | `~/.local/share/PhoneBox/app` | `~/.config/PhoneBox` |
-   | macOS | `~/Library/Application Support/PhoneBox/app` | `~/Library/Application Support/PhoneBox` |
+   | Windows | `%LOCALAPPDATA%\PhoneMon\app` | `%APPDATA%\PhoneMon` |
+   | Linux | `~/.local/share/PhoneMon/app` | `~/.config/PhoneMon` |
+   | macOS | `~/Library/Application Support/PhoneMon/app` | `~/Library/Application Support/PhoneMon` |
 
-   It adds a Start Menu shortcut on Windows, and asks whether to start PhoneBox at login: a Startup-folder shortcut
+   It adds a Start Menu shortcut on Windows, and asks whether to start PhoneMon at login: a Startup-folder shortcut
    on Windows, a systemd user service on Linux, a launchd agent on macOS.
 6. **Puts the app on the phone over USB**, if you want. It shows how to turn on USB debugging and waits for the phone.
 7. **Starts the agent** and opens its settings at <http://127.0.0.1:8765>.
 
 The agent installs for your user. System package managers may request administrator rights for missing dependencies;
 on Linux, setup asks before using `sudo`. Run it again
-any time to update or repair PhoneBox; settings and pairings are kept. Read [`setup.ps1`](../setup.ps1) or
+any time to update or repair PhoneMon; settings and pairings are kept. Read [`setup.ps1`](../setup.ps1) or
 [`setup.sh`](../setup.sh) before you run it if you like. With `-DryRun` / `--dry-run` it downloads and checks everything
 and changes nothing.
 
@@ -56,7 +56,7 @@ and changes nothing.
 | `-Yes` | `--yes` | Take the default answer to every question (unattended) |
 | `-NoPhone` | `--no-phone` | Do not install the app over USB (for a Wi-Fi-only phone) |
 | `-Serial <id>` | `--serial <id>` | The phone to use when several are connected (`adb devices`) |
-| `-NoAutostart` | `--no-autostart` | Do not start PhoneBox at login |
+| `-NoAutostart` | `--no-autostart` | Do not start PhoneMon at login |
 | `-NoStart` | `--no-start` | Install only |
 | — | `--no-extras` | Do not offer the optional helpers |
 | `-Version 1.0.0` | `--version 1.0.0` | Install that release instead of the latest |
@@ -90,13 +90,13 @@ curl -fsSL https://raw.githubusercontent.com/Sarveshsivasankaran/PhoneMon/main/s
 - **USB debugging gives a computer you allow control over the phone.** Allow only your own computers. You can
   withdraw them on the phone under *Developer options › Revoke USB debugging authorisations*.
 - **Wi-Fi is off until you turn it on.** Until then the agent listens only on this computer (`127.0.0.1:8765`).
-  When you turn it on, Windows asks to let PhoneBox through the firewall: allow *Private* networks only. On Linux
-  with ufw or firewalld, open TCP port 8766 for your local network. Every connection PhoneBox makes is listed in
+  When you turn it on, Windows asks to let PhoneMon through the firewall: allow *Private* networks only. On Linux
+  with ufw or firewalld, open TCP port 8766 for your local network. Every connection PhoneMon makes is listed in
   the [privacy policy](../PRIVACY.md).
 - **Linux USB permissions**: if `adb devices` shows `no permissions`, adb also needs udev rules. Install
   `android-sdk-platform-tools-common` on Debian/Ubuntu or `android-udev` on Arch. Some systems also need the
   `plugdev` group (`sudo usermod -aG plugdev $USER`, then log out and in). Setup points this out when it happens.
-- **On macOS**, the agent is signed with PhoneBox's own certificate, not an Apple Developer ID. The first time,
+- **On macOS**, the agent is signed with PhoneMon's own certificate, not an Apple Developer ID. The first time,
   macOS may ask whether it may control Music or Spotify (for Now Playing), or accept incoming connections (with Wi-Fi
   on). Shortcuts that press keys, and the Trackpad widget (its mouse events and its gestures), need *System Settings ›
   Privacy & Security › Accessibility* for PhoneBoxAgent; it
@@ -105,7 +105,7 @@ curl -fsSL https://raw.githubusercontent.com/Sarveshsivasankaran/PhoneMon/main/s
   again, even if it is listed and switched on ([#269](https://github.com/Sarveshsivasankaran/PhoneMon/issues/269)).
 - **Windows USB drivers**: if the phone never appears, Windows may need its USB driver. Google phones use the
   Google USB Driver; other brands have one on their support site.
-- **Scoop users**: setup stops if PhoneBox is installed with Scoop, so two copies don't fight over the same port.
+- **Scoop users**: setup stops if PhoneMon is installed with Scoop, so two copies don't fight over the same port.
   Keep using `scoop update phonebox`, or `scoop uninstall phonebox` first and then run setup.
 - **Windows on ARM** and **musl Linux** (Alpine) have no release build yet.
 
@@ -158,7 +158,7 @@ The settings are at <http://127.0.0.1:8765>, on Windows also from the tray icon.
 
 ### Stop and start the agent
 
-On Windows, use **Quit** in the tray menu. Start it again from the Start Menu (search for **PhoneBox**); with
+On Windows, use **Quit** in the tray menu. Start it again from the Start Menu (search for **PhoneMon**); with
 **Start with Windows** on, it also starts at the next sign-in.
 On Linux, setup installs a systemd user service named `phonebox` (no sudo needed):
 
@@ -203,7 +203,7 @@ deletes the settings, and `-Apk` / `--apk` removes the app from the connected ph
 | Tray icon | ✓ | — (settings in the browser) | — |
 | Start at login | Startup folder | systemd user service | launchd agent |
 
-On macOS, `nowplaying-cli` supplies system media metadata and cover art. The agent labels matching Safari or Chrome tabs as YouTube or YouTube Music. The progress bar advances from the last position supplied by macOS; Safari may report an outdated starting position. Volume follows the selected system output. When macOS does not expose its volume, an optional `m1ddc` installation can read it from a compatible display; display volume is read only in PhoneBox. Unsupported outputs show `n/a`. Apple silicon GPU usage comes from IORegistry when macOS exposes it; temperature, power and VRAM figures may remain unavailable.
+On macOS, `nowplaying-cli` supplies system media metadata and cover art. The agent labels matching Safari or Chrome tabs as YouTube or YouTube Music. The progress bar advances from the last position supplied by macOS; Safari may report an outdated starting position. Volume follows the selected system output. When macOS does not expose its volume, an optional `m1ddc` installation can read it from a compatible display; display volume is read only in PhoneMon. Unsupported outputs show `n/a`. Apple silicon GPU usage comes from IORegistry when macOS exposes it; temperature, power and VRAM figures may remain unavailable.
 
 </details>
 
@@ -216,19 +216,19 @@ both: the card is the main GPU, the GPU details widget can show either.
 
 #### LibreHardwareMonitor on Windows
 
-PhoneBox reads LibreHardwareMonitor's sensor list from `http://127.0.0.1:8085/data.json` whenever it is there; there
-is nothing to turn on in PhoneBox.
+PhoneMon reads LibreHardwareMonitor's sensor list from `http://127.0.0.1:8085/data.json` whenever it is there; there
+is nothing to turn on in PhoneMon.
 
 1. Download the latest release from
    [LibreHardwareMonitor's releases](https://github.com/LibreHardwareMonitor/LibreHardwareMonitor/releases), unzip it
    to a folder of its own and start `LibreHardwareMonitor.exe` **as administrator** (CPU temperatures and several GPU
    sensors need it).
-2. In its menu choose **Options › Remote Web Server › Run**. The port stays **8085** (PhoneBox only looks there).
+2. In its menu choose **Options › Remote Web Server › Run**. The port stays **8085** (PhoneMon only looks there).
 3. Check it in a browser on the PC: <http://127.0.0.1:8085/data.json> should show a long JSON text. Within a few
    seconds the CPU temperature and the extra GPU values appear on the phone.
 4. To keep it running: **Options › Start Minimized**, **Minimize To Tray** and **Run On Windows Startup**.
 
-The web server answers on every network the PC is on. If Windows Firewall asks, PhoneBox only needs it on this
+The web server answers on every network the PC is on. If Windows Firewall asks, PhoneMon only needs it on this
 computer, so you can leave the network access unchecked. Menu names are those of recent LibreHardwareMonitor versions
 and may differ slightly in older ones.
 
@@ -240,12 +240,12 @@ Wi-Fi is off by default. To turn it on:
 2. In **General**, scroll down to **Wi-Fi & Tailscale** and turn on **Let the phone connect without the USB cable**.
 3. Click **Save**, then **Restart to apply** at the top of the page. The line next to **Pair a phone over Wi-Fi**
    says "Listening on port 8766" once it works.
-4. Allow PhoneBox through the firewall when Windows asks.
+4. Allow PhoneMon through the firewall when Windows asks.
 
 Then pair the phone in one of two ways:
 
 - **Without a cable:** click **Pair a phone over Wi-Fi**. The window shows a QR code that downloads the app and one
-  that pairs. Scan the second with the phone's camera, open the link and tap **Open in PhoneBox**; the phone asks you
+  that pairs. Scan the second with the phone's camera, open the link and tap **Open in PhoneMon**; the phone asks you
   to confirm a code that the window also shows. No developer options, USB debugging or adb needed. The QR code holds
   the PC's addresses, its certificate fingerprint and a one-time code (5 minutes, single use), never the key itself.
   A phone paired this way only uses Wi-Fi: plugging it into the PC does not wake it or open the panel, there is no
@@ -320,5 +320,5 @@ key as the installed app — if you built the app yourself, keep using your own 
 
 <details><summary><b>Can I use it without root?</b></summary>
 
-Yes. PhoneBox needs no root on the phone and no admin rights on the PC.
+Yes. PhoneMon needs no root on the phone and no admin rights on the PC.
 </details>

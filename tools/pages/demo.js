@@ -785,7 +785,7 @@
       // runs the rule's action once, like the agent's Test button
       const r = parse(body) || {};
       if (r.then === 'goto' && r.page) emit('goto', { page: r.page, rule: r.id || 'test', name: r.name || null, priority: r.priority ?? 5, countdown: r.countdownSec ?? null, hold: false });
-      else if (r.then === 'notify') emit('notify', { title: r.name || 'PhoneBox', text: (r.text || 'test').replace('{detail}', 'test'), level: r.level || 'info' });
+      else if (r.then === 'notify') emit('notify', { title: r.name || 'PhoneMon', text: (r.text || 'test').replace('{detail}', 'test'), level: r.level || 'info' });
       else if (r.then === 'push' && r.key) {
         const value = r.pushValue ?? true;
         setPush(r.key, value);

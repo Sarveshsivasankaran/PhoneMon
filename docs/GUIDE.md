@@ -1,6 +1,6 @@
 # User guide
 
-[Back to PhoneBox](../README.md) · [Installation and connections](SETUP.md) · [Development](DEVELOPMENT.md)
+[Back to PhoneMon](../README.md) · [Installation and connections](SETUP.md) · [Development](DEVELOPMENT.md)
 
 [Appearance](#appearance) · [Control Deck](#control-deck) · [Pages & templates](#pages--templates) · [Widgets](#widgets) · [Layout editor & settings](#layout-editor--settings) · [AI agent permission prompts](#ai-agent-permission-prompts) · [Webhooks](#webhooks) · [Rules](#rules) · [Security & privacy](#security--privacy)
 
@@ -90,7 +90,7 @@ The feed proxy is not available over Wi-Fi. See [PRIVACY.md](../PRIVACY.md) for 
 RTSP address (`rtsp://user:password@192.168.1.20:554/…`; the camera's manual or app has the exact path), then pick it
 in the widget. The agent pulls the stream with [ffmpeg](https://ffmpeg.org), which you install: `winget install
 Gyan.FFmpeg` on Windows, `brew install ffmpeg` on macOS, your distribution's `ffmpeg` package on Linux. Restart
-PhoneBox afterwards so it finds ffmpeg in PATH, or enter ffmpeg's full path in the same card. A camera runs only while
+PhoneMon afterwards so it finds ffmpeg in PATH, or enter ffmpeg's full path in the same card. A camera runs only while
 a Camera widget for it is on the phone's screen, at 5 frames a second by default; pick 1 to 10 next to the camera (smoother costs more CPU on the PC and more data to the phone), and expect a short delay. Choose
 **UDP** for a camera that doesn't stream over TCP. At most 4 cameras play at the same time.
 
@@ -146,13 +146,13 @@ An optional cost overview shows the last 30 days of spend and tokens; it is off 
 Local Claude, Codex and Antigravity sources keep refreshing when CodexBar is absent, fails, or reports stale data. General settings
 provide defaults; a widget's own options override them, including an empty provider selection.
 Install a compatible CLI from [CodexBar](https://github.com/steipete/CodexBar) if available for your system.
-PhoneBox uses native local sources when no compatible CLI is installed.
+PhoneMon uses native local sources when no compatible CLI is installed.
 
 **Claude quotas** need the sign-in of the Claude Code command-line tool (run `claude` and sign in). The Claude Desktop
 app keeps its own sign-in to itself, so with only the desktop app the widget shows the plan and says so; its sessions
 still show up in the Sessions widget.
 
-**Codex live quotas** are off by default (normally PhoneBox reads Codex's local session logs without running `codex`).
+**Codex live quotas** are off by default (normally PhoneMon reads Codex's local session logs without running `codex`).
 Turn on **Read live Codex quotas with the Codex CLI** in **Settings › General › AI quotas & CodexBar** to query
 account-wide limits through `codex app-server` even when no Codex session is active. It runs every few minutes only
 while an enabled page shows Codex quotas and fresh CodexBar data is not already winning, and backs off on failures.
@@ -208,7 +208,7 @@ Double-click the tray icon on Windows (or open <http://127.0.0.1:8765>):
   kiosk options (screen pinning, the panel as the phone's home screen so it starts after a reboot, keep the phone
   awake on the charger, open the panel when the phone is plugged in, which you can turn off for a phone you also
   use for app testing; no root needed); on macOS, optionally follow the computer lock (sleep the phone on lock,
-  wake it and open PhoneBox on unlock, with an ADB connection; phones secured by a PIN or password must be unlocked
+  wake it and open PhoneMon on unlock, with an ADB connection; phones secured by a PIN or password must be unlocked
   manually). Lock sync needs the agent to run in the macOS GUI session; [battery care](#rules);
   [AI agent permission prompts](#ai-agent-permission-prompts);
   phones (several at once, each with its own pages); Wi-Fi & Tailscale; updates.
@@ -217,7 +217,7 @@ Double-click the tray icon on Windows (or open <http://127.0.0.1:8765>):
   **Load albums** and pick one. The Immich source has been tested with Immich 3.4.2 (and earlier with 3.4.1); other versions may work.
 - **Advanced**: the raw JSON.
 
-Settings live in `%APPDATA%\PhoneBox\config.json` (Linux: `~/.config/PhoneBox`, macOS: `~/Library/Application Support/PhoneBox`);
+Settings live in `%APPDATA%\PhoneMon\config.json` (Linux: `~/.config/PhoneMon`, macOS: `~/Library/Application Support/PhoneMon`);
 the phone picks up changes within a few seconds.
 Use UTF-8 when editing this file externally. Saved page and shortcut icons use JSON Unicode escapes to survive
 ANSI-based editors; the settings editor displays the actual symbols. On startup, known double-encoded forms of
@@ -263,15 +263,15 @@ packet, it carries no password, so anyone on the same network who knows a MAC ad
 
 When Codex asks for permission (run a command, edit a file, use an MCP tool…), the phone shows the project, tool and
 operation with **Allow** and **Deny**. Turn it on in **Settings › General › AI coding agent permission prompts** and
-install the Codex hook. PhoneBox adds a `PermissionRequest` command hook to `~/.codex/hooks.json`, preserving other
+install the Codex hook. PhoneMon adds a `PermissionRequest` command hook to `~/.codex/hooks.json`, preserving other
 hooks and keeping a backup next to the file. Codex requires new or changed hooks to be reviewed once: start a new
-Codex session and trust the PhoneBox hook from `/hooks` (CLI) or **Settings › Hooks** (desktop app). Requires a Codex
+Codex session and trust the PhoneMon hook from `/hooks` (CLI) or **Settings › Hooks** (desktop app). Requires a Codex
 release with `PermissionRequest` command hooks (tested with Codex 0.170.0; on older builds that gate hooks behind a
 feature flag, enable `codex_hooks = true` under `[features]` in `~/.codex/config.toml`).
 
 When Claude Code asks for permission (run a command, edit a file, use an MCP tool…), the phone shows the request —
 project, tool and the command or file — with **Allow** and **Deny**. Turn it on in **Settings › General › Claude Code
-permission prompts** and press *Install hook*: PhoneBox adds a `PermissionRequest` hook to `~/.claude/settings.json`
+permission prompts** and press *Install hook*: PhoneMon adds a `PermissionRequest` hook to `~/.claude/settings.json`
 (and keeps a backup next to it as `settings.json.phonebox.bak`). If the phone is not connected or nobody answers in
 time, the hook returns no decision and Claude Code asks in the terminal as usual. Optionally only when you have been
 away from the keyboard for a minute.
@@ -284,7 +284,7 @@ card takes the project name from the workspace name WorkBuddy stores
 OpenCode needs no hook: prompts are off until you turn them on — press the **Ask on the phone** switch under
 **Settings › General › AI coding agent permission prompts** (or set `"phoneApprovals": true` in the `opencode` section
 of `config.json`). While it is on, when OpenCode's background service (`opencode serve --service`, which the desktop
-app and the CLI keep running) asks for permission — run a command, edit a file, fetch a page — PhoneBox reads it from
+app and the CLI keep running) asks for permission — run a command, edit a file, fetch a page — PhoneMon reads it from
 `~/.local/state/opencode/service.json`'s local API and shows the same card, with **Allow**, **Always allow** and
 **Deny**. Allow answers once, Always allow also saves OpenCode's proposed pattern for the project (its own "saved
 approval") — the card shows which pattern that would be before the countdown ends — and Deny rejects. If nobody answers
@@ -385,7 +385,7 @@ away → Ambient, evenings → Calm, doorbell, quota warning, review requested, 
 too warm) and has a Test button for each rule.
 
 **Battery care** (Settings › General) keeps the phone's battery between two levels, 50–80 % by default, so a panel
-that is always plugged in lasts longer. Phones cannot stop charging without root, so PhoneBox switches the power
+that is always plugged in lasts longer. Phones cannot stop charging without root, so PhoneMon switches the power
 where it comes from: a smart plug in Home Assistant, or two shortcuts (for example `uhubctl` for a USB hub with
 switchable ports). The panel keeps running over Wi-Fi while the USB power is off.
 
@@ -411,14 +411,14 @@ switchable ports). The panel keeps running over Wi-Fi while the USB power is off
   prompt at a time (allow, always allow or deny) and sees the command, any message and the pattern an always allow
   would save; nothing else about the session is sent.
 - **Claude quota:** read with the OAuth token Claude Code stores in `~/.claude/.credentials.json`, sent only to
-  `api.anthropic.com/api/oauth/usage` (the endpoint behind Claude Code's `/usage`). The token is read-only: PhoneBox
+  `api.anthropic.com/api/oauth/usage` (the endpoint behind Claude Code's `/usage`). The token is read-only: PhoneMon
   never refreshes it, so it can't interfere with Claude Code. This endpoint is undocumented and may change.
-  It is rate limited per account and shared with Claude Code, so PhoneBox asks at most every 3 minutes, and waits
+  It is rate limited per account and shared with Claude Code, so PhoneMon asks at most every 3 minutes, and waits
   longer after errors and as long as a `429` asks for, across restarts too. An expired or refused token is not sent:
-  PhoneBox waits until Claude Code renews it.
+  PhoneMon waits until Claude Code renews it.
 - **Codex quota and sessions** are read from local files in `~/.codex/sessions`. With the opt-in
   **Read live Codex quotas with the Codex CLI** setting (**Settings › General › AI quotas & CodexBar**, off by
-  default), PhoneBox also queries `codex app-server` about every 3 minutes (backing off on failures) while an enabled
+  default), PhoneMon also queries `codex app-server` about every 3 minutes (backing off on failures) while an enabled
   page shows Codex quotas and fresh CodexBar data is not already winning; no coding session or inference prompt is
   required, and local session quota stays as fallback. Claude Code sessions come from
   `~/.claude/sessions`. OpenCode sessions (opt-in, off by default) come from its background service's local HTTP API —
@@ -430,7 +430,7 @@ switchable ports). The panel keeps running over Wi-Fi while the USB power is off
 - **Native Antigravity quota:** the agent reads the running Antigravity server's port and CSRF token from its
   process arguments and queries its loopback quota/status API, or invokes the signed-in CLI's structured usage
   command. Only measured quota fields reach the panel; CLI conversation identifiers and token counters are omitted.
-  PhoneBox does not manage Google OAuth credentials; the CLI uses its own authentication. CLI auto-updates are
+  PhoneMon does not manage Google OAuth credentials; the CLI uses its own authentication. CLI auto-updates are
   disabled for these probes.
 - **No telemetry**: no accounts, no analytics, no crash reports. The [privacy policy](../PRIVACY.md) lists every
   connection the agent and the app make (update check, weather, the widgets that use public APIs) and how to turn

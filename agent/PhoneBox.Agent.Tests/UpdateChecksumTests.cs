@@ -144,6 +144,16 @@ b47da3d09583268d7bacef2d4375555313bf455af8a3ab16fd4d7ee95082826e  PhoneBoxAgent-
         Assert.False(UpdateService.AppCurrentOn("versionName=1.2.1", release.Version));
         Assert.True(UpdateService.AppCurrentOn("versionName=1.2.1 (stable)", release.Version));
         Assert.False(UpdateService.AppCurrentOn("versionName=1.2.1 (stable)", "1.2.3"));
+
+        using var stable122 = JsonDocument.Parse("""
+            { "tag_name": "v1.2.2-stable", "html_url": "https://example.invalid", "assets": [
+              { "name": "PhoneMon-1.2.3.apk", "browser_download_url": "https://example.invalid/panel-123" } ] }
+            """);
+        var release122 = UpdateService.SelectAssets(stable122.RootElement, "win-x64");
+        Assert.Equal("https://example.invalid/panel-123", release122.Apk);
+        Assert.Equal("1.2.3", release122.Version);
+        Assert.False(UpdateService.AppCurrentOn("versionName=1.2.1 (stable)", release122.Version));
+        Assert.True(UpdateService.AppCurrentOn("versionName=1.2.2 (stable)", release122.Version));
     }
 
     [Fact]

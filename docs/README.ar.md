@@ -1,6 +1,6 @@
 <p align="center"><img src="logo.png" width="160" alt="PhoneMon logo"></p>
 
-<h1 align="center">PhoneBox</h1>
+<h1 align="center">PhoneMon</h1>
 
 <p align="center">
   <a href="../README.md">English</a> ·
@@ -36,7 +36,7 @@
   <a href="https://github.com/Sarveshsivasankaran/PhoneMon/releases/latest"><b>تنزيل</b></a>
 </p>
 
-<p align="center"><img src="hero-0.6.png" width="900" alt="ثلاثة هواتف Android تعرض صفحات الأتمتة والصفحة الرئيسية والمخطّط في PhoneBox"></p>
+<p align="center"><img src="hero-0.6.png" width="900" alt="ثلاثة هواتف Android تعرض صفحات الأتمتة والصفحة الرئيسية والمخطّط في PhoneMon"></p>
 
 ## ما يمكنك فعله
 
@@ -46,7 +46,7 @@
 - اعرض الساعات والطقس والتقويمات والملاحظات والوسائط وأدوات تحكّم Home Assistant.
 - أنشئ صفحاتك وأدواتك في المحرّر المرئي وعاين التغييرات قبل حفظها.
 
-<p align="center"><a href="tour-0.6.mp4"><img src="tour-0.6.gif" width="780" alt="جولة في PhoneBox تعرض الإشعارات وطلبات الإذن والتبديل التلقائي بين الصفحات"></a><br>
+<p align="center"><a href="tour-0.6.mp4"><img src="tour-0.6.gif" width="780" alt="جولة في PhoneMon تعرض الإشعارات وطلبات الإذن والتبديل التلقائي بين الصفحات"></a><br>
 <sub>جولة ببيانات تجريبية تعرض الإشعارات وطلبات الإذن والتبديل التلقائي بين الصفحات. <a href="tour-0.6.mp4">شاهد فيديو MP4</a></sub></p>
 
 ## البداية السريعة
@@ -78,7 +78,7 @@ curl -fsSL https://raw.githubusercontent.com/Sarveshsivasankaran/PhoneMon/main/s
 
 ## الخصوصية والأمن
 
-يوصل PhoneBox الهاتف بالحاسوب مباشرة. لا يتطلّب حسابًا ولا يرسل بيانات قياس الاستخدام. تتّصل بعض الأدوات الاختيارية بالخدمات التي تضبطها.
+يوصل PhoneMon الهاتف بالحاسوب مباشرة. لا يتطلّب حسابًا ولا يرسل بيانات قياس الاستخدام. تتّصل بعض الأدوات الاختيارية بالخدمات التي تضبطها.
 
 ## الوثائق
 
@@ -92,4 +92,4 @@ curl -fsSL https://raw.githubusercontent.com/Sarveshsivasankaran/PhoneMon/main/s
 
 ## الترخيص
 
-[يُوزّع PhoneBox بموجب ترخيص MIT.](../LICENSE)
+[يُوزّع PhoneMon بموجب ترخيص MIT.](../LICENSE)

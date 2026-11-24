@@ -1,6 +1,6 @@
 <p align="center"><img src="logo.png" width="160" alt="PhoneMon logo"></p>
 
-<h1 align="center">PhoneBox</h1>
+<h1 align="center">PhoneMon</h1>
 
 <p align="center">
   <a href="../README.md">English</a> ·
@@ -30,7 +30,7 @@
 
 <p align="center"><b>Eski bir Android telefonu bilgisayarınız için bir masaüstü kontrol paneline dönüştürün.</b><br>
 USB veya Wi-Fi üzerinden PC istatistikleri, yapay zekâ kodlama oturumları, müzik ve dokunmatik kontroller.<br>
-Windows, Linux ve macOS. Root, PhoneBox hesabı veya bulut hizmeti gerekmez.</p>
+Windows, Linux ve macOS. Root, PhoneMon hesabı veya bulut hizmeti gerekmez.</p>
 
 <p align="center">
   <a href="https://sarveshsivasankaran.github.io/PhoneMon/"><b>Canlı demoyu dene</b></a> ·
@@ -46,10 +46,10 @@ Windows, Linux ve macOS. Root, PhoneBox hesabı veya bulut hizmeti gerekmez.</p>
   <a href="../LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="MIT lisansı"></a>
 </p>
 
-<p align="center"><img src="hero-0.6.png" width="900" alt="Otomasyon, ana sayfa ve planlayıcı sayfalarını gösteren üç telefonda PhoneBox"><br>
+<p align="center"><img src="hero-0.6.png" width="900" alt="Otomasyon, ana sayfa ve planlayıcı sayfalarını gösteren üç telefonda PhoneMon"><br>
 <sub>Demo verileriyle örnek düzenler.</sub></p>
 
-PhoneBox, tam ekran bir **Android uygulamasını** küçük bir **masaüstü ajanıyla** eşleştirir. Tarayıcı tabanlı görsel düzenleyicide panelinizi oluşturun: **124 widget**, **30 şablon**, çoklu sayfalar ve canlı önizleme. Birden fazla telefonu kendi düzenleriyle bağlayın veya tek bir telefonu eşleştirilmiş bilgisayarlar arasında değiştirin.
+PhoneMon, tam ekran bir **Android uygulamasını** küçük bir **masaüstü ajanıyla** eşleştirir. Tarayıcı tabanlı görsel düzenleyicide panelinizi oluşturun: **124 widget**, **30 şablon**, çoklu sayfalar ve canlı önizleme. Birden fazla telefonu kendi düzenleriyle bağlayın veya tek bir telefonu eşleştirilmiş bilgisayarlar arasında değiştirin.
 
 ## Neler yapabilirsiniz?
 
@@ -63,7 +63,7 @@ PhoneBox, tam ekran bir **Android uygulamasını** küçük bir **masaüstü aja
 
 Model, zamanlama ve token ayrıntıları için bir yapay zekâ oturumuna dokunun. Telefondan **İzin ver** veya **Reddet** yanıtı vermek için Claude Code izin istemlerini etkinleştirin. İsteğe bağlı [CodexBar entegrasyonu](GUIDE.md#widgets) kota sağlayıcıları ve maliyet özeti ekler.
 
-<p align="center"><a href="tour-0.6.mp4"><img src="tour-0.6.gif" width="780" alt="Bildirimler, Claude Code izin istemi ve otomatik sayfa geçişini gösteren PhoneBox turu"></a><br>
+<p align="center"><a href="tour-0.6.mp4"><img src="tour-0.6.gif" width="780" alt="Bildirimler, Claude Code izin istemi ve otomatik sayfa geçişini gösteren PhoneMon turu"></a><br>
 <sub>Demo verileriyle tur: bildirimler, izin istemleri ve otomatik sayfa geçişi. <a href="tour-0.6.mp4">MP4 izle</a></sub></p>
 
 ## Hızlı başlangıç
@@ -145,7 +145,7 @@ Ekran görüntüleri demo verileri kullanır. [Şablon galerisi ve widget'lara g
 
 ## Güvenlik ve gizlilik
 
-Masaüstü ayar sunucusu `127.0.0.1:8765` adresini dinler; USB bağlantısı `adb reverse` üzerinden ulaşır. İsteğe bağlı Wi-Fi bağlantısı 8766 portunda sabitlenmiş sertifika ve eşleştirilmiş anahtarla HTTPS kullanır. Ayarlar ve eşleştirme uç noktaları yerel kalır. PhoneBox kendi telemetri, analiz veya hesap sistemine sahip değildir. Ayrıntılar için [gizlilik politikasına](../PRIVACY.md) ve [SECURITY.md](../SECURITY.md) dosyasına bakın.
+Masaüstü ayar sunucusu `127.0.0.1:8765` adresini dinler; USB bağlantısı `adb reverse` üzerinden ulaşır. İsteğe bağlı Wi-Fi bağlantısı 8766 portunda sabitlenmiş sertifika ve eşleştirilmiş anahtarla HTTPS kullanır. Ayarlar ve eşleştirme uç noktaları yerel kalır. PhoneMon kendi telemetri, analiz veya hesap sistemine sahip değildir. Ayrıntılar için [gizlilik politikasına](../PRIVACY.md) ve [SECURITY.md](../SECURITY.md) dosyasına bakın.
 
 ## Geliştirme
 

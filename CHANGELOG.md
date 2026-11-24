@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.2.2 (stable) — 2026-11-25
+
+- Merged the local JARVIS AI engine (`llama.cpp` runtime, CameraX front-camera capture, Room memory database, tool approval flow, and CMU Flite 3-voice offline speech) directly into the single unified `PhoneMon` APK — removing the separate `JARVIS` companion APK requirement and eliminating `"Install the JARVIS APK"` errors.
+- Replaced the collapsed JARVIS bottom popout pill with just the glowing JARVIS mascot logo.
+- Updated publisher metadata to `Solo-P-Leveller` across Android (`BuildConfig` / manifest) and the desktop agent (assembly metadata, `/api/info`, and **Settings → Advanced**), and updated remaining user-facing `PhoneBox` labels across Android, Windows tray tooltips, installer scripts, and documentation to `PhoneMon`.
+- Updated `.github/FUNDING.yml` and removed unused standalone `local ai/` and legacy artifacts.
+
 ## 1.2.1 (stable) — 2026-11-24
 
 - Speak to the offline assistant through a caption popout based on the supplied animation. Vosk handles local English recognition and CMU Flite supplies three selectable spoken reply voices.

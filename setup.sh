@@ -11,7 +11,7 @@
 #   --yes               answer every question with its default (unattended)
 #   --no-phone          do not install the app on a phone over USB (for a Wi-Fi-only phone)
 #   --serial <id>       the phone to use when several are connected (see "adb devices")
-#   --no-autostart      do not start PhoneBox at login
+#   --no-autostart      do not start PhoneMon at login
 #   --no-start          install only; do not start the agent
 #   --no-extras         do not offer the optional helpers (playerctl, xprintidle, nowplaying-cli ...)
 #   --version <x.y.z>   install this release instead of the latest
@@ -256,7 +256,7 @@ offer_extras() {
   if ask "Install them now?" y; then
     # shellcheck disable=SC2086 # one package name per word
     if sudo_note && pkg_install $missing; then ok "Installed: $missing"
-    else caution "Some could not be installed (not every distribution packages all of them); PhoneBox works without them."; fi
+    else caution "Some could not be installed (not every distribution packages all of them); PhoneMon works without them."; fi
   fi
 }
 
@@ -270,11 +270,11 @@ remove_autostart() {
   if [ "$os" = linux ] && [ -f "$unit" ]; then
     systemctl --user disable phonebox.service >/dev/null 2>&1 || true
     rm -f "$unit"
-    info 'Removed the login service; PhoneBox no longer starts at login.'
+    info 'Removed the login service; PhoneMon no longer starts at login.'
   fi
   if [ "$os" = osx ] && [ -f "$plist" ]; then
     rm -f "$plist"
-    info 'Removed the login item; PhoneBox no longer starts at login.'
+    info 'Removed the login item; PhoneMon no longer starts at login.'
   fi
 }
 
@@ -297,7 +297,7 @@ stop_agent() {
 write_autostart() {
   if [ "$os" = linux ]; then
     if ! systemd_user; then
-      caution "No systemd user session here, so PhoneBox cannot start at login automatically."
+      caution "No systemd user session here, so PhoneMon cannot start at login automatically."
       caution "Add $app/PhoneBoxAgent to your desktop's startup applications instead."
       return 1
     fi
@@ -322,7 +322,7 @@ write_autostart() {
     mkdir -p "$(dirname "$unit")"
     cat > "$unit" <<EOF
 [Unit]
-Description=PhoneBox agent (desk panel for an Android phone)
+Description=PhoneMon agent (desk panel for an Android phone)
 After=graphical-session.target
 
 [Service]
@@ -423,18 +423,18 @@ install_phone_app() { # install_phone_app apk serial -> 0 when installed
   level="$("$adb" -s "$device" shell getprop ro.build.version.sdk 2>/dev/null | tr -d '\r[:space:]')"
   case "$level" in ''|*[!0-9]*) level=0 ;; esac
   if [ "$level" -gt 0 ] && [ "$level" -lt 21 ]; then
-    caution "This phone runs Android API $level; PhoneBox needs Android 5.0 (API 21) or later. The app was not installed."
+    caution "This phone runs Android API $level; PhoneMon needs Android 5.0 (API 21) or later. The app was not installed."
     return 1
   fi
   info "Installing $(basename "$apk") on $device (the phone may ask you to confirm) ..."
   out="$("$adb" -s "$device" install -r "$apk" 2>&1)" || true
   case "$out" in
     *INSTALL_FAILED_UPDATE_INCOMPATIBLE*)
-      caution 'The phone has a PhoneBox app signed with a different key (for example one you built yourself).'
-      caution 'It was left as it is, with its data. To switch to the release app, uninstall PhoneBox on the phone'
+      caution 'The phone has a PhoneMon app signed with a different key (for example one you built yourself).'
+      caution 'It was left as it is, with its data. To switch to the release app, uninstall PhoneMon on the phone'
       caution '(this deletes its settings) and run setup again.'
       return 1 ;;
-    *INSTALL_FAILED_VERSION_DOWNGRADE*) ok 'The phone already has a newer PhoneBox app; it was kept.'; return 0 ;;
+    *INSTALL_FAILED_VERSION_DOWNGRADE*) ok 'The phone already has a newer PhoneMon app; it was kept.'; return 0 ;;
     *INSTALL_FAILED_USER_RESTRICTED*|*INSTALL_FAILED_ABORTED*)
       caution 'The phone refused the installation. Confirm it on the phone; Xiaomi / Redmi / POCO phones also need'
       caution '"Install via USB" in Developer options. Then run setup again.'
@@ -442,7 +442,7 @@ install_phone_app() { # install_phone_app apk serial -> 0 when installed
     *Success*) ;;
     *) caution "The app could not be installed: $(printf '%s' "$out" | tr '\n' ' ')"; return 1 ;;
   esac
-  ok 'PhoneBox app installed on the phone'
+  ok 'PhoneMon app installed on the phone'
   "$adb" -s "$device" shell am start -n "$package/.MainActivity" >/dev/null 2>&1 || true
   return 0
 }
@@ -501,7 +501,10 @@ main() {
   ver="${tag#v}"
   tag="v$ver"
   display="$ver"
-  case "$tag" in v1.2.1-stable|v1.2.2) tag=v1.2.1-stable; ver=1.2.2; display="1.2.1 (stable)" ;; esac
+  case "$tag" in
+    v1.2.1-stable|v1.2.2) tag=v1.2.1-stable; ver=1.2.2; display="1.2.1 (stable)" ;;
+    v1.2.2-stable|v1.2.3) tag=v1.2.2-stable; ver=1.2.3; display="1.2.2 (stable)" ;;
+  esac
   printf '%s' "$ver" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$' || die "unexpected version '$tag'."
   base="https://github.com/$repo/releases/download/$tag"
   ok "PhoneMon $display ($rid)"
@@ -527,7 +530,7 @@ main() {
   fi
   local out
   if ! out="$("$tmp/agent/PhoneBoxAgent" --print-install-dir 2>&1)"; then
-    die "this system cannot run the PhoneBox $rid build: $out"
+    die "this system cannot run the PhoneMon $rid build: $out"
   fi
   app="$(printf '%s\n' "$out" | tail -n1)"
   case "$app" in /*/PhoneMon/app|/*/PhoneBox/app) ;; *) die "unexpected install folder from the agent: $app" ;; esac
@@ -554,13 +557,13 @@ main() {
   adb="$(find_adb)"
   if [ -n "$adb" ]; then ok "$adb"
   else
-    caution 'adb is not installed. Without it PhoneBox still works over Wi-Fi, but cannot reach the phone over USB'
+    caution 'adb is not installed. Without it PhoneMon still works over Wi-Fi, but cannot reach the phone over USB'
     caution '(wake it on plug-in, install and update the phone app, fall back to USB when Wi-Fi drops).'
     if [ "$dry" = 1 ]; then info 'Would offer to install it.'
     elif ask 'Install adb now?' y; then
       install_adb
       adb="$(find_adb)"
-      if [ -n "$adb" ]; then ok "adb installed: $adb"; else caution 'adb could not be installed; PhoneBox will work over Wi-Fi only until it is.'; fi
+      if [ -n "$adb" ]; then ok "adb installed: $adb"; else caution 'adb could not be installed; PhoneMon will work over Wi-Fi only until it is.'; fi
     fi
   fi
 
@@ -572,7 +575,7 @@ main() {
   if [ "$dry" = 1 ]; then
     step 'Dry run finished'
     info "Would stop the running agent and install PhoneMon $display to $app (settings stay)."
-    [ "$autostart" = 0 ] || info 'Would ask to start PhoneBox at login.'
+    [ "$autostart" = 0 ] || info 'Would ask to start PhoneMon at login.'
     [ "$phone" = 0 ] || info 'Would offer to install the app on a phone connected over USB.'
     info 'Nothing was changed.'
     return
@@ -593,7 +596,7 @@ main() {
 
   if [ "$autostart" = 1 ]; then
     step 'Start at login'
-    if ask 'Start PhoneBox when you log in?' y; then write_autostart || true
+    if ask 'Start PhoneMon when you log in?' y; then write_autostart || true
     else remove_autostart; fi
   else
     remove_autostart
@@ -603,7 +606,7 @@ main() {
   if [ "$phone" = 1 ]; then
     step 'Phone app'
     if [ -z "$adb" ]; then caution 'Skipped: adb is not installed.'
-    elif ask 'Install the PhoneBox app on a phone connected over USB now?' y; then
+    elif ask 'Install the PhoneMon app on a phone connected over USB now?' y; then
       info 'USB debugging lets an allowed computer control the phone. Allow only your own computers; you can'
       info 'revoke them under Developer options > "Revoke USB debugging authorisations".'
       device="$(select_phone)"
@@ -630,7 +633,7 @@ main() {
     step 'Done (not started)'
     info "Start it with $app/PhoneBoxAgent"
   else
-    step 'Starting PhoneBox'
+    step 'Starting PhoneMon'
     start_agent
     local i=0 up=0
     while [ "$i" -lt 30 ]; do
@@ -639,7 +642,7 @@ main() {
       i=$((i + 1))
     done
     if [ "$up" = 1 ]; then
-      ok "PhoneBox is running: settings at $settings_url"
+      ok "PhoneMon is running: settings at $settings_url"
       if [ "$os" = osx ]; then open "$settings_url" >/dev/null 2>&1 || true
       elif [ -n "${DISPLAY:-}${WAYLAND_DISPLAY:-}" ] && have xdg-open; then (xdg-open "$settings_url" >/dev/null 2>&1 &) || true; fi
     else
@@ -648,13 +651,13 @@ main() {
   fi
 
   step 'Good to know'
-  if [ "$phone_done" = 1 ]; then info 'Keep the phone plugged in: PhoneBox wakes it and opens the panel.'
+  if [ "$phone_done" = 1 ]; then info 'Keep the phone plugged in: PhoneMon wakes it and opens the panel.'
   elif [ "$phone" = 1 ]; then info 'Phone app later: plug the phone in and use Settings > General > Install the phone app, or run setup again.'; fi
   info 'Wi-Fi only: install the app from the release page on the phone, then on the computer open'
   info 'Settings > General > Wi-Fi & Tailscale > Pair a phone over Wi-Fi and scan the QR code.'
   if [ "$os" = linux ]; then info 'With a firewall (ufw, firewalld), Wi-Fi also needs TCP port 8766 open on your local network.'; fi
-  info "Until Wi-Fi is on, PhoneBox only listens on this computer. Every connection it makes: https://github.com/$repo/blob/main/PRIVACY.md"
-  info 'Updates: PhoneBox updates itself from Settings. Run setup again any time to repair it.'
+  info "Until Wi-Fi is on, PhoneMon only listens on this computer. Every connection it makes: https://github.com/$repo/blob/main/PRIVACY.md"
+  info 'Updates: PhoneMon updates itself from Settings. Run setup again any time to repair it.'
   info "Uninstall: curl -fsSL https://raw.githubusercontent.com/$repo/main/scripts/uninstall.sh | bash -s -- [--purge] [--apk]"
 }
 

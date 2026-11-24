@@ -1,6 +1,6 @@
 <p align="center"><img src="logo.png" width="160" alt="PhoneMon logo"></p>
 
-<h1 align="center">PhoneBox</h1>
+<h1 align="center">PhoneMon</h1>
 
 <p align="center">
   <a href="../README.md">English</a> ·
@@ -36,7 +36,7 @@ USB または Wi-Fi で接続し、PC の状態や AI コーディングセッ�
   <a href="https://github.com/Sarveshsivasankaran/PhoneMon/releases/latest"><b>ダウンロード</b></a>
 </p>
 
-<p align="center"><img src="hero-0.6.png" width="900" alt="3 台の Android スマートフォンに自動化、ホーム、プランナーを表示した PhoneBox"></p>
+<p align="center"><img src="hero-0.6.png" width="900" alt="3 台の Android スマートフォンに自動化、ホーム、プランナーを表示した PhoneMon"></p>
 
 ## できること
 
@@ -46,7 +46,7 @@ USB または Wi-Fi で接続し、PC の状態や AI コーディングセッ�
 - 時計、天気、予定、メモ、メディア、Home Assistant の操作ボタンを表示する。
 - ビジュアルエディターでページやウィジェットを配置し、保存前にプレビューする。
 
-<p align="center"><a href="tour-0.6.mp4"><img src="tour-0.6.gif" width="780" alt="通知、許可の確認、ページの自動切り替えを紹介する PhoneBox のデモ"></a><br>
+<p align="center"><a href="tour-0.6.mp4"><img src="tour-0.6.gif" width="780" alt="通知、許可の確認、ページの自動切り替えを紹介する PhoneMon のデモ"></a><br>
 <sub>デモデータを使用。通知、許可の確認、ページの自動切り替えを紹介します。 <a href="tour-0.6.mp4">MP4 を見る</a></sub></p>
 
 ## クイックスタート
@@ -78,7 +78,7 @@ Windows のシステムトレイから設定を開くか、次のアドレスに
 
 ## プライバシーとセキュリティ
 
-PhoneBox はスマートフォンとパソコンを直接接続します。PhoneBox アカウントは不要で、利用状況データは送信しません。一部のオプションウィジェットは、設定した外部サービスに接続します。
+PhoneMon はスマートフォンとパソコンを直接接続します。PhoneMon アカウントは不要で、利用状況データは送信しません。一部のオプションウィジェットは、設定した外部サービスに接続します。
 
 ## ドキュメント
 
@@ -92,4 +92,4 @@ PhoneBox はスマートフォンとパソコンを直接接続します。Phone
 
 ## ライセンス
 
-[PhoneBox は MIT ライセンスで公開されています。](../LICENSE)
+[PhoneMon は MIT ライセンスで公開されています。](../LICENSE)

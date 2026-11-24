@@ -1,6 +1,6 @@
 <p align="center"><img src="logo.png" width="160" alt="PhoneMon logo"></p>
 
-<h1 align="center">PhoneBox</h1>
+<h1 align="center">PhoneMon</h1>
 
 <p align="center">
   <a href="../README.md">English</a> ·
@@ -36,7 +36,7 @@
   <a href="https://github.com/Sarveshsivasankaran/PhoneMon/releases/latest"><b>ดาวน์โหลด</b></a>
 </p>
 
-<p align="center"><img src="hero-0.6.png" width="900" alt="PhoneBox แสดงหน้าอัตโนมัติ, หน้าบ้าน และหน้าวางแผนบนสาม Android โทรศัพท์"></p>
+<p align="center"><img src="hero-0.6.png" width="900" alt="PhoneMon แสดงหน้าอัตโนมัติ, หน้าบ้าน และหน้าวางแผนบนสาม Android โทรศัพท์"></p>
 
 ## สิ่งที่ทำได้
 
@@ -46,7 +46,7 @@
 - แสดงนาฬิกา อากาศ ปฏิทิน โน๊ต สื่อมวลชน และตัวควบคุม Home Assistant
 - จัดหน้าและวิดเจ็ตในตัวแก้ไขแบบภาพ แล้วดูตัวอย่างก่อนบันทึก
 
-<p align="center"><a href="tour-0.6.mp4"><img src="tour-0.6.gif" width="780" alt="PhoneBox การแสดงการแจ้งเตือน, คำถามขออนุญาต และเปลี่ยนหน้าอัตโนมัติ"></a><br>
+<p align="center"><a href="tour-0.6.mp4"><img src="tour-0.6.gif" width="780" alt="PhoneMon การแสดงการแจ้งเตือน, คำถามขออนุญาต และเปลี่ยนหน้าอัตโนมัติ"></a><br>
 <sub>ข้อมูลการทดลอง: การแจ้งเตือน, คำถามขออนุญาต และเปลี่ยนหน้าอัตโนมัติ <a href="tour-0.6.mp4">ดู MP4</a></sub></p>
 
 ## เริ่มเร็ว
@@ -78,7 +78,7 @@ curl -fsSL https://raw.githubusercontent.com/Sarveshsivasankaran/PhoneMon/main/s
 
 ## ความเป็นส่วนตัวและความปลอดภัย
 
-PhoneBox เชื่อมโทรศัพท์กับคอมพิวเตอร์โดยตรง ไม่ต้องมีบัญชีและไม่ส่งข้อมูลการใช้งาน วิดเจ็ตเสริมบางตัวติดต่อเฉพาะบริการที่คุณตั้งค่าไว้
+PhoneMon เชื่อมโทรศัพท์กับคอมพิวเตอร์โดยตรง ไม่ต้องมีบัญชีและไม่ส่งข้อมูลการใช้งาน วิดเจ็ตเสริมบางตัวติดต่อเฉพาะบริการที่คุณตั้งค่าไว้
 
 ## เอกสาร
 
@@ -92,4 +92,4 @@ PhoneBox เชื่อมโทรศัพท์กับคอมพิว�
 
 ## ใบอนุญาต
 
-[PhoneBox ถูกปล่อยออกมาภายใต้ MIT License](../LICENSE)
+[PhoneMon ถูกปล่อยออกมาภายใต้ MIT License](../LICENSE)

@@ -297,7 +297,7 @@ public sealed class ProcessMonitor(ILogger<ProcessMonitor> log, SessionMonitor s
     public KillResult KillPid(int pid)
     {
         if (pid == 0) return new(0, 0, "PID 0 is protected and cannot be terminated");
-        if (pid == _selfPid) return new(0, 0, "that is the PhoneBox agent itself");
+        if (pid == _selfPid) return new(0, 0, "that is the PhoneMon agent itself");
         Process p;
         try { p = Process.GetProcessById(pid); }
         catch { return new(0, 0, "process not found"); }

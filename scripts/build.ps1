@@ -1,7 +1,7 @@
 <#
 .SYNOPSIS
   Builds release artifacts into dist\:
-    PhoneBox-<version>.apk               Android panel (release-signed if a key is configured)
+    PhoneMon-<version>.apk               Android panel (release-signed if a key is configured)
     PhoneBoxAgent-<version>-<rid>.zip    agent for win-x64, linux-x64, linux-arm64, osx-arm64, osx-x64 (self-contained: no .NET runtime needed)
 #>
 $ErrorActionPreference = 'Stop'
@@ -15,7 +15,7 @@ Write-Host "==> Android APK ($version)"
 Push-Location (Join-Path $root 'android')
 try { .\gradlew.bat assembleRelease --console=plain -q } finally { Pop-Location }
 if ($LASTEXITCODE) { throw 'Android release build failed' }
-Copy-Item (Join-Path $root 'android\app\build\outputs\apk\release\app-release.apk') (Join-Path $dist "PhoneBox-$version.apk") -Force
+Copy-Item (Join-Path $root 'android\app\build\outputs\apk\release\app-release.apk') (Join-Path $dist "PhoneMon-$version.apk") -Force
 
 # Self-contained single-file builds for every supported system (no .NET runtime needed), as in release.yml.
 # Zip files lose the Unix executable bit; install.sh and the agent's updater set it again.

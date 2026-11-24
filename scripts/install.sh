@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# PhoneBox installer for Linux and macOS.
+# PhoneMon installer for Linux and macOS.
 #
 #   ./scripts/install.sh                 # build and install the agent, then start it
 #   ./scripts/install.sh --autostart     # ... and start it at login (systemd user service / launchd agent)
@@ -102,7 +102,7 @@ if [ "$autostart" = 1 ]; then
     done
     cat > "$unit" <<EOF
 [Unit]
-Description=PhoneBox agent (desk panel for an Android phone)
+Description=PhoneMon agent (desk panel for an Android phone)
 After=graphical-session.target
 
 [Service]
@@ -168,4 +168,4 @@ if [ "$apk" = 1 ]; then
   fi
 fi
 
-echo "PhoneBox is running. Settings: http://127.0.0.1:8765"
+echo "PhoneMon is running. Settings: http://127.0.0.1:8765"

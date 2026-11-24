@@ -1,6 +1,6 @@
 <p align="center"><img src="logo.png" width="160" alt="PhoneMon logo"></p>
 
-<h1 align="center">PhoneBox</h1>
+<h1 align="center">PhoneMon</h1>
 
 <p align="center">
   <a href="../README.md">English</a> ·
@@ -36,7 +36,7 @@ Estatísticas do PC, sessões de programação com IA, música e controles por t
   <a href="https://github.com/Sarveshsivasankaran/PhoneMon/releases/latest"><b>Baixar</b></a>
 </p>
 
-<p align="center"><img src="hero-0.6.png" width="900" alt="PhoneBox mostrando as páginas de automação, home e planner em três telefones Android"></p>
+<p align="center"><img src="hero-0.6.png" width="900" alt="PhoneMon mostrando as páginas de automação, home e planner em três telefones Android"></p>
 
 ## O que você pode fazer
 
@@ -46,7 +46,7 @@ Estatísticas do PC, sessões de programação com IA, música e controles por t
 - Mostrar relógios, tempo, calendários, notas, mídia e controles Home Assistant.
 - Monte páginas e widgets no editor visual e visualize as mudanças antes de salvar.
 
-<p align="center"><a href="tour-0.6.mp4"><img src="tour-0.6.gif" width="780" alt="PhoneBox tour mostrando notificações, solicitações de permissão e troca automática de página"></a><br>
+<p align="center"><a href="tour-0.6.mp4"><img src="tour-0.6.gif" width="780" alt="PhoneMon tour mostrando notificações, solicitações de permissão e troca automática de página"></a><br>
 <sub>Dados de demonstração: notificações, solicitações de permissão e troca automática de página. <a href="tour-0.6.mp4">Assista ao MP4</a></sub></p>
 
 ## Quick start
@@ -78,7 +78,7 @@ Abra a página de configurações na bandeja Windows ou visite o endereço abaix
 
 ## Privacidade e segurança
 
-O PhoneBox conecta o celular e o computador diretamente. Ele dispensa conta e não envia telemetria. Alguns widgets opcionais se conectam aos serviços que você configurar.
+O PhoneMon conecta o celular e o computador diretamente. Ele dispensa conta e não envia telemetria. Alguns widgets opcionais se conectam aos serviços que você configurar.
 
 ## Documentação
 
@@ -92,4 +92,4 @@ O PhoneBox conecta o celular e o computador diretamente. Ele dispensa conta e n�
 
 ## Licença
 
-[PhoneBox é lançado sob a licença MIT.](../LICENSE)
+[PhoneMon é lançado sob a licença MIT.](../LICENSE)

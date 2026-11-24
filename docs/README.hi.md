@@ -1,6 +1,6 @@
 <p align="center"><img src="logo.png" width="160" alt="PhoneMon logo"></p>
 
-<h1 align="center">PhoneBox</h1>
+<h1 align="center">PhoneMon</h1>
 
 <p align="center">
   <a href="../README.md">English</a> ·
@@ -36,7 +36,7 @@ USB या Wi-Fi से जुड़कर PC की स्थिति, AI क�
   <a href="https://github.com/Sarveshsivasankaran/PhoneMon/releases/latest"><b>डाउनलोड</b></a>
 </p>
 
-<p align="center"><img src="hero-0.6.png" width="900" alt="PhoneBox तीन Android फोनों पर स्वचालन, घर और प्लानर पृष्ठ दिखा रहा है"></p>
+<p align="center"><img src="hero-0.6.png" width="900" alt="PhoneMon तीन Android फोनों पर स्वचालन, घर और प्लानर पृष्ठ दिखा रहा है"></p>
 
 ## आप क्या कर सकते हैं
 
@@ -46,7 +46,7 @@ USB या Wi-Fi से जुड़कर PC की स्थिति, AI क�
 - घड़ी, मौसम, पंचांग, नोट्स, मीडिया तथा Home Assistant नियंत्रण दिखाएँ.
 - विज़ुअल एडिटर में पेज और विजेट बनाएँ और सहेजने से पहले प्रीव्यू देखें।
 
-<p align="center"><a href="tour-0.6.mp4"><img src="tour-0.6.gif" width="780" alt="PhoneBox दौरा सूचनाएँ, अनुमति प्रोम्प्ट तथा स्वचालित पृष्ठ स्विचिंग दिखाता है"></a><br>
+<p align="center"><a href="tour-0.6.mp4"><img src="tour-0.6.gif" width="780" alt="PhoneMon दौरा सूचनाएँ, अनुमति प्रोम्प्ट तथा स्वचालित पृष्ठ स्विचिंग दिखाता है"></a><br>
 <sub>डेमो डाटा: अधिसूचनाएं, अनुमति प्रोम्प्ट और स्वचालित पृष्ठ स्विचिंग। <a href="tour-0.6.mp4">MP4 देखें</a></sub></p>
 
 ## त्वरित प्रारंभ
@@ -78,7 +78,7 @@ Windows ट्रे से विन्यास पृष्ठ खोले�
 
 ## गोपनीयता तथा सुरक्षा
 
-PhoneBox फ़ोन और कंप्यूटर को सीधे जोड़ता है। इसके लिए खाते की ज़रूरत नहीं है और यह टेलीमेट्री नहीं भेजता। कुछ वैकल्पिक विजेट आपकी कॉन्फ़िगर की हुई सेवाओं से जुड़ते हैं।
+PhoneMon फ़ोन और कंप्यूटर को सीधे जोड़ता है। इसके लिए खाते की ज़रूरत नहीं है और यह टेलीमेट्री नहीं भेजता। कुछ वैकल्पिक विजेट आपकी कॉन्फ़िगर की हुई सेवाओं से जुड़ते हैं।
 
 ## दस्तावेज़ीकरण
 
@@ -92,4 +92,4 @@ PhoneBox फ़ोन और कंप्यूटर को सीधे जो
 
 ## लाइसेंस
 
-[PhoneBox MIT लाइसेंस के तहत जारी किया गया है।](../LICENSE)
+[PhoneMon MIT लाइसेंस के तहत जारी किया गया है।](../LICENSE)

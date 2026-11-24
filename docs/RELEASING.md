@@ -2,7 +2,7 @@
 
 Pushing a change to the root `VERSION` file on `main` starts the release workflow and publishes after checks and signing succeed. For a release update, bump the Android version name and code, the agent version, and the dated changelog together with `VERSION`. Routine changes leave `VERSION` alone. Manual dispatch remains available for retries before publication.
 
-The release titled **1.2.1 (stable)** uses the distinct Git tag `v1.2.1-stable` and numeric package version `1.2.2`. Filenames, desktop binary versions, Scoop and WinGet all use the numeric package version. The Android app shows the release title and uses an increasing version code. The next ordinary release can use `1.2.3` or higher with its normal numeric title and tag.
+The release titled **1.2.2 (stable)** uses the distinct Git tag `v1.2.2-stable` and numeric package version `1.2.3`. Filenames, desktop binary versions, Scoop and WinGet all use the numeric package version. The Android app shows the release title and uses an increasing version code. The next ordinary release can use `1.2.4` or higher with its normal numeric title and tag.
 
 1. Update `agent/PhoneBox.Agent/PhoneBox.Agent.csproj`, Android `versionName` and its increasing `versionCode`.
 2. Add dated release notes to `CHANGELOG.md`; update README and demo catalog counts when widgets/templates change.
@@ -12,7 +12,7 @@ The release titled **1.2.1 (stable)** uses the distinct Git tag `v1.2.1-stable` 
 5. Monitor the automatically triggered **release** workflow. Use manual dispatch to retry a failed build before publication.
 
 The release workflow reuses the build checks, then tests and smoke-runs the agent on native Windows x64,
-Linux x64/ARM64, and macOS ARM64/Intel runners. It builds the signed APK, signs the macOS agent with PhoneBox's own certificate, creates
+Linux x64/ARM64, and macOS ARM64/Intel runners. It builds the signed APK, signs the macOS agent with PhoneMon's own certificate, creates
 provenance attestations and SHA-256 checksums, and publishes the release notes from the changelog.
 The reusable artifact contract also checks the real upload/download boundary with transfer fixtures: exact release
 filenames and hashes, exclusion of debug intermediates, and the actual demo's Pages tar format. It never publishes
@@ -21,7 +21,7 @@ Published releases update the Scoop bucket and generate winget manifests in a fo
 Winget manifests are prepared for submission; generation alone does not mean the package is accepted into winget-pkgs.
 
 The agent zips are self-contained single files: each one carries its own .NET runtime, so .NET security fixes
-reach users only through a PhoneBox release. When .NET ships a fix for Kestrel, TLS or the runtime, publish a patch
+reach users only through a PhoneMon release. When .NET ships a fix for Kestrel, TLS or the runtime, publish a patch
 release (`setup-dotnet` with `10.0.x` picks up the newest runtime). Single-file bundles are not compressed on
 purpose: the zip is barely smaller and a compressed bundle costs about 90 MB more memory in a process that runs all day.
 

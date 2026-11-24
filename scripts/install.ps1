@@ -1,10 +1,10 @@
 <#
 .SYNOPSIS
-  Installs (or updates) PhoneBox on this computer and, optionally, on the connected phone.
+  Installs (or updates) PhoneMon on this computer and, optionally, on the connected phone.
 
 .DESCRIPTION
   1. Publishes the agent to a temporary staging folder.
-  2. Stops a running agent and installs the staged build in %LOCALAPPDATA%\PhoneBox\app.
+  2. Stops a running agent and installs the staged build in %LOCALAPPDATA%\PhoneMon\app.
   3. Optionally adds a Start-with-Windows shortcut.
   4. Optionally installs the panel APK on the connected phone: the newest of dist\ and the last build, rebuilt
      first when the app's sources are newer (or with -BuildApk).
@@ -23,7 +23,7 @@ param(
 $ErrorActionPreference = 'Stop'
 $root = Split-Path $PSScriptRoot
 . (Join-Path $PSScriptRoot 'install-apk.ps1')
-$app = Join-Path $env:LOCALAPPDATA 'PhoneBox\app'
+$app = Join-Path $env:LOCALAPPDATA 'PhoneMon\app'
 $exe = Join-Path $app 'PhoneBoxAgent.exe'
 
 if (-not (Get-Command dotnet -ErrorAction SilentlyContinue)) { throw '.NET 10 SDK is required: winget install Microsoft.DotNet.SDK.10' }
@@ -58,11 +58,12 @@ if ($programs -and (Test-Path $programs)) {
     Write-Host '==> Adding Start Menu shortcut'
     # a shortcut that cannot be written must not stop the script before the agent is started again
     try {
+        Remove-Item (Join-Path $programs 'PhoneBox.lnk') -ErrorAction SilentlyContinue
         $shell = New-Object -ComObject WScript.Shell
-        $lnk = $shell.CreateShortcut((Join-Path $programs 'PhoneBox.lnk'))
+        $lnk = $shell.CreateShortcut((Join-Path $programs 'PhoneMon.lnk'))
         $lnk.TargetPath = $exe
         $lnk.WorkingDirectory = $app
-        $lnk.Description = 'PhoneBox agent'
+        $lnk.Description = 'PhoneMon agent'
         $lnk.Save()
     } catch {
         Write-Warning "Could not create the Start Menu shortcut: $($_.Exception.Message)"
@@ -71,11 +72,12 @@ if ($programs -and (Test-Path $programs)) {
 
 if ($Autostart) {
     Write-Host '==> Adding Start-with-Windows shortcut'
+    Remove-Item (Join-Path $startup 'PhoneBox.lnk') -ErrorAction SilentlyContinue
     $shell = New-Object -ComObject WScript.Shell
-    $lnk = $shell.CreateShortcut((Join-Path $startup 'PhoneBox.lnk'))
+    $lnk = $shell.CreateShortcut((Join-Path $startup 'PhoneMon.lnk'))
     $lnk.TargetPath = $exe
     $lnk.WorkingDirectory = $app
-    $lnk.Description = 'PhoneBox agent'
+    $lnk.Description = 'PhoneMon agent'
     $lnk.Save()
 }
 
@@ -87,7 +89,7 @@ try { Start-Process $exe -WorkingDirectory $app } catch { $launchError = $_ }
 if (-not $launchError) {
     Start-Sleep 2
     try { Invoke-RestMethod http://127.0.0.1:8765/api/info -TimeoutSec 5 | Out-Null; Write-Host 'PhoneMon is running. Settings: http://127.0.0.1:8765  (or the tray icon)' }
-    catch { Write-Warning "The agent did not respond; see $env:LOCALAPPDATA\PhoneBox\agent.log" }
+    catch { Write-Warning "The agent did not respond; see $env:LOCALAPPDATA\PhoneMon\agent.log" }
 }
 
 if ($Apk) {

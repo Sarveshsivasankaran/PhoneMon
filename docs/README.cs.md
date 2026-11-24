@@ -1,6 +1,6 @@
 <p align="center"><img src="logo.png" width="160" alt="PhoneMon logo"></p>
 
-<h1 align="center">PhoneBox</h1>
+<h1 align="center">PhoneMon</h1>
 
 <p align="center">
   <a href="../README.md">English</a> ·
@@ -36,7 +36,7 @@ Stav počítače, relace programování s AI, hudba a dotykové ovládání pře
   <a href="https://github.com/Sarveshsivasankaran/PhoneMon/releases/latest"><b>Stáhnout</b></a>
 </p>
 
-<p align="center"><img src="hero-0.6.png" width="900" alt="PhoneBox zobrazující stránky automatizace, domova a plánovače na třech telefonech Android"></p>
+<p align="center"><img src="hero-0.6.png" width="900" alt="PhoneMon zobrazující stránky automatizace, domova a plánovače na třech telefonech Android"></p>
 
 ## Co můžete dělat
 
@@ -46,7 +46,7 @@ Stav počítače, relace programování s AI, hudba a dotykové ovládání pře
 - Zobrazit hodiny, počasí, kalendáře, poznámky, média a ovládací prvky Home Assistant.
 - Vytvářet stránky a widgety ve vizuálním editoru a prohlížet si změny před uložením.
 
-<p align="center"><a href="tour-0.6.mp4"><img src="tour-0.6.gif" width="780" alt="PhoneBox prohlídka zobrazující oznámení, výzvy k povolení a automatické přepínání stránek"></a><br>
+<p align="center"><a href="tour-0.6.mp4"><img src="tour-0.6.gif" width="780" alt="PhoneMon prohlídka zobrazující oznámení, výzvy k povolení a automatické přepínání stránek"></a><br>
 <sub>Demo data: oznámení, výzvy k oprávnění a automatické přepínání stránek. <a href="tour-0.6.mp4">Podívejte se na MP4</a></sub></p>
 
 ## Rychlý start
@@ -78,7 +78,7 @@ Otevřete stránku nastavení z panelu Windows nebo navštivte níže uvedenou a
 
 ## Ochrana soukromí a bezpečnost
 
-PhoneBox propojuje telefon a počítač přímo. Nevyžaduje účet a neodesílá telemetrii. Některé volitelné widgety se připojují ke službám, které nastavíte.
+PhoneMon propojuje telefon a počítač přímo. Nevyžaduje účet a neodesílá telemetrii. Některé volitelné widgety se připojují ke službám, které nastavíte.
 
 ## Dokumentace
 
@@ -92,4 +92,4 @@ PhoneBox propojuje telefon a počítač přímo. Nevyžaduje účet a neodesíl�
 
 ## Licence
 
-[PhoneBox je vydán pod licencí MIT.](../LICENSE)
+[PhoneMon je vydán pod licencí MIT.](../LICENSE)

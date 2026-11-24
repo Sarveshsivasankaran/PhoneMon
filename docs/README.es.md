@@ -1,6 +1,6 @@
 <p align="center"><img src="logo.png" width="160" alt="PhoneMon logo"></p>
 
-<h1 align="center">PhoneBox</h1>
+<h1 align="center">PhoneMon</h1>
 
 <p align="center">
   <a href="../README.md">English</a> ·
@@ -30,7 +30,7 @@
 
 <p align="center"><b>Convierte un teléfono Android antiguo en un panel de escritorio para tu ordenador.</b><br>
 Estadísticas del PC, sesiones de programación con IA, música y controles táctiles por USB o Wi-Fi.<br>
-Windows, Linux y macOS. Sin root, sin cuenta de PhoneBox ni servicio en la nube.</p>
+Windows, Linux y macOS. Sin root, sin cuenta de PhoneMon ni servicio en la nube.</p>
 
 <p align="center">
   <a href="https://sarveshsivasankaran.github.io/PhoneMon/"><b>Probar demo en vivo</b></a> ·
@@ -46,10 +46,10 @@ Windows, Linux y macOS. Sin root, sin cuenta de PhoneBox ni servicio en la nube.
   <a href="../LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="Licencia MIT"></a>
 </p>
 
-<p align="center"><img src="hero-0.6.png" width="900" alt="PhoneBox en tres teléfonos"><br>
+<p align="center"><img src="hero-0.6.png" width="900" alt="PhoneMon en tres teléfonos"><br>
 <sub>Diseños de ejemplo con datos de demostración.</sub></p>
 
-PhoneBox combina una **aplicación Android** a pantalla completa con un ligero **agente de escritorio**. Diseña tu panel en un editor visual web: **124 widgets**, **30 plantillas**, varias páginas y vista previa en vivo.
+PhoneMon combina una **aplicación Android** a pantalla completa con un ligero **agente de escritorio**. Diseña tu panel en un editor visual web: **124 widgets**, **30 plantillas**, varias páginas y vista previa en vivo.
 
 ## Qué puedes hacer
 

@@ -1,6 +1,6 @@
 <p align="center"><img src="logo.png" width="160" alt="PhoneMon logo"></p>
 
-<h1 align="center">PhoneBox</h1>
+<h1 align="center">PhoneMon</h1>
 
 <p align="center">
   <a href="../README.md">English</a> ·
@@ -30,7 +30,7 @@
 
 <p align="center"><b>Biến một chiếc điện thoại Android cũ thành bảng điều khiển để bàn cho máy tính của bạn.</b><br>
 Thông số PC, các phiên lập trình bằng AI, nhạc và điều khiển cảm ứng qua USB hoặc Wi-Fi.<br>
-Windows, Linux và macOS. Không cần root, tài khoản PhoneBox hay dịch vụ đám mây.</p>
+Windows, Linux và macOS. Không cần root, tài khoản PhoneMon hay dịch vụ đám mây.</p>
 
 <p align="center">
   <a href="https://sarveshsivasankaran.github.io/PhoneMon/"><b>Dùng thử bản demo trực tiếp</b></a> ·
@@ -46,10 +46,10 @@ Windows, Linux và macOS. Không cần root, tài khoản PhoneBox hay dịch v�
   <a href="../LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="Giấy phép MIT"></a>
 </p>
 
-<p align="center"><img src="hero-0.6.png" width="900" alt="PhoneBox trên ba chiếc điện thoại hiển thị các trang tự động hóa, trang chủ và lập kế hoạch"><br>
+<p align="center"><img src="hero-0.6.png" width="900" alt="PhoneMon trên ba chiếc điện thoại hiển thị các trang tự động hóa, trang chủ và lập kế hoạch"><br>
 <sub>Các bố cục ví dụ với dữ liệu demo.</sub></p>
 
-PhoneBox ghép nối một **ứng dụng Android** toàn màn hình với một **tác nhân máy tính (agent)** nhỏ gọn. Hãy xây dựng bảng điều khiển của bạn trong trình chỉnh sửa trực quan chạy trên trình duyệt: **124 widget**, **30 mẫu**, nhiều trang và xem trước trực tiếp. Kết nối nhiều điện thoại, mỗi chiếc với bố cục riêng, hoặc chuyển một chiếc điện thoại giữa các máy tính đã ghép nối.
+PhoneMon ghép nối một **ứng dụng Android** toàn màn hình với một **tác nhân máy tính (agent)** nhỏ gọn. Hãy xây dựng bảng điều khiển của bạn trong trình chỉnh sửa trực quan chạy trên trình duyệt: **124 widget**, **30 mẫu**, nhiều trang và xem trước trực tiếp. Kết nối nhiều điện thoại, mỗi chiếc với bố cục riêng, hoặc chuyển một chiếc điện thoại giữa các máy tính đã ghép nối.
 
 ## Bạn có thể làm gì
 
@@ -63,7 +63,7 @@ PhoneBox ghép nối một **ứng dụng Android** toàn màn hình với một
 
 Chạm vào một phiên AI để xem chi tiết về mô hình, thời gian và token của nó. Bật tùy chọn nhắc cấp quyền của Claude Code để trả lời **Cho phép (Allow)** hoặc **Từ chối (Deny)** ngay từ điện thoại. Tích hợp tùy chọn [CodexBar](GUIDE.md#widgets) bổ sung các nhà cung cấp hạn mức và tổng quan chi phí.
 
-<p align="center"><a href="tour-0.6.mp4"><img src="tour-0.6.gif" width="780" alt="Chuyến tham quan PhoneBox hiển thị thông báo, lời nhắc cấp quyền của Claude Code và chuyển trang tự động"></a><br>
+<p align="center"><a href="tour-0.6.mp4"><img src="tour-0.6.gif" width="780" alt="Chuyến tham quan PhoneMon hiển thị thông báo, lời nhắc cấp quyền của Claude Code và chuyển trang tự động"></a><br>
 <sub>Một chuyến tham quan với dữ liệu demo: thông báo, lời nhắc cấp quyền và chuyển trang tự động. <a href="tour-0.6.mp4">Xem bản MP4</a></sub></p>
 
 ## Bắt đầu nhanh
@@ -106,7 +106,7 @@ Hãy đọc các script trước khi chạy chúng: [Windows](../setup.ps1) · [
 
 ### 3. Tùy biến theo ý bạn
 
-Mở <http://127.0.0.1:8765> (hoặc nhấp đúp vào biểu tượng PhoneBox trên khay hệ thống Windows). Trong mục **Trang (Pages)**, chọn một mẫu, kéo và thay đổi kích thước các widget, rồi bấm **Lưu (Save)**. Dùng **Xem trước trực tiếp (Live preview)** để xem các chỉnh sửa chưa lưu với dữ liệu thật.
+Mở <http://127.0.0.1:8765> (hoặc nhấp đúp vào biểu tượng PhoneMon trên khay hệ thống Windows). Trong mục **Trang (Pages)**, chọn một mẫu, kéo và thay đổi kích thước các widget, rồi bấm **Lưu (Save)**. Dùng **Xem trước trực tiếp (Live preview)** để xem các chỉnh sửa chưa lưu với dữ liệu thật.
 Vuốt, chạm vào các chấm chỉ trang hoặc dùng phím âm lượng của điện thoại để di chuyển giữa các trang.
 
 <details>
@@ -176,7 +176,7 @@ Máy chủ cài đặt trên máy tính lắng nghe tại `127.0.0.1:8765`; USB 
 Wi-Fi tùy chọn dùng HTTPS trên cổng 8766 với chứng chỉ được ghim cố định và khóa đã ghép nối. Các endpoint cài đặt và ghép nối
 luôn ở cục bộ. Điện thoại yêu cầu các hành động đã cấu hình theo ID; lệnh và thông tin đăng nhập của các tích hợp luôn nằm trên máy tính.
 
-PhoneBox không có hệ thống đo lường từ xa (telemetry), phân tích hay tài khoản riêng. Các widget và tích hợp tùy chọn sẽ liên hệ với
+PhoneMon không có hệ thống đo lường từ xa (telemetry), phân tích hay tài khoản riêng. Các widget và tích hợp tùy chọn sẽ liên hệ với
 các dịch vụ bên ngoài để lấy dữ liệu thời tiết, hạn mức, GitHub và các dữ liệu khác, và agent sẽ kiểm tra bản cập nhật trên GitHub.
 Các nguồn cấp công khai được hỗ trợ có thể dự phòng qua agent bằng USB khi điện thoại không có internet.
 [Chính sách quyền riêng tư](../PRIVACY.md) liệt kê các kết nối ra ngoài và cách tắt chúng.
@@ -213,7 +213,7 @@ Ký mã miễn phí do [SignPath.io](https://about.signpath.io/) cung cấp, ch�
 
 ## Lời cảm ơn
 
-Những người đã thử nghiệm PhoneBox trên phần cứng của chính họ:
+Những người đã thử nghiệm PhoneMon trên phần cứng của chính họ:
 
 - [anandyakshit](https://github.com/anandyakshit): hỗ trợ Android 7, trên một chiếc điện thoại Android 7.1.1 ([#73](https://github.com/Sarveshsivasankaran/PhoneMon/issues/73)).
 

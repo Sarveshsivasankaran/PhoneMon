@@ -28,7 +28,7 @@
   <a href="docs/README.zh-Hant.md">中文（繁體）</a>
 </p>
 
-<p align="center">Published by Solo-P-Leveller · Based on PhoneBox by Ersin KOÇ</p>
+<p align="center">Published by Solo-P-Leveller · Based on PhoneMon by Ersin KOÇ</p>
 
 <p align="center"><b>Turn an old Android phone into a desk panel for your computer.</b><br>
 PC stats, AI coding sessions, music and touch controls over USB or Wi-Fi.<br>
@@ -198,8 +198,8 @@ before you install it.
 
 | Add-on | What it does | What it sends outside the PC |
 |---|---|---|
-| [PhoneBox Games Tab](https://github.com/lucasaz/phonebox-games-tab) (Windows) | A Games page with live FPS, cover art and play time, through the push API and a Custom HTML widget | Store / Xbox apps' package names, with the Windows display language and region, to the Microsoft Store catalog (`displaycatalog.mp.microsoft.com`); the phone loads cover images from Microsoft's image servers and from Steam's, whose URL contains the game's Steam app ID |
-| [PhoneBox for GNOME](https://github.com/Gabrielmororo180/phonebox-gnome) (Linux, GNOME) | CPU and the Claude session quota in the GNOME top bar; a click opens the panel, with page tabs, right below it. Also works as a desktop widget | Nothing of its own; the panel it opens makes the same requests as on the phone, such as the weather from `api.open-meteo.com` (see [PRIVACY.md](PRIVACY.md)) |
+| [PhoneMon Games Tab](https://github.com/lucasaz/phonebox-games-tab) (Windows) | A Games page with live FPS, cover art and play time, through the push API and a Custom HTML widget | Store / Xbox apps' package names, with the Windows display language and region, to the Microsoft Store catalog (`displaycatalog.mp.microsoft.com`); the phone loads cover images from Microsoft's image servers and from Steam's, whose URL contains the game's Steam app ID |
+| [PhoneMon for GNOME](https://github.com/Gabrielmororo180/phonebox-gnome) (Linux, GNOME) | CPU and the Claude session quota in the GNOME top bar; a click opens the panel, with page tabs, right below it. Also works as a desktop widget | Nothing of its own; the panel it opens makes the same requests as on the phone, such as the weather from `api.open-meteo.com` (see [PRIVACY.md](PRIVACY.md)) |
 
 ## Security & privacy
 

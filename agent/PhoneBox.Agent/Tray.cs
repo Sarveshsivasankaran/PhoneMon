@@ -153,13 +153,13 @@ public sealed class Tray : IHostedService
             dynamic lnk = shell.CreateShortcut(AppPaths.StartupShortcut);
             lnk.TargetPath = Environment.ProcessPath;
             lnk.WorkingDirectory = Path.GetDirectoryName(Environment.ProcessPath);
-            lnk.Description = "PhoneBox agent";
+            lnk.Description = "PhoneMon agent";
             lnk.Save();
         }
         catch (Exception ex)
         {
             var options = culture.TextInfo.IsRightToLeft ? MessageBoxOptions.RightAlign | MessageBoxOptions.RtlReading : 0;
-            MessageBox.Show(string.Format(culture, Text("autostartError", culture), ex.Message), "PhoneBox",
+            MessageBox.Show(string.Format(culture, Text("autostartError", culture), ex.Message), "PhoneMon",
                 MessageBoxButtons.OK, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1, options);
         }
     }

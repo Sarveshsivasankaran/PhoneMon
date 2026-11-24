@@ -90,7 +90,7 @@ esac''')
                 root = Path(directory)
                 result = self.install(mode, root)
                 self.assertIn('Phone app skipped', result.stdout)
-                self.assertIn('PhoneBox is running', result.stdout)
+                self.assertIn('PhoneMon is running', result.stdout)
                 self.assertFalse((root / 'phone-installed').exists())
 
     def test_unverified_agent_still_blocks_installation(self):

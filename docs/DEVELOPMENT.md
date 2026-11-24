@@ -1,6 +1,6 @@
 # Development guide
 
-[Back to PhoneBox](../README.md) · [Installation and connections](SETUP.md) · [User guide](GUIDE.md)
+[Back to PhoneMon](../README.md) · [Installation and connections](SETUP.md) · [User guide](GUIDE.md)
 
 [How it works](#how-it-works) · [Development](#development)
 
@@ -13,7 +13,7 @@ flowchart LR
     UI -->|weather, rates, HN| Web(("Public APIs"))
   end
   subgraph PC["Windows / Linux / macOS"]
-    Agent["PhoneBox agent<br/>(.NET 10)"]
+    Agent["PhoneMon agent<br/>(.NET 10)"]
     Agent --- Mon["System, GPU, media, volume,<br/>processes, sessions, quotas, GitHub"]
     Agent --- Set["Settings page &<br/>layout editor"]
   end

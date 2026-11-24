@@ -141,7 +141,7 @@ app.MapPost("/api/controls/spotify/disconnect", async (SpotifyControl spotify, C
 app.MapGet("/api/controls/spotify/callback", async (string? state, string? code, SpotifyControl spotify, CancellationToken ct) =>
 {
     try { return state is not null && code is not null && await spotify.Complete(state, code, ct)
-        ? Results.Text("Spotify connected. Return to PhoneBox settings; this tab can be closed.", "text/plain")
+        ? Results.Text("Spotify connected. Return to PhoneMon settings; this tab can be closed.", "text/plain")
         : Results.BadRequest("Spotify sign-in expired or was refused. Start again from desktop settings."); }
     catch { return Results.BadRequest("Spotify sign-in failed. Start again from desktop settings."); }
 });
@@ -562,6 +562,7 @@ app.MapPost("/api/shortcuts/test", async (HttpRequest req, ConfigStore cfg, Push
 app.MapGet("/api/info", (AdbReverse adb, ConfigStore cfg) => Results.Json(new
 {
     version = AppPaths.Version,
+    publisher = "Solo-P-Leveller",
     os = AppPaths.Os,
     configPath = cfg.Path,
     logPath = AppPaths.LogPath,
@@ -1109,7 +1110,7 @@ app.MapDelete("/api/settings/shortcut-icon", (string id, HttpRequest req, Config
 });
 
 app.Lifetime.ApplicationStarted.Register(() =>
-    app.Logger.LogInformation("PhoneBox agent {Version} ready on http://127.0.0.1:{Port}, phone USB port {UsbPort} (config: {Path})",
+    app.Logger.LogInformation("PhoneMon agent {Version} ready on http://127.0.0.1:{Port}, phone USB port {UsbPort} (config: {Path})",
         AppPaths.Version, Port, usb.Port, configPath));
 
 app.Run();

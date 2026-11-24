@@ -17,7 +17,7 @@ people who proposed or prototyped something are credited in the [changelog](../C
 - **Discord login through the desktop app** ([#338](https://github.com/Sarveshsivasankaran/PhoneMon/issues/338)): Discord refuses
   `AUTHORIZE` over IPC both without `redirect_uri` (0.9.24) and with it (0.9.25); the working combination is being
   tested against a real Discord client.
-- **Feeding PhoneBox from MQTT**: a bridge script and a guide example for pushed values and notifications
+- **Feeding PhoneMon from MQTT**: a bridge script and a guide example for pushed values and notifications
   ([#241](https://github.com/Sarveshsivasankaran/PhoneMon/issues/241)).
 - **Rules for pushed values**: a "not updated for N seconds" condition, `>=` / `<=`, and a separate release threshold
   ([#242](https://github.com/Sarveshsivasankaran/PhoneMon/issues/242), pull request

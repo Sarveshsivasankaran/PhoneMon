@@ -266,15 +266,15 @@ function Install-PhoneApp([string]$Adb, [string]$Apk, [string]$Device) {
     $sdkLevel = 0
     [void][int]::TryParse(("$((Invoke-Native $Adb @('-s', $Device, 'shell', 'getprop', 'ro.build.version.sdk')).Output)").Trim(), [ref]$sdkLevel)
     if ($sdkLevel -gt 0 -and $sdkLevel -lt 21) {
-        Write-Caution "This phone runs Android API $sdkLevel; PhoneBox needs Android 5.0 (API 21) or later. The app was not installed."
+        Write-Caution "This phone runs Android API $sdkLevel; PhoneMon needs Android 5.0 (API 21) or later. The app was not installed."
         return $false
     }
     Write-Info "Installing $(Split-Path $Apk -Leaf) on $Device (the phone may ask you to confirm) ..."
     $result = Invoke-Native $Adb @('-s', $Device, 'install', '-r', $Apk)
     $text = $result.Output -join ' '
     if ($text -match 'INSTALL_FAILED_UPDATE_INCOMPATIBLE') {
-        Write-Caution 'The phone has a PhoneBox app signed with a different key (for example one you built yourself).'
-        Write-Caution 'It was left as it is, with its data. To switch to the release app, uninstall PhoneBox on the phone'
+        Write-Caution 'The phone has a PhoneMon app signed with a different key (for example one you built yourself).'
+        Write-Caution 'It was left as it is, with its data. To switch to the release app, uninstall PhoneMon on the phone'
         Write-Caution '(this deletes its settings) and run setup again.'
         return $false
     }
@@ -354,9 +354,10 @@ function Install-PhoneMon {
     $ver = $tag.Trim().TrimStart('v')
     $tag = "v$ver"
     if ($tag -in 'v1.2.1-stable', 'v1.2.2') { $tag = 'v1.2.1-stable'; $ver = '1.2.2' }
+    elseif ($tag -in 'v1.2.2-stable', 'v1.2.3') { $tag = 'v1.2.2-stable'; $ver = '1.2.3' }
     if ($ver -notmatch '^\d+\.\d+\.\d+$') { throw "Unexpected version '$tag'." }
     $base = "https://github.com/$Repo/releases/download/$tag"
-    $displayVersion = if ($tag -eq 'v1.2.1-stable') { '1.2.1 (stable)' } else { $ver }
+    $displayVersion = if ($tag -eq 'v1.2.1-stable') { '1.2.1 (stable)' } elseif ($tag -eq 'v1.2.2-stable') { '1.2.2 (stable)' } else { $ver }
     if ($installed -eq $ver) { Write-Ok "PhoneMon $displayVersion (already installed; it will be reinstalled, settings stay)" }
     elseif ($installed) { Write-Ok "PhoneMon $displayVersion (updating from $installed; settings stay)" }
     else { Write-Ok "PhoneMon $displayVersion" }
@@ -572,7 +573,7 @@ function Install-PhoneMon {
     }
 }
 
-function Install-PhoneBox { Install-PhoneMon }
+function Install-PhoneMon { Install-PhoneMon }
 
 # Everything runs from here, so a download cut off half way cannot run half a script.
 try {

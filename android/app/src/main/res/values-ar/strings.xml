@@ -7,10 +7,10 @@
     <string name="pair_progress">جارٍ الاقتران بـ ⁨%1$s⁩…</string>
     <string name="pair_done">تم الاقتران بـ ⁨%1$s⁩</string>
     <string name="pair_failed_title">تعذّر الاقتران</string>
-    <string name="pair_failed_unreachable">تعذّر الاتصال بـ ⁨%1$s⁩ على العنوان ⁦%2$s⁩. يجب أن يكون الهاتف والكمبيوتر على الشبكة نفسها أو أن يتصلا عبر Tailscale. تأكّد من أن جدار الحماية على الكمبيوتر يسمح بالاتصال بـ PhoneBox.</string>
+    <string name="pair_failed_unreachable">تعذّر الاتصال بـ ⁨%1$s⁩ على العنوان ⁦%2$s⁩. يجب أن يكون الهاتف والكمبيوتر على الشبكة نفسها أو أن يتصلا عبر Tailscale. تأكّد من أن جدار الحماية على الكمبيوتر يسمح بالاتصال بـ PhoneMon.</string>
     <string name="pair_failed_code">لم يقبل ⁨%1$s⁩ الرمز. يمكن استخدام الرمز مرة واحدة فقط، وتستمر صلاحيته 5 دقائق. ابدأ الاقتران مجددًا على الكمبيوتر.</string>
     <string name="pair_failed_answer">ردّ ⁨%1$s⁩ برمز الاستجابة ⁨%2$d⁩.</string>
     <string name="pair_failed_certificate">شهادة الكمبيوتر تختلف عن الشهادة في رمز QR. ابدأ الاقتران من جديد.</string>
     <string name="ok">موافق</string>
-    <string name="webview_failed">لا يمكن تشغيل اللوحة على هذا الهاتف: تعذّر على Android تشغيل WebView. بعض هواتف Android 5 لا تستطيع تشغيل إصدارات WebView التي يحتاجها PhoneBox.</string>
+    <string name="webview_failed">لا يمكن تشغيل اللوحة على هذا الهاتف: تعذّر على Android تشغيل WebView. بعض هواتف Android 5 لا تستطيع تشغيل إصدارات WebView التي يحتاجها PhoneMon.</string>
 </resources>

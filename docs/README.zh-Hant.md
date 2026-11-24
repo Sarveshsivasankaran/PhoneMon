@@ -1,6 +1,6 @@
 <p align="center"><img src="logo.png" width="160" alt="PhoneMon logo"></p>
 
-<h1 align="center">PhoneBox</h1>
+<h1 align="center">PhoneMon</h1>
 
 <p align="center">
   <a href="../README.md">English</a> ·
@@ -36,7 +36,7 @@
   <a href="https://github.com/Sarveshsivasankaran/PhoneMon/releases/latest"><b>下載</b></a>
 </p>
 
-<p align="center"><img src="hero-0.6.png" width="900" alt="PhoneBox 顯示自動化、家庭和計劃頁面 Android 電話"></p>
+<p align="center"><img src="hero-0.6.png" width="900" alt="PhoneMon 顯示自動化、家庭和計劃頁面 Android 電話"></p>
 
 ## 可以做什麼
 
@@ -46,7 +46,7 @@
 - 顯示時鐘、天氣、日曆、筆記、媒體和 Home Assistant 控件。
 - 使用視覺化編輯器配置頁面與小工具，並在儲存前預覽變更。
 
-<p align="center"><a href="tour-0.6.mp4"><img src="tour-0.6.gif" width="780" alt="PhoneBox 遊戲展示通知、權限提示和自動頁面切換"></a><br>
+<p align="center"><a href="tour-0.6.mp4"><img src="tour-0.6.gif" width="780" alt="PhoneMon 遊戲展示通知、權限提示和自動頁面切換"></a><br>
 <sub>示範資料：通知、權限提示和自動頁面切換。 <a href="tour-0.6.mp4">觀看 MP4</a></sub></p>
 
 ## 快速入門
@@ -78,7 +78,7 @@ curl -fsSL https://raw.githubusercontent.com/Sarveshsivasankaran/PhoneMon/main/s
 
 ## 隱私和安全
 
-PhoneBox 會直接連接手機與電腦。無須註冊帳號，也不會傳送遙測資料。部分選用的小工具會連線到您設定的服務。
+PhoneMon 會直接連接手機與電腦。無須註冊帳號，也不會傳送遙測資料。部分選用的小工具會連線到您設定的服務。
 
 ## 文件
 
@@ -92,4 +92,4 @@ PhoneBox 會直接連接手機與電腦。無須註冊帳號，也不會傳送�
 
 ## 授權
 
-[PhoneBox 是以MIT授權條款發佈的](../LICENSE)
+[PhoneMon 是以MIT授權條款發佈的](../LICENSE)

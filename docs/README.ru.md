@@ -1,6 +1,6 @@
 <p align="center"><img src="logo.png" width="160" alt="PhoneMon logo"></p>
 
-<h1 align="center">PhoneBox</h1>
+<h1 align="center">PhoneMon</h1>
 
 <p align="center">
   <a href="../README.md">English</a> ·
@@ -30,7 +30,7 @@
 
 <p align="center"><b>Превратите старый Android-смартфон в настольную панель управления для вашего компьютера.</b><br>
 Статистика ПК, сессии ИИ-программирования, музыка и сенсорное управление по USB или Wi-Fi.<br>
-Windows, Linux и macOS. Без root, без аккаунта PhoneBox и без облачных сервисов.</p>
+Windows, Linux и macOS. Без root, без аккаунта PhoneMon и без облачных сервисов.</p>
 
 <p align="center">
   <a href="https://sarveshsivasankaran.github.io/PhoneMon/"><b>Живое демо</b></a> ·
@@ -46,10 +46,10 @@ Windows, Linux и macOS. Без root, без аккаунта PhoneBox и без
   <a href="../LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="Лицензия MIT"></a>
 </p>
 
-<p align="center"><img src="hero-0.6.png" width="900" alt="PhoneBox на трёх телефонах"><br>
+<p align="center"><img src="hero-0.6.png" width="900" alt="PhoneMon на трёх телефонах"><br>
 <sub>Примеры макетов с демо-данными.</sub></p>
 
-PhoneBox объединяет полноэкранное **Android-приложение** с компактным **десктопным агентом**. Настройте панель в визуальном редакторе в браузере: **123 виджетов**, **30 шаблонов**, несколько страниц и предпросмотр в реальном времени.
+PhoneMon объединяет полноэкранное **Android-приложение** с компактным **десктопным агентом**. Настройте панель в визуальном редакторе в браузере: **123 виджетов**, **30 шаблонов**, несколько страниц и предпросмотр в реальном времени.
 
 ## Возможности
 

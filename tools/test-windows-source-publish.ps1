@@ -3,7 +3,7 @@ $installer = Join-Path $PSScriptRoot '../scripts/install.ps1'
 $fixture = Join-Path ([IO.Path]::GetTempPath()) ('phonebox-publish-test-' + [guid]::NewGuid().ToString('N'))
 $oldLocalAppData = $env:LOCALAPPDATA
 $env:LOCALAPPDATA = $fixture
-$app = Join-Path $fixture 'PhoneBox/app'
+$app = Join-Path $fixture 'PhoneMon/app'
 $installed = Join-Path $app 'PhoneBoxAgent.exe'
 New-Item -ItemType Directory -Path $app -Force | Out-Null
 [IO.File]::WriteAllText($installed, 'running install')

@@ -16,7 +16,7 @@ body:
   - type: input
     id: version
     attributes:
-      label: PhoneBox version
+      label: PhoneMon version
       description: The settings page shows it next to its title (the agent and the phone app should match).
       placeholder: "0.9.6"
     validations:
@@ -43,7 +43,7 @@ body:
     attributes:
       label: Agent log
       description: >-
-        The end of agent.log: %LOCALAPPDATA%\PhoneBox (Windows), ~/.local/share/PhoneBox (Linux),
-        ~/Library/Application Support/PhoneBox (macOS). Remove anything private first (keys, tokens, calendar URLs,
+        The end of agent.log: %LOCALAPPDATA%\PhoneMon (Windows), ~/.local/share/PhoneMon (Linux),
+        ~/Library/Application Support/PhoneMon (macOS). Remove anything private first (keys, tokens, calendar URLs,
         names of your files or sessions).
       render: text

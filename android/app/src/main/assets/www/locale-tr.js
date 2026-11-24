@@ -1,4 +1,4 @@
-// PhoneBox interface translations. See docs/DEVELOPMENT.md for the locale checks.
+// PhoneMon interface translations. See docs/DEVELOPMENT.md for the locale checks.
 window.PhoneBoxLocaleData = Object.assign(window.PhoneBoxLocaleData || {}, {
   "tr": {
     "strings": {
@@ -330,14 +330,14 @@ window.PhoneBoxLocaleData = Object.assign(window.PhoneBoxLocaleData || {}, {
       "s.adv.phoneApp": "Telefon uygulaması",
       "s.adv.upToDate": "(güncel)",
       "s.adv.needsUsb": "(USB ihtiyacı)",
-      "s.adv.notInstalledCopy": "kurulu kopya değil, kendisini sadece %LOCALAPPDATA%\\ PhoneBox \\app'ten güncelledi",
+      "s.adv.notInstalledCopy": "kurulu kopya değil, kendisini sadece %LOCALAPPDATA%\\ PhoneMon \\app'ten güncelledi",
       "s.adv.notSeenYet": "henüz görülmedi",
       "s.adv.log": "Log",
       "s.kiosk.pin": "Paneli sabitle: Ana sayfa ve Son Zamanlar üzerinde kalacak (Android bir kez soruyor; sabitlemeyi kaldırmak için Geri ve Genel Bakış'ı birlikte tutun)",
       "s.kiosk.homeScreen": "Paneli telefonun ana ekranı olarak kullan: yeniden başlatmadan sonra başlar ve Ana Ekran ona döner (başlatıcıyı geri almak için kapatın)",
       "s.kiosk.keepAwake": "Telefonu uyanık tut: Android ekran korumasını kapatın (ücretsiz şarj cihazında başlar) ve bağlandığında ekranı açık tutun (USB üzerinde ayarlanır)",
-      "s.kiosk.openOnConnect": "Telefon bağlandığında PhoneBox'yi aç: telefonu uyandır ve paneli USB üzerinden bağlandığında öne getir (kendin açmak için kapatın, uygulama testleri için de kullandığınız bir telefon için)",
-      "s.kiosk.followLock": "Bilgisayar kilidini izle: macOS kilitlendiğinde telefon ekranını kapatın; macOS kilidi açıldığında onu uyandır ve PhoneBox'yi açın (ADB gereklidir; PIN veya parola ile korunan telefonların kilidini el ile aç)",
+      "s.kiosk.openOnConnect": "Telefon bağlandığında PhoneMon'yi aç: telefonu uyandır ve paneli USB üzerinden bağlandığında öne getir (kendin açmak için kapatın, uygulama testleri için de kullandığınız bir telefon için)",
+      "s.kiosk.followLock": "Bilgisayar kilidini izle: macOS kilitlendiğinde telefon ekranını kapatın; macOS kilidi açıldığında onu uyandır ve PhoneMon'yi açın (ADB gereklidir; PIN veya parola ile korunan telefonların kilidini el ile aç)",
       "s.claude.shareConversation": "Konuşmayı telefonda göster (son mesajları ve adımlarını görmek için Claude Code oturumuna dokun; bunlar sadece telefonuna gönderilen sizin sorularınız ve Claude 'nin cevapları)",
       "s.claude.onlyWhenAway": "Sadece bilgisayardan uzak olduğumda (bir dakika klavye veya fare yok)",
       "s.claude.shareSessionTitles": "Telefonda Claude Code sohbet başlıklarını göster (Claude Code genellikle onları ilk soru işaretinizden çıkarır)",
@@ -379,7 +379,7 @@ window.PhoneBoxLocaleData = Object.assign(window.PhoneBoxLocaleData || {}, {
       "s.obs.enable": "OBS'ye bağlan (<b> OBS </b> widget, On air widget ve kuralları için)",
       "s.obs.hint": "OBS'de: Araçlar › WebSocket Server Ayarları › <i> Enable WebSocket server </i> ; copy the password from <i> Show Connect Info </i> .",
       "s.battery.leadTail": "Nereden geldiği: <b> akıllı fiş Home Assistant </b>'de (telefon kendi şarj cihazında) veya iki <b> kısayol </b> , örneğin <code>uhubctl</code> bir USB hub için değiştirilebilir portlarla. USB güç olmadan panel Wi-Fi üzerinde çalışmaya devam eder.",
-      "s.claude.hint": "Ne zaman? Claude Code izin ister (bir komut çalıştır, bir dosya düzenle…), telefon bu isteği <b>İzin Ver</b> ve <b>Reddedildi.</b>Telefon bağlanmıyorsa ya da kimse zamanında cevap vermiyorsa, Claude Code Terminalde normal olarak soruyor. Bu, terminalde küçük bir hook'a ihtiyaç duyar. <code>~/.claude/settings.json</code>; PhoneBox onu sizin için ekler (bir yedek dosyanın yanında tutulur).",
+      "s.claude.hint": "Ne zaman? Claude Code izin ister (bir komut çalıştır, bir dosya düzenle…), telefon bu isteği <b>İzin Ver</b> ve <b>Reddedildi.</b>Telefon bağlanmıyorsa ya da kimse zamanında cevap vermiyorsa, Claude Code Terminalde normal olarak soruyor. Bu, terminalde küçük bir hook'a ihtiyaç duyar. <code>~/.claude/settings.json</code>; PhoneMon onu sizin için ekler (bir yedek dosyanın yanında tutulur).",
       "s.wifi.lead": "Telefonu, bunu açtıktan sonra (ve yeniden başlattıktan) sonra USB üzerinden bir kez bağlayarak veya kablo olmadan eşleyin: <b> Telefonu Wi-Fi üzerinden eşleyin </b> telefonun kamerasıyla taranacak bir QR kodu gösterir. Telefon bu bilgisayara HTTPS ile konuşur, sadece bu bilgisayarın sertifikasına güvenir ve gizli anahtar göstermek zorundadır. Telefon ve bu bilgisayar aynı ağ üzerinde olmalı &mdash; ya da her ikisi de <a href=\"https://tailscale.com\" target=\"_blank\" rel=\"noopener\"> Tailscale </a> , ki bu başka bir yerden veya ayrı Wi-Fi ağları arasında çalışabilir. Windows Güvenlik Duvarı bir kere izin istemelidir &mdash; onay verin (Tailscale' nin kullandığı ağ türüne de işaret edin).",
       "s.upd.checksBefore": "Kontrol",
       "s.upd.checksAfter": "GitHub üzerinde her 6 saatte bir. Telefon uygulaması telefonda sorulmadan USB üzerine kuruluyor; ajan kendi dosyalarını değiştiriyor ve yeniden başlatıyor.",
@@ -395,7 +395,7 @@ window.PhoneBoxLocaleData = Object.assign(window.PhoneBoxLocaleData || {}, {
       "s.r.matchTime": "22:00-07:00",
       "s.restartApplyTitle": "Wi-Fi ayarları yeniden başlatmadan sonra değişir",
       "s.ap.inheritFont": "Kalıtsal ( {font} )",
-      "s.battery.leadHead": "Sürekli bağlanmış olan bir telefon bataryasını tüketiyor. PhoneBox İkisinin arasında tutabilirsin.",
+      "s.battery.leadHead": "Sürekli bağlanmış olan bir telefon bataryasını tüketiyor. PhoneMon İkisinin arasında tutabilirsin.",
       "s.battery.leadMid": "Telefonlar kök olmadan kendi kendilerine şarj etmeyi durduramaz, bu yüzden güç değiştirilir",
       "s.wh.payloadHintFull": "JSON Payloads taşıyabilir <code>value</code>, <code>title</code>, <code>sub</code>, <code>unit</code>, <code>icon</code>, <code>color</code>, <code>level</code> (ok / uyarmak / hata), <code>progress</code> (0&ndash;1 veya 0&ndash,100), <code>items</code> (bir liste) ve <code>ttl</code> (saniyede). Sadece metin veya bir sayı da işe yarar. <code>title</code>, <code>text</code>, <code>level</code>, <code>vibrate</code>, <code>seconds</code>, <code>wake</code> (Gece ekranını aydınlatır) ve <code>page</code> (Ona geçin)",
       "s.pair.title": "Telefonu {pc} ile eşle",

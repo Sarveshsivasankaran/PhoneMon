@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<title>PhoneBox</title>
+<title>PhoneMon</title>
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="controls.css">
 <link rel="stylesheet" href="appearance.css">
@@ -90,7 +90,7 @@
       if (text) {
         text.removeAttribute('data-i18n');
         text.textContent = 'This Android System WebView is too old to run the panel. Update Android System WebView or '
-          + 'Google Chrome from Google Play (version 80 or later), then open PhoneBox again.';
+          + 'Google Chrome from Google Play (version 80 or later), then open PhoneMon again.';
       }
       if (btn) btn.style.display = 'none';
       el.hidden = false; el.style.display = 'flex';
@@ -181,7 +181,7 @@
     </div>
     <div id="jConfirm" hidden><p id="jAction"></p><button id="jDeny">Cancel</button> <button id="jApprove">Confirm action</button></div>
     <footer><button id="jVoice" type="button">Speak</button><button id="jCamera" type="button">Camera</button><button id="jSettings" type="button" aria-expanded="false">Setup</button></footer>
-    <div class="j-setup" hidden><label><input type="checkbox" id="jWake"> Listen for “Jarvis”</label><div><button id="jChat">Install chat model</button> <button id="jVision">Install vision model</button> <button id="jSample">Hear voice</button></div><small id="jDownload"></small></div>
+    <div class="j-setup" hidden><label><input type="checkbox" id="jWake"> Listen for “Jarvis”</label><div><button id="jChat">Install chat model</button> <button id="jVision">Install vision model</button> <button id="jSample">Hear voice</button></div><small id="jDownload"></small><small class="j-pub" style="opacity:.7">PhoneMon · Solo-P-Leveller</small></div>
   </section>
 </div>
 <script src="compat.js"></script>

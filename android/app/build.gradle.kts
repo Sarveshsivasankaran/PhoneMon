@@ -30,8 +30,9 @@ android {
         applicationId = "net.oxog.phonebox.deskpanel"
         minSdk = 21 // Android 5.0; see CONTRIBUTING.md before changing it
         targetSdk = 35
-        versionCode = 8
-        versionName = "1.2.1 (stable)"
+        versionCode = 9
+        versionName = "1.2.2 (stable)"
+        buildConfigField("String", "PUBLISHER_NAME", "\"Solo-P-Leveller\"")
 
         ndk {
             abiFilters.addAll(listOf("arm64-v8a", "armeabi-v7a", "x86_64"))

@@ -78,7 +78,7 @@ public sealed class UpdateService(ConfigStore cfg, AdbReverse adb, IHostApplicat
 
     protected override async Task ExecuteAsync(CancellationToken ct)
     {
-        _http.DefaultRequestHeaders.UserAgent.ParseAdd("PhoneBox/" + AppPaths.Version);
+        _http.DefaultRequestHeaders.UserAgent.ParseAdd("PhoneMon/" + AppPaths.Version);
         _http.DefaultRequestHeaders.Accept.ParseAdd("application/vnd.github+json");
         CleanupOldFiles();
         if (RunningInstalled) RemoveFrameworkDependentLeftovers(InstallDir, SingleFile);
@@ -189,7 +189,7 @@ public sealed class UpdateService(ConfigStore cfg, AdbReverse adb, IHostApplicat
             _state = "installing the phone app";
             if (_latest is null) { await CheckCoreAsync(ct); _state = "installing the phone app"; } // not CheckAsync: this method already holds the gate
             if (_latest?.Apk is null) return "could not find the phone app in the GitHub releases";
-            var apk = await VerifiedDownloadAsync(_latest.Apk, $"PhoneBox-{_latest.Version}.apk", ct);
+            var apk = await VerifiedDownloadAsync(_latest.Apk, $"PhoneMon-{_latest.Version}.apk", ct);
             var adbExe = AdbReverse.FindAdb(cfg.Get().AdbPath) ?? throw new InvalidOperationException("adb not found");
             var failed = new List<string>();
             foreach (var serial in targets)
@@ -221,7 +221,7 @@ public sealed class UpdateService(ConfigStore cfg, AdbReverse adb, IHostApplicat
         // decided before the download: a phone that already has the new app can report it while the APK downloads,
         // and must not turn this into a retry that skips the phones that never got it
         var appCurrent = AppVersion is not null && !Newer(_latest!.Version, AppVersion);
-        var apk = await VerifiedDownloadAsync(_latest!.Apk!, $"PhoneBox-{_latest.Version}.apk", ct);
+        var apk = await VerifiedDownloadAsync(_latest!.Apk!, $"PhoneMon-{_latest.Version}.apk", ct);
         var adbExe = AdbReverse.FindAdb(cfg.Get().AdbPath) ?? throw new InvalidOperationException("adb not found");
         var connected = adb.Devices.Split(", ", StringSplitOptions.RemoveEmptyEntries);
         var retry = _phoneRetryFor == _latest.Version ? _phoneRetry : [];
@@ -452,7 +452,12 @@ public sealed class UpdateService(ConfigStore cfg, AdbReverse adb, IHostApplicat
             if (name.StartsWith("SHA256SUMS-", StringComparison.OrdinalIgnoreCase) && name.EndsWith(".txt", StringComparison.OrdinalIgnoreCase)) sums = url;
         }
         var tag = release.GetProperty("tag_name").GetString() ?? "";
-        var version = tag == AppPaths.StableTag ? AppPaths.StablePackageVersion : tag.TrimStart('v', 'V');
+        var version = tag switch
+        {
+            "v1.2.1-stable" => "1.2.2",
+            "v1.2.2-stable" => "1.2.3",
+            _ => tag.TrimStart('v', 'V'),
+        };
         return new Release(version, release.GetProperty("html_url").GetString(), apk, zip, sums);
     }
 

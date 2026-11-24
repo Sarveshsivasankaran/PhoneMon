@@ -1,6 +1,6 @@
 <p align="center"><img src="logo.png" width="160" alt="PhoneMon logo"></p>
 
-<h1 align="center">PhoneBox</h1>
+<h1 align="center">PhoneMon</h1>
 
 <p align="center">
   <a href="../README.md">English</a> ·
@@ -30,7 +30,7 @@
 
 <p align="center"><b>Verwandle ein altes Android-Smartphone in ein Schreibtisch-Panel für deinen Computer.</b><br>
 PC-Statistiken, KI-Coding-Sitzungen, Musik und Touch-Steuerung über USB oder WLAN.<br>
-Windows, Linux und macOS. Kein Root, kein PhoneBox-Konto und kein Cloud-Dienst nötig.</p>
+Windows, Linux und macOS. Kein Root, kein PhoneMon-Konto und kein Cloud-Dienst nötig.</p>
 
 <p align="center">
   <a href="https://sarveshsivasankaran.github.io/PhoneMon/"><b>Live-Demo testen</b></a> ·
@@ -46,10 +46,10 @@ Windows, Linux und macOS. Kein Root, kein PhoneBox-Konto und kein Cloud-Dienst n
   <a href="../LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="MIT-Lizenz"></a>
 </p>
 
-<p align="center"><img src="hero-0.6.png" width="900" alt="PhoneBox auf drei Smartphones mit Automatisierungs-, Start- und Planerseiten"><br>
+<p align="center"><img src="hero-0.6.png" width="900" alt="PhoneMon auf drei Smartphones mit Automatisierungs-, Start- und Planerseiten"><br>
 <sub>Beispiellayouts mit Demodaten.</sub></p>
 
-PhoneBox verbindet eine Vollbild-**Android-App** mit einem schlanken **Desktop-Agenten**. Gestalte dein Panel im browserbasierten visuellen Editor: **123 Widgets**, **30 Vorlagen**, mehrere Seiten und Live-Vorschau. Verbinde mehrere Telefone mit eigenen Layouts oder wechsle mit einem Telefon zwischen gekoppelten Computern.
+PhoneMon verbindet eine Vollbild-**Android-App** mit einem schlanken **Desktop-Agenten**. Gestalte dein Panel im browserbasierten visuellen Editor: **123 Widgets**, **30 Vorlagen**, mehrere Seiten und Live-Vorschau. Verbinde mehrere Telefone mit eigenen Layouts oder wechsle mit einem Telefon zwischen gekoppelten Computern.
 
 ## Funktionen
 
@@ -105,7 +105,7 @@ Das Setup lädt das neueste Release herunter, prüft die SHA-256-Prüfsumme und 
 
 ## Sicherheit & Datenschutz
 
-Der Einstellungsserver läuft lokal auf `127.0.0.1:8765` (USB über `adb reverse`, WLAN über HTTPS Port 8766 mit gepinntem Zertifikat). PhoneBox hat keine eigene Telemetrie oder Konten. Siehe [Datenschutzrichtlinie](../PRIVACY.md) und [SECURITY.md](../SECURITY.md).
+Der Einstellungsserver läuft lokal auf `127.0.0.1:8765` (USB über `adb reverse`, WLAN über HTTPS Port 8766 mit gepinntem Zertifikat). PhoneMon hat keine eigene Telemetrie oder Konten. Siehe [Datenschutzrichtlinie](../PRIVACY.md) und [SECURITY.md](../SECURITY.md).
 
 ## Lizenz
 
