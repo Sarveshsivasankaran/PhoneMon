@@ -3,7 +3,6 @@ package com.phonebox.jarvis.core.agent
 import android.util.Log
 import com.phonebox.jarvis.core.ai.JarvisState
 import com.phonebox.jarvis.core.ai.PhoneInference
-import com.phonebox.jarvis.core.ai.ReasoningModelSpec
 import com.phonebox.jarvis.core.memory.MemoryManager
 import com.phonebox.jarvis.core.voice.TextToSpeechEngine
 import com.phonebox.jarvis.integrations.phonemon.PhoneMonAdapter
@@ -51,7 +50,15 @@ class AgentOrchestrator(
             _currentStreamingText.value = ""
             memoryManager.recordTurn("USER", input, isSpoken = isVoice)
 
-            processModelOutput(PhoneInference.answer(input), isVoice)
+            val direct = when (input.trim().lowercase().trimEnd('?', '.', '!')) {
+                "pc status", "show pc status", "show pc metrics", "show cpu usage", "what is my cpu usage" -> "get_pc_metrics"
+                "list shortcuts", "show my shortcuts" -> "list_shortcuts"
+                "obs status" -> "obs_status"
+                "spotify status" -> "spotify_status"
+                else -> null
+            }
+            if (direct != null) executeTool(direct, emptyMap(), isVoice)
+            else processModelOutput(PhoneInference.answer(input), isVoice)
         }
     }
 

@@ -102,7 +102,6 @@ builder.Services.AddSingleton(sp => new LyricsService(sp.GetRequiredService<Conf
 AddMonitor<BatteryMonitor>(builder.Services);
 AddMonitor<RuleEngine>(builder.Services);
 AddMonitor<ChargeGuard>(builder.Services);
-builder.Services.AddSingleton<AiService>();
 builder.Services.AddHostedService<Tray>();
 
 var app = builder.Build();
@@ -376,7 +375,7 @@ JarvisSession? latestSession = null;
 app.MapPost("/api/jarvis/session", (JarvisSession message) =>
 {
     if (message.State is not ("STANDBY" or "LISTENING" or "THINKING" or "VISION" or "EXECUTING" or "SPEAKING" or "ERROR")
-        || message.Text is null || message.Text.Length > 2000) return Results.BadRequest();
+        || message.Text is null || message.Text.Length > 2000 || message.User?.Length > 2000) return Results.BadRequest();
     Interlocked.Exchange(ref latestSession, message with { Seen = DateTimeOffset.UtcNow });
     return Results.NoContent();
 });
@@ -401,11 +400,9 @@ app.MapGet("/api/jarvis/profile", () =>
     return File.Exists(file) ? Results.File(file, "application/json")
         : Results.Json(new { assistantName = "JARVIS", personality = "", model = "qwen2.5-0.5b" });
 });
-app.MapGet("/api/ai/status", (AiService ai) => Results.Json(ai.GetStatus()));
-app.MapGet("/api/ai/models", (AiService ai) => Results.Json(ai.GetModels()));
-app.MapPost("/api/ai/swap", (AiSwapRequest req, AiService ai) => Results.Json(ai.SwapModel(req.Model)));
-app.MapPost("/api/ai/verify", (AiVerifyRequest req, AiService ai) => Results.Json(ai.VerifyModel(req.Model)));
-app.MapPost("/api/ai/prompt", async (AiPromptRequest req, AiService ai) => Results.Json(await ai.ExecutePrompt(req.Prompt, req.Model, req.Image)));
+app.MapGet("/api/ai/status", () => Results.Redirect("/api/jarvis/session"));
+app.MapMethods("/api/ai/{action}", ["GET", "POST"], () =>
+    Results.Json(new { error = "Open the assistant on the paired PhoneMon panel for local inference and model setup." }, statusCode: 409));
 // The phone's panel (embedded at build time) for the live preview in the layout editor; local port only.
 app.MapGet("/panel/{*file}", (string? file, HttpRequest req) =>
 {
@@ -1131,7 +1128,7 @@ static void AddMonitor<T>(IServiceCollection s) where T : class, IHostedService
 }
 
 /// <summary>Body of POST /api/pair/claim.</summary>
-internal sealed record JarvisSession(string State, string Text, DateTimeOffset Seen = default);
+internal sealed record JarvisSession(string State, string Text, DateTimeOffset Seen = default, string? User = null);
 internal sealed record PairClaim(string? Code);
 
 public partial class Program

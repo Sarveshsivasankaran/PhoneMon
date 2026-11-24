@@ -66,6 +66,12 @@ class JarvisHandler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=str(WEB_DIR), **kwargs)
 
+    def translate_path(self, path):
+        for filename in ("jarvis.css", "jarvis-mascot.png"):
+            if path.split("?", 1)[0] == "/panel-visuals/" + filename:
+                return str(ROOT_DIR.parent / "android/app/src/main/assets/www" / filename)
+        return super().translate_path(path)
+
     def do_GET(self):
         if self.path == "/api/profile":
             self.send_json_response(load_profile())

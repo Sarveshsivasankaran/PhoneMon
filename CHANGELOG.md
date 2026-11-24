@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.2.1 — 2026-11-24
+
+- Open JARVIS over the live PhoneMon home screen. The supplied floating mascot, animated edge, waveform and conversation card follow real assistant activity.
+- Both launcher icons lead to the desk panel. Chat, voice, model setup, approvals and front-camera analysis share the card.
+
 ## 1.2.0 — 2026-11-23
 
 - Bundle the ARM64 llama.cpp runtime and install verified text and vision models on the phone.

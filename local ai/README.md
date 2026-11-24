@@ -4,7 +4,7 @@
 
 Install the PhoneMon panel and JARVIS APKs from the same release on an ARM64 phone. Pair the desk panel with the desktop agent using its normal USB or Wi-Fi setup. JARVIS uses the panel's authenticated connection.
 
-Open JARVIS and tap **Set up model**. Install chat for Qwen2.5 0.5B or vision for LFM2.5-VL 450M and its projector. Wait for **Model installed**. Model files are SHA-256 verified and stored privately on the phone. Updates preserve weights. After uninstalling or clearing app data, install the weights again. Chat and front-camera analysis work offline after setup.
+Open either launcher icon, tap the mascot on the live desk panel, and choose **Setup**. Install chat for Qwen2.5 0.5B or vision for LFM2.5-VL 450M and its projector. Wait for **Model installed**. Model files are SHA-256 verified and stored privately on the phone. Updates preserve weights. After uninstalling or clearing app data, install the weights again. Chat and front-camera analysis work offline after setup.
 
 Start the dashboard with `python scripts/web_server.py` and open http://127.0.0.1:8780. The active assistant fetches its name, instructions and model selection every ten seconds, including after reconnecting. Install the selected model on the phone. Desk-panel operations require a connection. Sensitive actions show their parameters for confirmation on the phone.
 
@@ -14,6 +14,6 @@ Use JDK 17 and Android SDK 35. Run `scripts/build.ps1` on Windows or `bash scrip
 
 ## Voice and camera
 
-With microphone permission granted and the microphone enabled, say “Jarvis” followed by a question in the same utterance, or speak the question within eight seconds. The screen edges pulse and the supplied badge appears above the input controls. The camera button captures a single frame on demand.
+With microphone permission granted and **Listen for “Jarvis” on this panel** enabled in Setup, say “Jarvis” followed by a question in the same utterance, or speak the question within eight seconds. The screen edges pulse and the supplied badge appears above the input controls. The camera button captures a single frame on demand.
 
 The web dashboard saves the assistant profile locally. Live runtime and inference controls require a paired phone connection.

@@ -15,6 +15,7 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
+import android.net.Uri
 import android.os.BatteryManager
 import android.os.SystemClock
 import android.os.Bundle
@@ -170,6 +171,9 @@ class MainActivity : Activity(), SensorEventListener {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
+        if (intent.getBooleanExtra("showAssistant", false) && hasWeb) {
+            web.evaluateJavascript("window.openJarvisHUD && window.openJarvisHUD()", null)
+        }
         handlePairingLink(intent)
     }
 
@@ -383,6 +387,32 @@ class MainActivity : Activity(), SensorEventListener {
     }
 
     inner class Bridge {
+        @JavascriptInterface
+        fun jarvis(key: String, operation: String, argument: String): String {
+            if (!ok(key) || argument.length > 4096) return "{}"
+            val app = "com.phonebox.jarvis"
+            if (packageManager.checkSignatures(packageName, app) != PackageManager.SIGNATURE_MATCH)
+                return JSONObject().put("error", "Install the JARVIS APK from this PhoneMon release.").toString()
+            if (operation == "openOnLaunch") {
+                val open = intent?.getBooleanExtra("showAssistant", false) == true
+                intent?.removeExtra("showAssistant")
+                return JSONObject().put("open",open).toString()
+            }
+            if (operation == "camera") {
+                runOnUiThread {
+                    if (resumed) startActivity(Intent().setClassName(app, "$app.CaptureActivity"))
+                }
+                return "{}"
+            }
+            if (operation !in setOf("status","voice","text","install","listening","idle","approve","deny")) return "{}"
+            return try {
+                contentResolver.call(Uri.parse("content://$app.session"), operation, argument, null)
+                    ?.getString("session") ?: "{}"
+            } catch (e: Exception) {
+                JSONObject().put("error","Phone assistant unavailable. Install matching PhoneMon and JARVIS APKs.").toString()
+            }
+        }
+
         private fun ok(key: String) = key == bridgeKey
 
         private val validTrackpadTypes = setOf("move", "click", "rightClick", "mousedown", "mouseup", "scroll", "hscroll") +

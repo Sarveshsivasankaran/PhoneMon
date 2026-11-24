@@ -7,6 +7,7 @@
   <link rel="icon" href="favicon.ico">
   <link rel="alternate icon" href="favicon.ico">
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="/panel-visuals/jarvis.css">
   <link rel="stylesheet" href="animation.css">
 </head>
 <body>
@@ -25,13 +26,13 @@
 
     <section class="assistant-preview" aria-label="Animated JARVIS home preview">
       <img class="preview-home" src="home.png" alt="PhoneMon home dashboard">
-      <div class="preview-edge" id="previewEdge"></div>
-      <section class="preview-agent" id="previewAgent">
-        <img src="logo.png" alt="" class="preview-mascot">
-        <header><strong id="assistantName">JARVIS</strong><span id="assistantState">STANDBY</span></header>
-        <div class="preview-wave" aria-hidden="true"></div>
-        <div class="preview-transcript" id="assistantTranscript">Ready when you are.</div>
-      </section>
+      <button id="jarvisTrigger" aria-label="Show assistant"><img src="/panel-visuals/jarvis-mascot.png" alt=""></button>
+      <div id="jarvisOverlay" hidden><div class="j-edge"></div><section class="j-card">
+        <img class="j-mascot" src="/panel-visuals/jarvis-mascot.png" alt="">
+        <header class="j-head"><strong id="assistantName">JARVIS</strong><span class="j-state" id="assistantState">STANDBY</span><button id="jClose" aria-label="Close assistant">×</button></header>
+        <div class="j-wave" aria-hidden="true"></div>
+        <div class="j-exchange" aria-live="polite"><div id="jQuestion" hidden><small>YOU</small><p id="jUser"></p></div><small id="jSpeaker">JARVIS</small><p id="assistantTranscript"></p></div>
+      </section></div>
     </section>
     <section class="card assistant-settings">
       <div class="card-header"><h2>ASSISTANT PROFILE</h2><span class="badge" id="profileSync">Saved on this computer</span></div>

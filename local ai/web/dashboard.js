@@ -32,6 +32,18 @@ document.getElementById('saveProfile').addEventListener('click', async () => {
 
 loadProfile().catch(error => { profileSync.textContent = `Profile unavailable: ${error.message}`; });
 
+const overlay = document.getElementById('jarvisOverlay');
+const trigger = document.getElementById('jarvisTrigger');
+const wave = overlay.querySelector('.j-wave');
+for (let i = 0; i < 24; i++) {
+  const bar = document.createElement('i');
+  bar.style.setProperty('--delay', (-i * .075) + 's');
+  wave.append(bar);
+}
+function showAssistant(open) { overlay.hidden = !open; trigger.hidden = open; }
+trigger.onclick = () => showAssistant(true);
+document.getElementById('jClose').onclick = () => showAssistant(false);
+let previousState = '';
 async function refreshSession() {
   let session = {state: 'OFFLINE'};
   try {
@@ -39,12 +51,17 @@ async function refreshSession() {
     if (response.ok) session = await response.json();
   } finally {
     const state = session.state;
+    const active = ['LISTENING','THINKING','VISION','EXECUTING','SPEAKING'].includes(state);
+    if (active && previousState !== state) showAssistant(true);
+    previousState = state;
+    overlay.dataset.active = String(active);
     document.getElementById('activenessBadge').textContent = state === 'OFFLINE' ? 'PHONE OFFLINE' : 'CONNECTED';
     document.getElementById('assistantState').textContent = state;
-    document.getElementById('previewAgent').dataset.state = state;
-    document.getElementById('previewEdge').classList.toggle('active', ['LISTENING','THINKING','VISION','SPEAKING','EXECUTING'].includes(state));
-    document.getElementById('assistantTranscript').textContent = session.text || (state === 'OFFLINE' ? 'Open the assistant on your paired phone.' : 'Ready when you are.');
-    setTimeout(() => refreshSession().catch(console.warn), 1000);
+    document.getElementById('jQuestion').hidden = !session.user;
+    document.getElementById('jUser').textContent = session.user || '';
+    document.getElementById('jSpeaker').textContent = document.getElementById('assistantName').textContent.toUpperCase();
+    document.getElementById('assistantTranscript').textContent = session.text || (state === 'OFFLINE' ? 'Open PhoneMon on your paired phone.' : 'Ready when you are.');
+    setTimeout(() => refreshSession().catch(console.warn), 700);
   }
 }
 refreshSession().catch(console.warn);

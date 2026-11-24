@@ -10,7 +10,9 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
     <!-- Android 11+: the speech recognizer has to be visible to the app (Dictation widget) -->
+    <uses-permission android:name="com.phonebox.jarvis.CONTROL_SESSION" />
     <queries>
+        <package android:name="com.phonebox.jarvis" />
         <intent>
             <action android:name="android.speech.RecognitionService" />
         </intent>

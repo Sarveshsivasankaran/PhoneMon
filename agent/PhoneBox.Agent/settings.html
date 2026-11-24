@@ -903,81 +903,8 @@ nav a.on::before { color: var(--accent); }
 
     <section id="ai">
       <h2>JARVIS Local AI</h2>
-      <p class="lead">Manage on-device AI models (Qwen3 1.7B, LFM2.5-VL 450M) and monitor live activeness, memory allocation, and hardware telemetry on the connected Samsung Galaxy M31.</p>
-
-      <div class="card">
-        <h3>Model Management &amp; Sequential Paging</h3>
-        <p class="hint" style="margin:0 0 14px">Models execute locally on the phone's ARM Cortex-A73 cores with zero cloud dependencies. Memory arbitration pages models sequentially to stay within the 1,800 MB RAM budget.</p>
-        
-        <div class="row" style="gap:14px;margin-bottom:12px;align-items:stretch">
-          <div class="card" style="flex:1;min-width:280px;margin-bottom:0;background:var(--panel-2)">
-            <div class="row" style="justify-content:space-between;margin-bottom:6px">
-              <strong>Qwen3 1.7B Instruct</strong>
-              <span class="pill on" id="aiQwenPill"><i></i> Loaded in RAM</span>
-            </div>
-            <p class="hint" style="margin:0 0 10px">Reasoning LLM &bull; GGUF Q4_K_M (1.12 GB) &bull; 2048 ctx &bull; 4 threads</p>
-            <div class="row" style="gap:8px">
-              <button class="btn sm primary" id="btnAiLoadQwen" onclick="aiSwapModel('qwen3')">Active in RAM</button>
-              <button class="btn sm" onclick="aiVerifyModel('qwen3')">Verify Checksum</button>
-            </div>
-          </div>
-
-          <div class="card" style="flex:1;min-width:280px;margin-bottom:0;background:var(--panel-2)">
-            <div class="row" style="justify-content:space-between;margin-bottom:6px">
-              <strong>LFM2.5-VL 450M</strong>
-              <span class="pill" id="aiLfmPill"><i></i> Ready on Disk</span>
-            </div>
-            <p class="hint" style="margin:0 0 10px">Vision Language Model &bull; GGUF Q4_K_M (360 MB + 95 MB Projector) &bull; 384&times;384</p>
-            <div class="row" style="gap:8px">
-              <button class="btn sm" id="btnAiLoadLfm" onclick="aiSwapModel('lfm')">Load in RAM</button>
-              <button class="btn sm" onclick="aiVerifyModel('lfm')">Verify Checksum</button>
-            </div>
-          </div>
-        </div>
-
-        <div style="margin-top:14px">
-          <div class="row" style="justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:4px">
-            <span>RAM Resident Memory (Galaxy M31 Budget: 1,800 MB)</span>
-            <span id="aiRamLabel">1,364 MB / 1,800 MB (75%)</span>
-          </div>
-          <div style="height:8px;background:var(--line);border-radius:99px;overflow:hidden">
-            <div id="aiRamBar" style="height:100%;width:75%;background:var(--accent);transition:width .3s"></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="card">
-        <h3>Subsystem Activeness &amp; Telemetry</h3>
-        <div class="grid2" style="gap:12px">
-          <div class="card" style="margin-bottom:0;background:var(--panel-2)">
-            <strong>Wake-Word &amp; Audio VAD</strong>
-            <p class="hint" id="aiVoiceStatus" style="margin:4px 0 0">Listening for "JARVIS" (16 kHz Mono AudioRecord)</p>
-          </div>
-          <div class="card" style="margin-bottom:0;background:var(--panel-2)">
-            <strong>CameraX Vision Sensor</strong>
-            <p class="hint" id="aiVisionStatus" style="margin:4px 0 0">Active &bull; Ask &amp; See Mode (Back Lens)</p>
-          </div>
-          <div class="card" style="margin-bottom:0;background:var(--panel-2)">
-            <strong>Local Persistent Memory</strong>
-            <p class="hint" id="aiMemoryStatus" style="margin:4px 0 0">Room DB Verified &bull; Semantic Facts &amp; Audit Logs</p>
-          </div>
-          <div class="card" style="margin-bottom:0;background:var(--panel-2)">
-            <strong>PhoneMon Agent Link</strong>
-            <p class="hint" id="aiLinkStatus" style="margin:4px 0 0">Connected &bull; Local Port 8765 Loopback</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="card">
-        <h3>Test Local Neural Reasoning</h3>
-        <div class="row" style="gap:10px;margin-bottom:10px">
-          <input type="text" id="aiPromptInput" placeholder="Send prompt (e.g. 'Status report' or 'Show CPU usage')" value="System status report" style="flex:1">
-          <button class="btn primary" id="btnAiSendPrompt" onclick="aiSendTestPrompt()">Send</button>
-        </div>
-        <div class="card" style="background:var(--panel-2);margin-bottom:0;font-family:monospace;font-size:12.5px;min-height:60px;line-height:1.5" id="aiResponseBox">
-          &gt; Standing by. Click Send to test on-device token generation.
-        </div>
-      </div>
+      <p class="lead">Open the assistant on your desk panel to talk, use the front camera, or install local models.</p>
+      <a class="btn" href="http://127.0.0.1:8780/" target="_blank" rel="noopener">Open assistant profile</a>
     </section>
 
     <section id="advanced">
@@ -3829,107 +3756,12 @@ function fitLeads() {
 }
 window.addEventListener('resize', fitLeads);
 
-// JARVIS Local AI Model Management & Activeness
-let aiActiveModel = 'qwen3';
-
-async function aiRefreshStatus() {
-  try {
-    const res = await fetch('/api/ai/status');
-    if (!res.ok) return;
-    const data = await res.json();
-    aiActiveModel = data.activeModel || 'qwen3';
-    const isQwen = aiActiveModel === 'qwen3';
-
-    if ($('aiQwenPill')) {
-      $('aiQwenPill').className = 'pill' + (isQwen ? ' on' : '');
-      $('aiQwenPill').innerHTML = '<i></i> ' + (isQwen ? 'Loaded in RAM' : 'Ready on Disk');
-    }
-    if ($('btnAiLoadQwen')) {
-      $('btnAiLoadQwen').className = 'btn sm' + (isQwen ? ' primary' : '');
-      $('btnAiLoadQwen').textContent = isQwen ? 'Active in RAM' : 'Load in RAM';
-    }
-    if ($('aiLfmPill')) {
-      $('aiLfmPill').className = 'pill' + (!isQwen ? ' on' : '');
-      $('aiLfmPill').innerHTML = '<i></i> ' + (!isQwen ? 'Loaded in RAM' : 'Ready on Disk');
-    }
-    if ($('btnAiLoadLfm')) {
-      $('btnAiLoadLfm').className = 'btn sm' + (!isQwen ? ' primary' : '');
-      $('btnAiLoadLfm').textContent = !isQwen ? 'Active in RAM' : 'Load in RAM';
-    }
-
-    const ramUsed = data.currentRamMb || (isQwen ? 1120 : 340);
-    const budget = data.memoryBudgetMb || 1800;
-    const pct = Math.round((ramUsed / budget) * 100);
-    if ($('aiRamLabel')) $('aiRamLabel').textContent = `${ramUsed} MB / ${budget} MB (${pct}%)`;
-    if ($('aiRamBar')) $('aiRamBar').style.width = pct + '%';
-  } catch (e) { }
-}
-
-async function aiSwapModel(model) {
-  aiActiveModel = model;
-  if ($('aiResponseBox')) $('aiResponseBox').textContent = `> Requesting sequential model swap to ${model}...`;
-  try {
-    const res = await fetch('/api/ai/swap', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model })
-    });
-    if (res.ok) {
-      const data = await res.json();
-      await aiRefreshStatus();
-      if ($('aiResponseBox')) $('aiResponseBox').textContent = `> Sequential memory swap complete: Switched active model to ${model === 'qwen3' ? 'Qwen3 1.7B Instruct' : 'LFM2.5-VL 450M Vision'} (${data.currentRamMb} MB resident).`;
-      return;
-    }
-  } catch (e) { }
-  aiRefreshStatus();
-}
-
-async function aiVerifyModel(model) {
-  if ($('aiResponseBox')) $('aiResponseBox').textContent = `> Verifying SHA-256 integrity for ${model}...`;
-  try {
-    const res = await fetch('/api/ai/verify', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model })
-    });
-    if (res.ok) {
-      const data = await res.json();
-      if ($('aiResponseBox')) $('aiResponseBox').textContent = `> SHA-256 verification: ${data.name} weights valid. Hash: ${data.sha256.substring(0, 24)}... Integrity verified 100%.`;
-      return;
-    }
-  } catch (e) { }
-  if ($('aiResponseBox')) $('aiResponseBox').textContent = `> Verifying SHA-256 integrity for ${model} weights on local storage... SHA-256 checksum MATCH (Integrity 100% verified).`;
-}
-
-async function aiSendTestPrompt() {
-  const prompt = ($('aiPromptInput')?.value || '').trim();
-  if (!prompt) return;
-  if ($('aiResponseBox')) $('aiResponseBox').textContent = `> [${aiActiveModel === 'qwen3' ? 'Qwen3 1.7B' : 'LFM2.5-VL 450M'}] Processing on-device...`;
-  try {
-    const res = await fetch('/api/ai/prompt', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt, model: aiActiveModel })
-    });
-    if (res.ok) {
-      const data = await res.json();
-      if ($('aiResponseBox')) {
-        $('aiResponseBox').textContent = `> [${data.model}] (${data.latencyMs}ms, ${data.tokensPerSecond} t/s)\n${data.response}`;
-      }
-      return;
-    }
-  } catch (e) { }
-  if ($('aiResponseBox')) {
-    $('aiResponseBox').textContent = `> [${aiActiveModel === 'qwen3' ? 'Qwen3 1.7B' : 'LFM2.5-VL 450M'}] Processing on-device via ARM NEON SIMD...\nResponse: All local AI subsystems nominal. Zero cloud transmission.`;
-  }
-}
-
 function route() {
   const id = (location.hash || '#pages').slice(1);
   document.querySelectorAll('section').forEach((s) => s.classList.toggle('on', s.id === id));
   document.querySelectorAll('nav a').forEach((a) => a.classList.toggle('on', a.getAttribute('href') === '#' + id));
   if (id === 'webhooks') loadPushed();
-  if (id === 'ai') aiRefreshStatus();
+
   fitLeads();
 }
 window.addEventListener('hashchange', route);
@@ -3939,7 +3771,7 @@ fitLeads();
 load();
 setInterval(() => {
   loadInfo();
-  if (location.hash === '#ai') aiRefreshStatus();
+
 }, 5000);
 </script>
 </body>

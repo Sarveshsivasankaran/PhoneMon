@@ -30,7 +30,7 @@ class JarvisProvider : ContentProvider() {
         }
         val path = when (method) {
             "session" -> {
-                body = JSONObject().put("state",data.getString("state")).put("text",data.getString("text").take(2000)).toString().toByteArray()
+                body = JSONObject().put("state",data.getString("state")).put("text",data.getString("text").take(2000)).put("user", data.optString("user").take(2000)).toString().toByteArray()
                 post("/api/jarvis/session")
             }
             "panel_status" -> when (data.getString("section")) {
@@ -99,6 +99,14 @@ class JarvisProvider : ContentProvider() {
         }
         val result = link.request(verb, path, body, if (body != null) "application/json" else null, panelRequest = false)
         val value = result.body.bufferedReader().use { reader ->
+            if (method == "get_pc_metrics" && result.code in 200..299) {
+                val pc = JSONObject(reader.readText()).getJSONObject("pc")
+                return@use buildString {
+                    append("CPU ").append(pc.optString("cpu", "unavailable")).append("%")
+                    append(" · RAM ").append(pc.optString("ramUsedGb", "?")).append(" / ").append(pc.optString("ramTotalGb", "?")).append(" GB")
+                    if (!pc.isNull("gpu")) append(" · GPU ").append(pc.optString("gpu")).append("%")
+                }
+            }
             val chars = CharArray(16000)
             val count = reader.readBlock(chars)
             String(chars, 0, count)

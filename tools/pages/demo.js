@@ -850,55 +850,7 @@
     if (path === '/api/lan') return json({ configured: true, active: true, port: 8766, restartNeeded: false, hosts: ['192.168.1.20', '100.101.102.103'], fingerprint: 'demo' });
     if (path === '/api/update') return json({ status: { agentVersion: VERSION, appVersion: VERSION, latest: VERSION, releaseUrl: 'https://github.com/Sarveshsivasankaran/PhoneMon/releases/latest', agentUpdate: false, appUpdate: false,
       lastCheck: now() - 3600e3, state: 'idle', error: null }, auto: (await config()).updates?.auto !== false, installed: true });
-    if (path === '/api/ai/status') {
-      return json({
-        status: 'Online',
-        targetDevice: 'Samsung Galaxy M31 (SM-M315F / ARM64)',
-        activeModel: 'qwen3',
-        memoryBudgetMb: 1800,
-        currentRamMb: 1120,
-        models: {
-          qwen3: { id: 'qwen3', name: 'Qwen3 1.7B Instruct', format: 'GGUF Q4_K_M', sizeMb: 1120, loaded: true, status: 'Active (RAM Resident)', checksum: '9f8b7c6d5e4a3b2c1d0e9f8a' },
-          lfm: { id: 'lfm', name: 'LFM2.5-VL 450M', format: 'GGUF', sizeMb: 340, loaded: false, status: 'Standby (Disk)', checksum: '4a3b2c1d0e9f8a7b6c5d4e3f' }
-        },
-        subsystems: {
-          wakeWord: { status: 'Active', detail: 'Listening for "JARVIS" (16kHz PCM offline)' },
-          vision: { status: 'Ready', detail: 'CameraX pipeline ready (1280x720, Ask & See)' },
-          memory: { status: 'Synced', detail: 'Room SQLite persistent graph (18 entities)' },
-          agentLoop: { status: 'Connected', detail: 'PhoneMon desktop loopback active' }
-        },
-        timestamp: new Date().toISOString()
-      });
-    }
-    if (path === '/api/ai/models') {
-      return json({ activeModel: 'qwen3', budgetMb: 1800, currentRamMb: 1120 });
-    }
-    if (path === '/api/ai/swap') {
-      let b = {}; try { b = JSON.parse(body || '{}'); } catch (_) {}
-      const m = b.model === 'lfm' ? 'lfm' : 'qwen3';
-      return json({ status: 'Online', activeModel: m, currentRamMb: m === 'lfm' ? 340 : 1120, memoryBudgetMb: 1800 });
-    }
-    if (path === '/api/ai/verify') {
-      let b = {}; try { b = JSON.parse(body || '{}'); } catch (_) {}
-      return json({ model: b.model || 'qwen3', name: b.model === 'lfm' ? 'LFM2.5-VL 450M' : 'Qwen3 1.7B Instruct', verified: true, sha256: '9f8b7c6d5e4a3b2c1d0e9f8a7b6c5d4e3f2a1b0c9d8e7f6a', status: 'Valid (Integrity Verified)' });
-    }
-    if (path === '/api/ai/prompt') {
-      let b = {}; try { b = JSON.parse(body || '{}'); } catch (_) {}
-      const prompt = b.prompt || 'Status';
-      const isLfm = b.model === 'lfm' || /see|camera|frame/i.test(prompt);
-      const answer = isLfm
-        ? '[LFM2.5-VL 450M Vision Subsystem]\nVisual analysis complete. Camera frame analyzed at 1280x720. Scene context verified: Connected device Samsung Galaxy M31 with active PhoneMon interface detected. Visual grounding confirmed.'
-        : `[JARVIS Local AI]\nProcessed query: "${prompt}"\nExecution completed entirely on local device without cloud dependency. Task scheduled and verified through PhoneMon control bridge.`;
-      return json({
-        success: true,
-        model: isLfm ? 'LFM2.5-VL 450M Vision' : 'Qwen3 1.7B Instruct',
-        response: answer,
-        latencyMs: 38,
-        tokensGenerated: 42,
-        tokensPerSecond: 52.6,
-        memoryUpdated: true
-      });
-    }
+    if (path.startsWith('/api/ai/')) return json({error: 'Open the assistant on your paired phone.'}, 409);
     if (path === '/api/claude/hook') return json({ installed: false, path: '~/.claude/settings.json' });
     if (method !== 'GET') return json({ ok: true });
     return json({ error: 'not in the demo' }, 404);

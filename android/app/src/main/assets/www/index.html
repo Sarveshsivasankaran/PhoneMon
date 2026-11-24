@@ -7,6 +7,7 @@
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="controls.css">
 <link rel="stylesheet" href="appearance.css">
+<link rel="stylesheet" href="jarvis.css">
 </head>
 <body>
 <!-- Pages and widgets are built by main.js and widgets/*.js from the layout designed in the agent's settings page. -->
@@ -162,89 +163,23 @@
 })();
 </script>
 
-<!-- JARVIS Floating Assistant Trigger -->
-<div id="jarvisTrigger" role="button" aria-label="Open JARVIS AI Assistant" title="JARVIS Local AI">
-  <div class="jarvis-pulse"></div>
-  <div class="jarvis-orb">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
-      <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
-      <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
-      <line x1="12" x2="12" y1="19" y2="22"/>
-    </svg>
-  </div>
-  <span class="jarvis-label">JARVIS</span>
-</div>
-
-<!-- JARVIS Futuristic HUD Assistant Overlay -->
+<button id="jarvisTrigger" type="button" aria-label="Open JARVIS assistant" aria-expanded="false"><img src="jarvis-mascot.png" alt=""></button>
 <div id="jarvisOverlay" hidden>
-  <div class="jarvis-backdrop"></div>
-  <div class="jarvis-hud">
-    <div class="hud-header">
-      <div class="hud-brand">
-        <div class="hud-core-indicator"></div>
-        <div class="hud-title-wrap">
-          <span class="hud-title">J.A.R.V.I.S.</span>
-          <span class="hud-sub">LOCAL ON-DEVICE AI · SAMSUNG GALAXY M31</span>
-        </div>
-      </div>
-      <div class="hud-models-badge">
-        <span class="hud-badge mode-badge" id="hudCompatBadge" title="Adaptive hardware profile">Universal Mode</span>
-        <span class="hud-badge active" id="hudModelBadge">Qwen3 1.7B</span>
-        <span class="hud-badge" id="hudVisionBadge">LFM2.5-VL 450M</span>
-      </div>
-      <button class="hud-close" id="jarvisClose" aria-label="Close JARVIS">✕</button>
+  <div class="j-edge"></div>
+  <section class="j-card" aria-label="PhoneMon assistant">
+    <img class="j-mascot" src="jarvis-mascot.png" alt="">
+    <header class="j-head"><strong id="jName">JARVIS</strong><span class="j-state" id="jState">STANDBY</span>
+      <button id="jClose" aria-label="Close assistant">×</button></header>
+    <div class="j-wave" aria-hidden="true"></div>
+    <div class="j-exchange" aria-live="polite">
+      <div id="jQuestion" hidden><small>YOU</small><p id="jUser"></p></div>
+      <small id="jSpeaker">JARVIS</small><p id="jReply"></p>
     </div>
-
-    <div class="hud-body">
-      <!-- Arc Reactor / Radar Visualizer -->
-      <div class="hud-visualizer">
-        <div class="reactor-outer">
-          <div class="reactor-ring ring-1"></div>
-          <div class="reactor-ring ring-2"></div>
-          <div class="reactor-ring ring-3"></div>
-          <div class="reactor-center" id="jarvisCore">
-            <div class="reactor-glow"></div>
-            <span class="reactor-icon">🎙</span>
-          </div>
-        </div>
-        <div class="hud-status-text" id="jarvisStatusText">Offline keyword spotting active ("JARVIS"). Tap to converse.</div>
-        <button class="hud-wake-btn active" id="jarvisWakeToggle" title="Continuous wake-word detection">🎙 Wake-Word: ON</button>
-        <div class="hud-wave" id="jarvisWave">
-          <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
-        </div>
-      </div>
-
-      <!-- Live Dialogue & Stream Area -->
-      <div class="hud-dialogue" id="jarvisDialogue">
-        <div class="msg jarvis">
-          <span class="speaker">JARVIS:</span>
-          <span class="text">Online and ready, sir. On-device reasoning (Qwen3 1.7B) and vision (LFM2.5-VL 450M) are running with zero cloud latency. What would you like to inspect or control?</span>
-        </div>
-      </div>
-
-      <!-- Quick Action Pills -->
-      <div class="hud-actions">
-        <button class="action-pill" data-prompt="Check Samsung Galaxy M31 hardware status, thermal and battery">⚡ M31 Telemetry</button>
-        <button class="action-pill" data-prompt="Analyze camera frame and identify visual surroundings">📷 Analyze Vision</button>
-        <button class="action-pill" data-prompt="What active processes and sessions are on the PC?">🖥 PC Status</button>
-        <button class="action-pill" data-prompt="Switch active reasoning model to LFM2.5-VL">🔄 Switch Model</button>
-      </div>
-
-      <!-- Prompt Input & Controls -->
-      <div class="hud-footer">
-        <button class="hud-mic-btn" id="jarvisMicBtn" title="Speak to JARVIS">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
-            <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
-            <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
-            <line x1="12" x2="12" y1="19" y2="22"/>
-          </svg>
-        </button>
-        <button class="hud-cam-btn" id="jarvisCamBtn" title="Capture Camera Frame for LFM2.5-VL Vision">📷</button>
-        <input type="text" id="jarvisInput" placeholder="Ask JARVIS (Qwen3 1.7B local reasoning)..." autocomplete="off">
-        <button class="hud-send-btn" id="jarvisSendBtn">Send</button>
-      </div>
-    </div>
-  </div>
+    <div id="jConfirm" hidden><p id="jAction"></p><button id="jDeny">Cancel</button> <button id="jApprove">Confirm action</button></div>
+    <form class="j-input"><input id="jPrompt" maxlength="2000" placeholder="Ask a question…" aria-label="Message to assistant" autocomplete="off"><button id="jSend">Send</button></form>
+    <footer><button id="jVoice" type="button">Speak</button><button id="jCamera" type="button">Camera</button><button id="jSettings" type="button" aria-expanded="false">Setup</button></footer>
+    <div class="j-setup" hidden><label><input type="checkbox" id="jWake"> Listen for “Jarvis” on this panel</label><div><button id="jChat">Install chat</button> <button id="jVision">Install vision</button></div><small id="jDownload"></small></div>
+  </section>
 </div>
 <script src="compat.js"></script>
 <script src="locale-existing.js"></script>
