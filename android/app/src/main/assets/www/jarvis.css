@@ -27,7 +27,7 @@
 .j-wave i {width:2px;height:var(--bar);border-radius:3px;background:linear-gradient(#f89fff,#8c65ff);box-shadow:0 0 4px #a674ff66}
 #jarvisOverlay[data-active=true] .j-wave i {animation:j-wave .5s ease-in-out alternate infinite;animation-delay:var(--delay)}
 .j-content {min-height:32px;display:flex;align-items:stretch;gap:9px;overflow:auto;padding:6px 4px}
-.j-captions {flex:1;min-width:0;overflow:auto;overflow-wrap:anywhere;white-space:pre-wrap;font-size:14px}
+.j-captions {flex:1;min-width:0;overflow:auto;overflow-wrap:anywhere;white-space:normal;font-size:14px}
 .j-captions p,#jConfirm p {margin:0 0 4px}.j-captions p:last-child{margin-bottom:0}
 .j-captions b {color:#75ecef;font-size:12px;margin-right:3px}.j-captions #jQuestion b{color:#e4a0fe}
 #jCapture {position:relative;flex:0 0 30%;margin:0;align-self:flex-start;border:1px solid #c099e2;border-radius:9px;overflow:hidden}
@@ -40,3 +40,5 @@
 @keyframes j-wave{from{transform:scaleY(.34)}to{transform:scaleY(1.15)}}@keyframes j-glow{to{filter:brightness(1.35)}}
 @media(max-height:320px){.j-mascot{height:32px;width:32px}.j-card{max-height:calc(100% - 48px);gap:3px;bottom:15px}}
 @media(prefers-reduced-motion:reduce){#jarvisOverlay *,#jarvisOverlay *::before{animation:none!important;transition:none!important}}
+
+.j-captions span {white-space:pre-wrap}
