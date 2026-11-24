@@ -208,6 +208,7 @@ test('desktop settings font and font size controls preview and persist',async({p
   await widgetEditor.getByRole('combobox',{name:'Font',exact:true}).selectOption('serif');
   await widgetEditor.getByRole('slider',{name:'Font size',exact:true}).fill('80');
   await page.locator('#save').click();await expect(page.locator('#save')).toBeDisabled();
+  await page.setViewportSize({width:780,height:360}); // Compare responsive font sizes at the original viewport.
   await page.goto('/panel/');
   await expect.poll(()=>css(page.locator('.w-note'),'fontFamily')).toMatch(/Georgia|serif/i);
   expect(parseFloat(await css(page.locator('.w-note .note-t'),'fontSize'))).toBeCloseTo(baseNote*0.8,0);
