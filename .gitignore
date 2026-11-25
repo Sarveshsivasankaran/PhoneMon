@@ -44,12 +44,6 @@ ui-test-report/
 tools/ui-tests/node_modules/
 tools/ui-tests/test-results/
 
-.wrongstack/
-!/.wrongstack/
-/.wrongstack/*
-!/.wrongstack/project.json
-
-
 *.log
 *.txt
 out_agent/
