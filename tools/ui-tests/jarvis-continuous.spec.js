@@ -38,7 +38,7 @@ test.describe('JARVIS continuous wake, voice selector, and night clock', () => {
         },
         cancelListening: () => {},
         stopListening: () => {},
-        jarvis: (op, arg) => {
+        jarvis: (_key, op, arg) => {
           if (op === 'openOnLaunch') return JSON.stringify({ open: false });
           if (op === 'listening') { state = 'LISTENING'; return snapshot(); }
           if (op === 'idle') { state = 'STANDBY'; return snapshot(); }
@@ -118,7 +118,7 @@ test.describe('JARVIS continuous wake, voice selector, and night clock', () => {
         jarvisListen: () => 1,
         cancelListening: () => {},
         stopListening: () => {},
-        jarvis: (op, arg) => {
+        jarvis: (_key, op, arg) => {
           if (op === 'openOnLaunch') return JSON.stringify({ open: false });
           if (op === 'setVoice') { voice = arg; window.__voiceOps.push(arg); }
           return snapshot();

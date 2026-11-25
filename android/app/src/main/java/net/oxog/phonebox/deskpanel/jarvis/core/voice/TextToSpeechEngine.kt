@@ -13,6 +13,7 @@ import java.io.IOException
 import java.util.Locale
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.coroutines.coroutineContext
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlinx.coroutines.*
@@ -91,6 +92,7 @@ class TextToSpeechEngine(
             override fun onError(utteranceId: String?, errorCode: Int) {
                 utteranceId?.let { pendingWaiters.remove(it)?.complete(false) }
             }
+            @android.annotation.SuppressLint("NewApi")
             override fun onStop(utteranceId: String?, interrupted: Boolean) {
                 utteranceId?.let { pendingWaiters.remove(it)?.complete(true) }
             }
