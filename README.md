@@ -28,7 +28,7 @@
   <a href="docs/README.zh-Hant.md">中文（繁體）</a>
 </p>
 
-<p align="center">Published by Solo-P-Leveller · Based on PhoneMon by Ersin KOÇ</p>
+<p align="center">Published by Solo-P-Leveller</p>
 
 <p align="center"><b>Turn an old Android phone into a desk panel for your computer.</b><br>
 PC stats, AI coding sessions, music and touch controls over USB or Wi-Fi.<br>
