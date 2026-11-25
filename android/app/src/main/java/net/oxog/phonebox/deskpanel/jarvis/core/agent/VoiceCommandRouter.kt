@@ -16,6 +16,9 @@ internal sealed class VoiceIntent {
 internal object VoiceCommandRouter {
     private val VIA_REGEX = Regex("""\b(?:using|via|over|through|on)\s+(adb|usb|tailscale|tail\s+scale|wi-?fi)\b""", RegexOption.IGNORE_CASE)
     private val FILLER_PREFIX = Regex("""^(?:please\s+|can\s+you\s+|could\s+you\s+|would\s+you\s+|jarvis[,\s]*)+""", RegexOption.IGNORE_CASE)
+    private val LINKS_STATUS_REGEX = Regex(
+        """^(?:(?:check|show|get|test|what(?:'s|\s+is))\s+(?:the\s+|my\s+)?(?:adb|tailscale|tail\s+scale)(?:\s+(?:(?:and|or|&)\s+)?(?:adb|tailscale|tail\s+scale))?(?:\s+(?:status|links?|connections?))?|(?:the\s+|my\s+)?(?:adb|tailscale|tail\s+scale)(?:\s+(?:(?:and|or|&)\s+)?(?:adb|tailscale|tail\s+scale))?\s+(?:status|links?|connections?)|(?:check|show|get)\s+(?:the\s+)?(?:connection|network|links?)|(?:network|connection|link)\s+status)$"""
+    )
     private val VOLUME_LEVEL_REGEX = Regex("""^(?:set|change|make|put)?\s*(?:the\s+)?(?:pc\s+|computer\s+|system\s+)?volume(?:\s+level)?(?:\s+to|\s+at)?\s+(\d{1,3})\s*(?:percent|%)?$""")
     private val BRIGHTNESS_REGEX = Regex("""^(?:set|change|dim|adjust)?\s*(?:the\s+)?(?:monitor\s+|screen\s+)?brightness(?:\s+to|\s+at)?\s+(\d{1,3})\s*(?:percent|%)?$""")
     private val PAUSE_RULES_REGEX = Regex("""^pause\s+(?:the\s+)?rules(?:\s+for\s+(\d{1,4})\s*(?:min|mins|minutes?)?)?$""")
@@ -31,12 +34,7 @@ internal object VoiceCommandRouter {
         val paramsBase = if (via != null) mapOf<String, Any?>("via" to via) else emptyMap()
 
         // ADB & Tailscale inspection and control
-        if (cleaned in setOf(
-                "adb status", "check adb", "tailscale status", "check tailscale",
-                "network status", "connection status", "check connection", "link status",
-                "adb and tailscale status", "adb tailscale status"
-            )
-        ) {
+        if (LINKS_STATUS_REGEX.matches(cleaned)) {
             return VoiceIntent.DirectTool("network_links", paramsBase)
         }
         if (cleaned in setOf("adb devices", "list adb devices", "show adb devices", "connected phones", "list devices")) {
