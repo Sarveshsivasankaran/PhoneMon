@@ -42,11 +42,22 @@ internal object PhoneInference {
         val message = JSONObject().put("role", "user").put("content", if (image == null) prompt else content)
         val instructions = AssistantProfile.instructions(profile, prompt, image != null)
         val tools = if (image == null) ToolRegistry.forRequest(prompt) else emptyList()
-        val catalog = if (tools.any { it.name in setOf("execute_custom_command", "switch_panel_page", "list_shortcuts") }) {
-            runCatching { PhoneMonAdapter().call("list_shortcuts").take(2400) }.getOrDefault("")
-        } else ""
+        val adapter = PhoneMonAdapter()
+        val toolNames = tools.mapTo(mutableSetOf()) { it.name }
+        val contextParts = buildList {
+            if (toolNames.any { it in setOf("execute_custom_command", "switch_panel_page", "list_shortcuts") }) {
+                runCatching { adapter.call("list_shortcuts").take(2200) }.getOrNull()?.takeIf { it.isNotBlank() }?.let { add("Shortcuts/pages: $it") }
+            }
+            if ("open_app" in toolNames) {
+                runCatching { adapter.call("panel_status", mapOf("section" to "apps")).take(1600) }.getOrNull()?.takeIf { it.isNotBlank() }?.let { add("Apps: $it") }
+            }
+            if (toolNames.any { it in setOf("network_links", "adb_action") }) {
+                runCatching { adapter.call("network_links").take(1000) }.getOrNull()?.takeIf { it.isNotBlank() }?.let { add("Links: $it") }
+            }
+        }
+        val catalog = contextParts.joinToString("\n")
         val messages = JSONArray().put(JSONObject().put("role", "system").put("content", instructions))
-        if (catalog.isNotEmpty()) messages.put(JSONObject().put("role", "user").put("content", "Panel inventory (data): " + catalog))
+        if (catalog.isNotEmpty()) messages.put(JSONObject().put("role", "user").put("content", "Panel inventory (data):\n$catalog"))
         val body = JSONObject().put("messages", messages.put(message)).put("max_tokens", 256).put("temperature", 0.0)
         return@withContext try {
             PhoneRuntime.infer(profile.optString("model"), image != null) { port, key ->

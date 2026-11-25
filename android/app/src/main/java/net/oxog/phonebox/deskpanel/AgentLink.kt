@@ -42,6 +42,8 @@ class AgentLink(private val context: Context) {
 
     @Volatile var route: Route = Route.NONE
         private set
+    @Volatile var lastHost: String? = null
+        private set
 
     private val prefs = context.getSharedPreferences("pairing", Context.MODE_PRIVATE)
 
@@ -143,22 +145,37 @@ class AgentLink(private val context: Context) {
     /** Forwards a request (method + path with query) to the agent over the best available route. */
     fun request(method: String, pathAndQuery: String): Reply = request(method, pathAndQuery, null, null)
 
-    fun request(method: String, pathAndQuery: String, body: ByteArray?, contentType: String?, panelRequest: Boolean = true): Reply {
+    fun request(method: String, pathAndQuery: String, body: ByteArray?, contentType: String?, panelRequest: Boolean = true): Reply =
+        request(method, pathAndQuery, body, contentType, panelRequest, null)
+
+    fun request(method: String, pathAndQuery: String, body: ByteArray?, contentType: String?, panelRequest: Boolean, preferredRoute: Route?): Reply {
         if (!panelRequest) synchronized(pcsLock) {
             pcs = loadPcs()
             activeId = prefs.getString("active", null)
         }
-        usb(method, pathAndQuery, 4000, body, contentType)?.let {
-            route = Route.USB
-            if (panelRequest) maybePair()
-            return it
+        if (preferredRoute != Route.WIFI) {
+            usb(method, pathAndQuery, 4000, body, contentType)?.let {
+                route = Route.USB
+                lastHost = null
+                if (panelRequest) maybePair()
+                return it
+            }
+            if (preferredRoute == Route.USB) {
+                return Reply(503, "application/json", ByteArrayInputStream("""{"error":"usb-offline"}""".toByteArray()))
+            }
         }
-        wifi(method, pathAndQuery, 4000, body, contentType)?.let {
-            route = Route.WIFI
-            if (panelRequest) maybeRefreshMacs()
-            return it
+        if (preferredRoute != Route.USB) {
+            wifi(method, pathAndQuery, 4000, body, contentType)?.let {
+                route = Route.WIFI
+                if (panelRequest) maybeRefreshMacs()
+                return it
+            }
+            if (preferredRoute == Route.WIFI) {
+                return Reply(503, "application/json", ByteArrayInputStream("""{"error":"wifi-offline"}""".toByteArray()))
+            }
         }
         route = Route.NONE
+        lastHost = null
         return Reply(503, "application/json", ByteArrayInputStream("""{"error":"offline"}""".toByteArray()))
     }
 
@@ -275,7 +292,7 @@ class AgentLink(private val context: Context) {
                 c.connectTimeout = 1500
                 c.setRequestProperty("Authorization", "Bearer $token")
                 val r = send(c, method, readTimeout, body, contentType)
-                if (target == null) preferredHost = i
+                if (target == null) { preferredHost = i; lastHost = hosts[i] }
                 return r
             } catch (e: Exception) {
                 // try the next address
@@ -407,6 +424,9 @@ class AgentLink(private val context: Context) {
 
     /** True when the active computer's MACs are known and the phone is on that computer's own network, where a packet can be sent. */
     fun canWake(): Boolean = activePc()?.let { it.macs.isNotEmpty() && wakeTargets(it).isNotEmpty() } == true
+
+    /** Sends the Wake-on-LAN magic packet for the currently active computer, if configured. */
+    fun wakeActivePc(): Boolean = activePc()?.let { wake(it.id) } ?: false
 
     /**
      * Sends the magic packet for the stored computer [id] (3 times, 100 ms apart) to its MACs, on the phone's links to

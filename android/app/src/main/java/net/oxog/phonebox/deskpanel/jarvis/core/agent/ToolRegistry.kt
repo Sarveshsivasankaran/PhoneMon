@@ -17,9 +17,30 @@ object ToolRegistry {
 
     val CONTROL_MEDIA = ToolDefinition(
         name = "control_media",
-        description = "Controls media playback on the computer (play, pause, next, prev, volume_up, volume_down).",
+        description = "Controls media playback or master volume on the computer (play, pause, play_pause, next, previous, volume_up, volume_down, mute, set_volume with level 0-100).",
         requiresApproval = false,
-        parametersSchemaJson = "{\"action\": \"string\"}"
+        parametersSchemaJson = """{"action":"play|pause|play_pause|next|previous|volume_up|volume_down|mute|set_volume","level":"optional 0-100 integer"}"""
+    )
+
+    val NETWORK_LINKS = ToolDefinition(
+        name = "network_links",
+        description = "Inspects ADB USB devices and Tailscale/LAN remote addresses and connection status.",
+        requiresApproval = false,
+        parametersSchemaJson = "{}"
+    )
+
+    val ADB_ACTION = ToolDefinition(
+        name = "adb_action",
+        description = "Runs a safe ADB action on connected Android devices (reconnect, devices, open_panel, wake_screen, sleep_screen, volume_up, volume_down, mute, play_pause, home, back).",
+        requiresApproval = false,
+        parametersSchemaJson = """{"action":"string","serial":"optional device serial"}"""
+    )
+
+    val WAKE_PC = ToolDefinition(
+        name = "wake_pc",
+        description = "Wakes the paired computer using Wake-on-LAN.",
+        requiresApproval = false,
+        parametersSchemaJson = "{}"
     )
 
     val SWITCH_PANEL_PAGE = ToolDefinition(
@@ -63,7 +84,10 @@ object ToolRegistry {
         CONTROL_MEDIA,
         SWITCH_PANEL_PAGE,
         SEND_NOTIFICATION,
-        EXECUTE_CUSTOM_COMMAND
+        EXECUTE_CUSTOM_COMMAND,
+        NETWORK_LINKS,
+        ADB_ACTION,
+        WAKE_PC
     )
 
     // Small local models do better when only relevant tools appear in the prompt.
@@ -75,19 +99,22 @@ object ToolRegistry {
         "discord_action" to "discord",
         "launch_game" to "steam game",
         "get_pc_metrics" to "cpu gpu memory ram disk network metrics telemetry temperature",
-        "control_media" to "music song track playback player media mute volume pause resume next previous",
+        "control_media" to "music song track playback player media mute volume pause resume next previous louder quieter",
         "switch_panel_page" to "page panel dashboard",
         "send_notification" to "notify notification",
         "execute_custom_command" to "shortcut workflow macro command",
         "list_shortcuts" to "shortcut shortcuts workflow workflows macro macros",
         "list_controls" to "controls devices mixer profile monitor",
         "set_brightness" to "brightness dim brighten",
-        "desk_command" to "brightness sound audio profile lock monitor desktop power duck timer configured control",
+        "desk_command" to "brightness sound audio profile lock monitor desktop power duck timer configured control sleep",
         "obs_action" to "obs stream record scene replay transition recording",
         "obs_status" to "obs stream recording",
         "pause_rules" to "rule rules automation automations",
         "spotify_action" to "spotify playlist queue",
-        "spotify_status" to "spotify playlist queue"
+        "spotify_status" to "spotify playlist queue",
+        "network_links" to "adb tailscale network connection tunnel usb wifi peers",
+        "adb_action" to "adb usb reconnect wake sleep panel device devices",
+        "wake_pc" to "wake wol computer pc power"
     ).mapValues { it.value.split(' ').toSet() }
 
     fun forRequest(prompt: String): List<ToolDefinition> {

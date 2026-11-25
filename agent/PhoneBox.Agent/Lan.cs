@@ -39,7 +39,12 @@ public static class Lan
     public static string Fingerprint(X509Certificate2 cert) => Convert.ToHexString(SHA256.HashData(cert.RawData)).ToLowerInvariant();
 
     /// <summary>Addresses the phone can try: private LAN IPv4 addresses first, then Tailscale (100.64.0.0/10).</summary>
-    public static IReadOnlyList<string> Addresses()
+    public static IReadOnlyList<string> Addresses() => CollectAddresses().Lan.Concat(CollectAddresses().Tailscale).Distinct().ToList();
+
+    /// <summary>Active Tailscale IPv4 addresses (100.64.0.0/10) configured on this computer.</summary>
+    public static IReadOnlyList<string> TailscaleAddresses() => CollectAddresses().Tailscale.Distinct().ToList();
+
+    private static (List<string> Lan, List<string> Tailscale) CollectAddresses()
     {
         var lan = new List<string>();
         var tailscale = new List<string>();
@@ -59,7 +64,7 @@ public static class Lan
                 else if (b[0] == 10 || (b[0] == 172 && b[1] is >= 16 and <= 31) || (b[0] == 192 && b[1] == 168)) lan.Add(ua.Address.ToString());
             }
         }
-        return lan.Concat(tailscale).Distinct().ToList();
+        return (lan, tailscale);
     }
 
     /// <summary>
@@ -87,7 +92,7 @@ public static class Lan
 
     /// <summary>Endpoints the phone may use over Wi-Fi. Settings, tests and pairing stay local-only.</summary>
     public static bool AllowedOverLan(PathString path) =>
-        path == "/api/jarvis/catalog" || path == "/api/jarvis/session" || path == "/api/jarvis/profile" || path == "/api/controls/spotify/state" || path.StartsWithSegments("/api/controls/spotify/action")
+        path == "/api/jarvis/catalog" || path == "/api/jarvis/session" || path == "/api/jarvis/profile" || path == "/api/jarvis/links" || path == "/api/jarvis/adb" || path == "/api/controls/spotify/state" || path.StartsWithSegments("/api/controls/spotify/action")
         || path == "/api/controls/state" || path == "/api/controls/listen" || path.StartsWithSegments("/api/controls/radio-logo") || path.StartsWithSegments("/api/controls/command") || path.StartsWithSegments("/api/controls/obs")
         || path.StartsWithSegments("/api/state") || path.StartsWithSegments("/api/config") || path.StartsWithSegments("/api/art")
         || path.StartsWithSegments("/api/media") || path.StartsWithSegments("/api/volume") || path.StartsWithSegments("/api/quotas")

@@ -388,7 +388,7 @@ class MainActivity : Activity(), SensorEventListener {
                 }
                 return "{}"
             }
-            if (operation !in setOf("status", "voice", "text", "install", "listening", "idle", "approve", "deny", "previewVoice", "clearThumbnail")) return "{}"
+            if (operation !in setOf("status", "voice", "text", "install", "listening", "idle", "approve", "deny", "previewVoice", "clearThumbnail", "setVoice", "stopSpeech")) return "{}"
             return try {
                 PanelSession.request(operation, argument)
             } catch (e: Throwable) {
@@ -581,9 +581,14 @@ class MainActivity : Activity(), SensorEventListener {
         @JavascriptInterface
         fun version(key: String): String = if (ok(key)) packageManager.getPackageInfo(packageName, 0).versionName ?: "" else ""
 
-        /** Dictation widget: true when the phone has a speech recognizer. */
         @JavascriptInterface
-        fun jarvisListen(key: String): Int = if (ok(key)) dictation.start("en-US", true, jarvis = true) else 0
+        fun jarvisListen(key: String): Int = if (ok(key)) dictation.start("en-US", false, jarvisCommand = true, wakeName = net.oxog.phonebox.deskpanel.jarvis.core.ai.AssistantProfile.name.value) else 0
+
+        @JavascriptInterface
+        fun jarvisWakeListen(key: String): Int = if (ok(key)) dictation.start("en-US", true, jarvisWake = true, wakeName = net.oxog.phonebox.deskpanel.jarvis.core.ai.AssistantProfile.name.value) else 0
+
+        @JavascriptInterface
+        fun hasMicPermission(key: String): Boolean = ok(key) && dictation.hasMicPermission()
 
         @JavascriptInterface
         fun canListen(key: String): Boolean = ok(key) && dictation.available()

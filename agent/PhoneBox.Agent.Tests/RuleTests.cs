@@ -421,3 +421,21 @@ public class BrowserGuardTests
     public void ForeignBrowserRequestsAreRefused(string? site, string? mode, string method, string path, bool foreign) =>
         Assert.Equal(foreign, BrowserGuard.IsForeign(site, mode, method, new Microsoft.AspNetCore.Http.PathString(path)));
 }
+
+public class JarvisNetworkAndAdbTests
+{
+    [Theory]
+    [InlineData("/api/jarvis/links", true)]
+    [InlineData("/api/jarvis/adb", true)]
+    [InlineData("/api/settings", false)]
+    public void JarvisLinkAndAdbEndpointsFollowLanAllowlist(string path, bool expected) =>
+        Assert.Equal(expected, Lan.AllowedOverLan(new Microsoft.AspNetCore.Http.PathString(path)));
+
+    [Fact]
+    public void TailscaleAddressesOnlyReturnsCgnatAddressesWhenPresent()
+    {
+        var addresses = Lan.TailscaleAddresses();
+        Assert.NotNull(addresses);
+        Assert.All(addresses, ip => Assert.False(string.IsNullOrWhiteSpace(ip)));
+    }
+}

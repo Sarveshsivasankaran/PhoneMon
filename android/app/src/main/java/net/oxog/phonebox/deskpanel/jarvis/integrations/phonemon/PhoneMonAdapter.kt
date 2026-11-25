@@ -10,6 +10,17 @@ import org.json.JSONObject
 class PhoneMonAdapter {
     suspend fun call(tool: String, params: Map<String, Any?> = emptyMap()): String = withContext(Dispatchers.IO) {
         val data = JSONObject(params)
+        val activeLink = attachedLink ?: fallbackLink
+        val viaPref = data.optString("via", "").lowercase()
+        val preferredRoute = when (viaPref) {
+            "adb", "usb" -> AgentLink.Route.USB
+            "tailscale", "wifi" -> AgentLink.Route.WIFI
+            else -> null
+        }
+        if (tool == "wake_pc") {
+            val sent = activeLink.wakeActivePc()
+            return@withContext if (sent) "Sent Wake-on-LAN packet to the paired computer." else "Could not wake the computer. Make sure the phone is on the computer's network and paired."
+        }
         var verb = "GET"
         var body: ByteArray? = null
         fun post(path: String): String { verb = "POST"; return path }
@@ -54,6 +65,14 @@ class PhoneMonAdapter {
             "get_pc_metrics" -> "/api/state"
             "list_controls" -> "/api/controls/state"
             "list_shortcuts" -> "/api/jarvis/catalog"
+            "network_links" -> "/api/jarvis/links"
+            "adb_action" -> {
+                val uri = Uri.parse("/api/jarvis/adb").buildUpon()
+                    .appendQueryParameter("action", data.getString("action").lowercase())
+                val serial = data.optString("serial")
+                if (serial.isNotBlank()) uri.appendQueryParameter("serial", serial)
+                post(uri.build().toString())
+            }
             "obs_status" -> "/api/controls/obs"
             "execute_custom_command" -> post("/api/run/" + segment("command_id"))
             "switch_panel_page" -> post("/api/goto/" + segment("target"))
@@ -84,6 +103,7 @@ class PhoneMonAdapter {
             }
             "control_media" -> when (val op = data.getString("action").lowercase()) {
                 "volume_up", "volume_down", "mute" -> post("/api/volume?op=" + op.removePrefix("volume_"))
+                "set_volume" -> post("/api/volume?level=" + data.getInt("level").coerceIn(0, 100))
                 "play_pause" -> post("/api/media/playpause")
                 "previous" -> post("/api/media/prev")
                 "next", "pause", "play" -> post("/api/media/$op")
@@ -92,35 +112,97 @@ class PhoneMonAdapter {
             else -> error("Unknown tool")
         }
 
-        val activeLink = attachedLink ?: fallbackLink
-        val result = activeLink.request(verb, path, body, if (body != null) "application/json" else null, panelRequest = false)
-        val value = result.body.bufferedReader().use { reader ->
-            if (tool == "get_pc_metrics" && result.code in 200..299) {
-                val pc = JSONObject(reader.readText()).getJSONObject("pc")
-                return@use buildString {
-                    append("CPU ").append(pc.optString("cpu", "unavailable")).append("%")
-                    append(" · RAM ").append(pc.optString("ramUsedGb", "?")).append(" / ").append(pc.optString("ramTotalGb", "?")).append(" GB")
-                    when (val gpu = pc.opt("gpu")) {
-                        is Number -> append(" · GPU ").append(gpu).append("%")
-                        is JSONObject -> {
-                            val details = listOfNotNull(
-                                gpu.optString("name").takeIf { !gpu.isNull("name") && it.isNotBlank() },
-                                (gpu.opt("util") as? Number)?.let { "$it% utilization" },
-                                (gpu.opt("temp") as? Number)?.let { "$it degrees Celsius" }
-                            )
-                            if (details.isNotEmpty()) append(" · GPU ").append(details.joinToString(", "))
-                        }
-                    }
-                }
-            }
+        val result = activeLink.request(verb, path, body, if (body != null) "application/json" else null, panelRequest = false, preferredRoute = preferredRoute)
+        val rawBody = result.body.bufferedReader().use { reader ->
             val chars = CharArray(16000)
             val count = reader.readBlock(chars)
             String(chars, 0, count)
         }
         check(result.code in 200..299) {
-            if (result.code == 503) "Pair the desk panel with the computer" else "PhoneMon returned HTTP ${result.code}"
+            if (result.code == 503) {
+                when (preferredRoute) {
+                    AgentLink.Route.USB -> "USB or ADB connection is unavailable."
+                    AgentLink.Route.WIFI -> "Tailscale or Wi-Fi connection is unreachable."
+                    else -> "Pair the desk panel with the computer."
+                }
+            } else {
+                val err = runCatching { JSONObject(rawBody).optString("message").ifBlank { JSONObject(rawBody).optString("error") } }.getOrDefault("")
+                err.ifBlank { "PhoneMon returned HTTP ${result.code}" }
+            }
         }
-        value
+        val routeLabel = describeRoute(activeLink)
+        if (tool == "get_pc_metrics") {
+            val pc = JSONObject(rawBody).getJSONObject("pc")
+            return@withContext buildString {
+                append("CPU ").append(pc.optString("cpu", "unavailable")).append("%")
+                append(" · RAM ").append(pc.optString("ramUsedGb", "?")).append(" / ").append(pc.optString("ramTotalGb", "?")).append(" GB")
+                when (val gpu = pc.opt("gpu")) {
+                    is Number -> append(" · GPU ").append(gpu).append("%")
+                    is JSONObject -> {
+                        val details = listOfNotNull(
+                            gpu.optString("name").takeIf { !gpu.isNull("name") && it.isNotBlank() },
+                            (gpu.opt("util") as? Number)?.let { "$it% utilization" },
+                            (gpu.opt("temp") as? Number)?.let { "$it degrees Celsius" }
+                        )
+                        if (details.isNotEmpty()) append(" · GPU ").append(details.joinToString(", "))
+                    }
+                }
+                append(" (").append(routeLabel).append(')')
+            }
+        }
+        if (tool == "network_links") {
+            return@withContext formatLinksSummary(rawBody, routeLabel)
+        }
+        if (tool == "adb_action") {
+            val msg = runCatching { JSONObject(rawBody).optString("message") }.getOrDefault("")
+            return@withContext if (msg.isNotBlank()) "$msg ($routeLabel)" else "Done ($routeLabel)."
+        }
+        if (tool == "control_media" && viaPref.isNotBlank()) {
+            val act = data.getString("action").replace('_', ' ')
+            return@withContext if (act == "set volume") "Volume set to ${data.optInt("level")} percent ($routeLabel)."
+            else "Executed $act ($routeLabel)."
+        }
+        rawBody
+    }
+
+    private fun describeRoute(link: AgentLink): String = when (link.route) {
+        AgentLink.Route.USB -> "via ADB"
+        AgentLink.Route.WIFI -> {
+            val host = link.lastHost ?: ""
+            if (isTailscaleIp(host)) "via Tailscale" else "via Wi-Fi"
+        }
+        AgentLink.Route.NONE -> "offline"
+    }
+
+    private fun isTailscaleIp(ip: String): Boolean {
+        val parts = ip.split('.')
+        if (parts.size != 4) return false
+        val first = parts[0].toIntOrNull() ?: return false
+        val second = parts[1].toIntOrNull() ?: return false
+        return first == 100 && second in 64..127
+    }
+
+    private fun formatLinksSummary(json: String, routeLabel: String): String {
+        val obj = JSONObject(json)
+        val adbDevs = obj.optJSONArray("adbDevices")?.let { a -> (0 until a.length()).map { a.getString(it) } } ?: emptyList()
+        val tsIps = obj.optJSONArray("tailscaleAddresses")?.let { a -> (0 until a.length()).map { a.getString(it) } } ?: emptyList()
+        val tsState = obj.optString("tailscaleState", "")
+        val tsPeers = obj.optInt("tailscaleOnlinePeers", 0)
+        return buildString {
+            append("Active link is ").append(routeLabel).append(". ")
+            if (adbDevs.isNotEmpty()) append("ADB connected to ").append(adbDevs.joinToString(", ")).append(". ")
+            else if (obj.optBoolean("adbAvailable")) append("ADB is ready with no device attached. ")
+            else append("ADB is not installed on the computer. ")
+            if (tsIps.isNotEmpty()) {
+                append("Tailscale is active at ").append(tsIps.first())
+                if (tsPeers > 0) append(" with ").append(tsPeers).append(" online peers")
+                append(".")
+            } else if (tsState.isNotBlank()) {
+                append("Tailscale state is ").append(tsState).append(".")
+            } else {
+                append("Tailscale interface was not detected.")
+            }
+        }.trim()
     }
 
     private fun java.io.Reader.readBlock(buffer: CharArray): Int {

@@ -33,13 +33,27 @@ class Dictation(private val activity: Activity, private val js: (String) -> Unit
     private var waitingFor: Request? = null
     private val timeLimit = Runnable { recognizer?.stopListening() }
 
-    private data class Request(val id: Int, val lang: String, val offline: Boolean, val jarvis: Boolean)
+    private data class Request(
+        val id: Int,
+        val lang: String,
+        val offline: Boolean,
+        val jarvisWake: Boolean = false,
+        val jarvisCommand: Boolean = false,
+        val wakeName: String = "jarvis"
+    )
 
     fun available(): Boolean = SpeechRecognizer.isRecognitionAvailable(activity)
+    fun hasMicPermission(): Boolean = granted()
 
     /** Starts a session and returns its id; asks for the microphone first if needed. [lang] is BCP 47 or "". */
-    fun start(lang: String, offline: Boolean, jarvis: Boolean = false): Int {
-        val request = Request(ids.incrementAndGet(), lang, offline, jarvis)
+    fun start(
+        lang: String,
+        offline: Boolean,
+        jarvisWake: Boolean = false,
+        jarvisCommand: Boolean = false,
+        wakeName: String = "jarvis"
+    ): Int {
+        val request = Request(ids.incrementAndGet(), lang, offline, jarvisWake, jarvisCommand, wakeName)
         main.post {
             if (!granted()) {
                 // a newer request replaces one still waiting for the permission prompt
@@ -87,7 +101,18 @@ class Dictation(private val activity: Activity, private val js: (String) -> Unit
     private fun begin(request: Request) {
         panelVoice.cancel(0)
         if (recognizer != null) { val was = session; end(); send("error", "cancelled", was) }
-        if (request.jarvis) { panelVoice.start(request.id); return }
+        if (request.jarvisWake) { panelVoice.start(request.id, continuousWake = true, wakeName = request.wakeName); return }
+        if (request.jarvisCommand) {
+            // Try system SpeechRecognizer (neural ASR) for accurate command dictation, falling back to local Vosk offline.
+            val tryOnDevice = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                SpeechRecognizer.isOnDeviceRecognitionAvailable(activity)
+            if (available() || tryOnDevice) {
+                startJarvisSystemRecognizer(request, preferOnDevice = tryOnDevice)
+            } else {
+                panelVoice.start(request.id, continuousWake = false, wakeName = request.wakeName)
+            }
+            return
+        }
         if (!available()) { send("error", "unavailable", request.id); return }
         // "on the phone only" is a promise: only Android 12's on-device recognizer keeps it
         if (request.offline && Build.VERSION.SDK_INT < 31) { send("error", "offline-unsupported", request.id); return }
@@ -97,6 +122,28 @@ class Dictation(private val activity: Activity, private val js: (String) -> Unit
             // Android 12+ without an on-device recognizer (isOnDeviceRecognitionAvailable is Android 13)
             send("error", "offline-unavailable", request.id); return
         }
+        attachSystemRecognizer(r, request, allowSystemRetry = false, allowVoskFallback = false)
+    }
+
+    private fun startJarvisSystemRecognizer(request: Request, preferOnDevice: Boolean) {
+        val r = try {
+            if (preferOnDevice && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                SpeechRecognizer.createOnDeviceSpeechRecognizer(activity)
+            } else if (available()) {
+                SpeechRecognizer.createSpeechRecognizer(activity)
+            } else null
+        } catch (_: Exception) {
+            null
+        }
+        if (r == null) {
+            if (preferOnDevice && available()) startJarvisSystemRecognizer(request, preferOnDevice = false)
+            else panelVoice.start(request.id, continuousWake = false, wakeName = request.wakeName)
+            return
+        }
+        attachSystemRecognizer(r, request, allowSystemRetry = preferOnDevice && available(), allowVoskFallback = true)
+    }
+
+    private fun attachSystemRecognizer(r: SpeechRecognizer, request: Request, allowSystemRetry: Boolean, allowVoskFallback: Boolean) {
         recognizer = r
         session = request.id
         val id = request.id
@@ -106,16 +153,42 @@ class Dictation(private val activity: Activity, private val js: (String) -> Unit
             override fun onRmsChanged(rmsdB: Float) {}
             override fun onBufferReceived(buffer: ByteArray?) {}
             override fun onEndOfSpeech() = send("end", "", id)
-            override fun onError(error: Int) { if (session == id) end(); send("error", error.toString(), id) }
-            override fun onResults(results: Bundle?) { if (session == id) end(); send("final", first(results), id) }
-            override fun onPartialResults(partialResults: Bundle?) = send("partial", first(partialResults), id)
+            override fun onError(error: Int) {
+                if (session != id) return
+                end()
+                if (request.jarvisCommand && error in setOf(SpeechRecognizer.ERROR_NO_MATCH, SpeechRecognizer.ERROR_SPEECH_TIMEOUT)) {
+                    send("final", "", id)
+                    return
+                }
+                if (allowSystemRetry && error != SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS) {
+                    startJarvisSystemRecognizer(request, preferOnDevice = false)
+                    return
+                }
+                if (allowVoskFallback && error != SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS) {
+                    panelVoice.start(id, continuousWake = false, wakeName = request.wakeName)
+                    return
+                }
+                send("error", error.toString(), id)
+            }
+            override fun onResults(results: Bundle?) {
+                if (session != id) return
+                end()
+                send("final", bestCandidate(results, request.jarvisCommand), id)
+            }
+            override fun onPartialResults(partialResults: Bundle?) = send("partial", normalizeSpoken(first(partialResults), request.jarvisCommand), id)
             override fun onEvent(eventType: Int, params: Bundle?) {}
         })
         val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
             .putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
             .putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
+            .putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 5)
             .putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, activity.packageName)
-        if (request.offline) intent.putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, true)
+        if (request.jarvisCommand) {
+            intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, 2200L)
+            intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_POSSIBLY_COMPLETE_SILENCE_LENGTH_MILLIS, 1500L)
+            intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_MINIMUM_LENGTH_MILLIS, 1500L)
+        }
+        if (request.offline && !request.jarvisCommand) intent.putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, true)
         if (request.lang.isNotBlank()) intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, request.lang)
         r.startListening(intent)
         main.postDelayed(timeLimit, MAX_MS)
@@ -130,6 +203,25 @@ class Dictation(private val activity: Activity, private val js: (String) -> Unit
 
     private fun first(b: Bundle?) = b?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)?.firstOrNull() ?: ""
 
+    private fun bestCandidate(b: Bundle?, normalize: Boolean): String {
+        val list = b?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION) ?: return ""
+        if (list.isEmpty()) return ""
+        if (!normalize) return list.first()
+        val domainHit = list.firstOrNull { cand ->
+            DOMAIN_HINT_REGEX.containsMatchIn(cand)
+        }
+        return normalizeSpoken(domainHit ?: list.first(), true)
+    }
+
+    private fun normalizeSpoken(text: String, normalize: Boolean): String {
+        if (!normalize || text.isBlank()) return text
+        return text
+            .replace(Regex("""\btail\s+scale\b""", RegexOption.IGNORE_CASE), "Tailscale")
+            .replace(Regex("""\ba\.?\s*d\.?\s*b\.?\b""", RegexOption.IGNORE_CASE), "ADB")
+            .replace(Regex("""\bphone\s+(?:mon|man|box)\b""", RegexOption.IGNORE_CASE), "PhoneMon")
+            .replace(Regex("""\b(?:jar\s+vis|jervis|jarves|jarvas|jarvice)\b""", RegexOption.IGNORE_CASE), "Jarvis")
+    }
+
     private fun send(kind: String, text: String, id: Int) =
         js("window.onAndroidSpeech && window.onAndroidSpeech(${JSONObject.quote(kind)}, ${JSONObject.quote(text.take(MAX_CHARS))}, $id)")
 
@@ -137,5 +229,6 @@ class Dictation(private val activity: Activity, private val js: (String) -> Unit
         const val PERMISSION_REQUEST = 41
         private const val MAX_MS = 60_000L
         private const val MAX_CHARS = 2000
+        private val DOMAIN_HINT_REGEX = Regex("""\b(jarvis|adb|tailscale|phonemon|spotify|docker|discord|brightness|volume|monitor|lock|obs)\b""", RegexOption.IGNORE_CASE)
     }
 }

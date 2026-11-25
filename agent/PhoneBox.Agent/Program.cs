@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Globalization;
 using System.Net;
 using System.Text.Json;
@@ -393,6 +394,52 @@ app.MapGet("/api/jarvis/catalog", (ConfigStore store, HttpRequest req) =>
         pages = config.PagesFor(req.Headers["X-PhoneBox-Device"].ToString()).Where(p => p.Enabled).Select(p => new { p.Id, p.Title }),
         rules = config.Rules.Select(r => new { r.Id, r.Name, r.Enabled })
     });
+});
+app.MapGet("/api/jarvis/links", async (AdbReverse adb, ConfigStore cfg, HttpContext ctx, CancellationToken ct) =>
+{
+    var remoteBytes = ctx.Connection.RemoteIpAddress?.MapToIPv4().GetAddressBytes();
+    var via = ctx.Connection.LocalPort == Port ? "adb"
+        : remoteBytes is { Length: 4 } b && b[0] == 100 && b[1] is >= 64 and <= 127 ? "tailscale"
+        : "lan";
+    var tailscaleIps = Lan.TailscaleAddresses();
+    string? tailscaleState = null;
+    int tailscalePeers = 0;
+    if (ToolProcess.Find("tailscale") is { } tsExe)
+    {
+        try
+        {
+            var psi = new ProcessStartInfo(tsExe);
+            psi.ArgumentList.Add("status");
+            psi.ArgumentList.Add("--json");
+            var r = await ToolProcess.RunAsync(psi, TimeSpan.FromMilliseconds(1500), ct);
+            if (r.ExitCode == 0 && !string.IsNullOrWhiteSpace(r.Output))
+            {
+                using var doc = JsonDocument.Parse(r.Output);
+                tailscaleState = doc.RootElement.TryGetProperty("BackendState", out var bs) ? bs.GetString() : null;
+                if (doc.RootElement.TryGetProperty("Peer", out var peers) && peers.ValueKind == JsonValueKind.Object)
+                    tailscalePeers = peers.EnumerateObject().Count(p => p.Value.TryGetProperty("Online", out var on) && on.GetBoolean());
+            }
+        }
+        catch { }
+    }
+    return Results.Json(new
+    {
+        via,
+        adbAvailable = AdbReverse.FindAdb(cfg.Get().AdbPath) is not null,
+        adbDevices = adb.AllDevices,
+        lanEnabled = cfg.Get().Lan.Enabled,
+        lanActive = lanCert is not null,
+        lanPort = lanCfg.Port,
+        lanAddresses = Lan.Addresses(),
+        tailscaleAddresses = tailscaleIps,
+        tailscaleState,
+        tailscaleOnlinePeers = tailscalePeers,
+    });
+});
+app.MapPost("/api/jarvis/adb", async (string? action, string? serial, AdbReverse adb, CancellationToken ct) =>
+{
+    var (ok, message) = await adb.RunDeviceActionAsync((action ?? "").Trim().ToLowerInvariant(), serial, ct);
+    return ok ? Results.Json(new { ok = true, message, devices = adb.AllDevices }) : Results.BadRequest(new { ok = false, message });
 });
 var jarvisProfiles = new JarvisProfileStore(configDir);
 app.MapGet("/api/jarvis/profile", () => Results.Json(jarvisProfiles.Read()));

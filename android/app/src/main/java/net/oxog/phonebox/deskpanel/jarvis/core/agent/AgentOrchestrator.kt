@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import net.oxog.phonebox.deskpanel.jarvis.core.ai.AssistantProfile
 import net.oxog.phonebox.deskpanel.jarvis.core.ai.JarvisState
 import net.oxog.phonebox.deskpanel.jarvis.core.ai.PhoneInference
 import net.oxog.phonebox.deskpanel.jarvis.core.memory.MemoryManager
@@ -38,8 +39,8 @@ class AgentOrchestrator(
     }
 
     fun previewVoice(voice: String) {
-        if (voice in setOf("slt", "rms", "awb")) {
-            ttsEngine.speak("Hello. This is my offline voice.", voice)
+        if (voice in AssistantProfile.SUPPORTED_VOICES) {
+            ttsEngine.speak("Hello! I am ${AssistantProfile.name.value}, ready to help.", voice)
         }
     }
 
@@ -57,15 +58,14 @@ class AgentOrchestrator(
             _currentStreamingText.value = ""
             memoryManager.recordTurn("USER", input, isSpoken = isVoice)
 
-            val direct = when (input.trim().lowercase().trimEnd('?', '.', '!')) {
-                "pc status", "show pc status", "show pc metrics", "show cpu usage", "what is my cpu usage" -> "get_pc_metrics"
-                "list shortcuts", "show my shortcuts" -> "list_shortcuts"
-                "obs status" -> "obs_status"
-                "spotify status" -> "spotify_status"
-                else -> null
+            when (val intent = VoiceCommandRouter.route(input)) {
+                is VoiceIntent.DirectTool -> executeTool(intent.tool, intent.params, intent.spokenSummary)
+                is VoiceIntent.OpenTarget -> resolveAndOpenTarget(intent.query, intent.preferShortcut, intent.via)
+                is VoiceIntent.SwitchPage -> resolveAndSwitchPage(intent.query, intent.via)
+                is VoiceIntent.SetBrightness -> resolveAndSetBrightness(intent.level, intent.via)
+                is VoiceIntent.DockerAction -> resolveAndRunDocker(intent.action, intent.query, intent.via)
+                null -> processModelOutput(PhoneInference.answer(input))
             }
-            if (direct != null) executeTool(direct, emptyMap())
-            else processModelOutput(PhoneInference.answer(input))
         }
     }
 
@@ -103,13 +103,111 @@ class AgentOrchestrator(
         scope.launch { finishTurn("Action cancelled.") }
     }
 
-    private suspend fun executeTool(toolName: String, params: Map<String, Any?>) {
+    private suspend fun resolveAndOpenTarget(query: String, preferShortcut: Boolean, via: String?) {
+        val viaMap = if (via != null) mapOf("via" to via) else emptyMap()
+        _currentState.value = JarvisState.EXECUTING
+        val shortcutMatch = runCatching {
+            val catalog = JSONObject(phoneMonAdapter.call("list_shortcuts", viaMap))
+            val items = catalog.optJSONArray("shortcuts")?.let { a ->
+                (0 until a.length()).map { i ->
+                    val o = a.getJSONObject(i)
+                    o.getString("id") to o.optString("label", o.getString("id"))
+                }
+            } ?: emptyList()
+            VoiceCommandRouter.bestNameMatch(query, items)
+        }.getOrNull()
+
+        if (preferShortcut && shortcutMatch != null) {
+            executeTool("execute_custom_command", viaMap + ("command_id" to shortcutMatch.first), "Running shortcut ${shortcutMatch.second}")
+            return
+        }
+
+        val appMatch = runCatching {
+            val appsObj = JSONObject(phoneMonAdapter.call("panel_status", viaMap + ("section" to "apps")))
+            val items = appsObj.optJSONArray("apps")?.let { a ->
+                (0 until a.length()).map { i ->
+                    val o = a.getJSONObject(i)
+                    o.getString("id") to o.optString("name", o.getString("id"))
+                }
+            } ?: emptyList()
+            VoiceCommandRouter.bestNameMatch(query, items)
+        }.getOrNull()
+
+        when {
+            appMatch != null -> executeTool("open_app", viaMap + ("id" to appMatch.first), "Opened ${appMatch.second}")
+            shortcutMatch != null -> executeTool("execute_custom_command", viaMap + ("command_id" to shortcutMatch.first), "Running shortcut ${shortcutMatch.second}")
+            else -> processModelOutput(PhoneInference.answer(if (via != null) "open $query via $via" else "open $query"))
+        }
+    }
+
+    private suspend fun resolveAndSwitchPage(query: String, via: String?) {
+        val viaMap = if (via != null) mapOf("via" to via) else emptyMap()
+        _currentState.value = JarvisState.EXECUTING
+        val match = runCatching {
+            val catalog = JSONObject(phoneMonAdapter.call("list_shortcuts", viaMap))
+            val items = catalog.optJSONArray("pages")?.let { a ->
+                (0 until a.length()).map { i ->
+                    val o = a.getJSONObject(i)
+                    o.getString("id") to o.optString("title", o.getString("id"))
+                }
+            } ?: emptyList()
+            VoiceCommandRouter.bestNameMatch(query, items)
+        }.getOrNull()
+        val targetId = match?.first ?: query.lowercase().replace(' ', '-')
+        val label = match?.second ?: query
+        executeTool("switch_panel_page", viaMap + ("target" to targetId), "Switched to the $label page")
+    }
+
+    private suspend fun resolveAndSetBrightness(level: Int, via: String?) {
+        val viaMap = if (via != null) mapOf("via" to via) else emptyMap()
+        _currentState.value = JarvisState.EXECUTING
+        val monitorId = runCatching {
+            val snap = JSONObject(phoneMonAdapter.call("list_controls", viaMap))
+            val monitors = snap.optJSONArray("monitors")
+            if (monitors != null && monitors.length() > 0) monitors.getJSONObject(0).optString("id") else null
+        }.getOrNull()
+        if (monitorId.isNullOrBlank()) {
+            finishTurn("No controllable desktop monitor was found.")
+            return
+        }
+        executeTool("set_brightness", viaMap + mapOf("id" to monitorId, "value" to level), "Set monitor brightness to $level percent")
+    }
+
+    private suspend fun resolveAndRunDocker(action: String, query: String, via: String?) {
+        val viaMap = if (via != null) mapOf("via" to via) else emptyMap()
+        _currentState.value = JarvisState.EXECUTING
+        val match = runCatching {
+            val dockerObj = JSONObject(phoneMonAdapter.call("panel_status", viaMap + ("section" to "docker")))
+            val items = dockerObj.optJSONArray("containers")?.let { a ->
+                (0 until a.length()).map { i ->
+                    val o = a.getJSONObject(i)
+                    o.optString("id", o.optString("name")) to o.optString("name", o.optString("id"))
+                }
+            } ?: emptyList()
+            VoiceCommandRouter.bestNameMatch(query, items)
+        }.getOrNull()
+        if (match == null) {
+            finishTurn("Could not find Docker container $query.")
+            return
+        }
+        executeTool("docker_action", viaMap + mapOf("id" to match.first, "action" to action), "Executed docker $action on ${match.second}")
+    }
+
+    private suspend fun executeTool(toolName: String, params: Map<String, Any?>, spokenSummary: String? = null) {
         ttsEngine.stop()
         _currentState.value = JarvisState.EXECUTING
-        val resultText = try {
-            phoneMonAdapter.call(toolName, params).ifBlank { "Completed $toolName." }
+        val viaNote = params["via"]?.toString()?.takeIf { it.isNotBlank() }?.let { " via ${if (it == "adb") "ADB" else if (it == "tailscale") "Tailscale" else it}" }.orEmpty()
+        var succeeded = true
+        val rawResult = try {
+            phoneMonAdapter.call(toolName, params)
         } catch (e: Exception) {
-            "Could not complete $toolName: ${e.message}"
+            succeeded = false
+            "Could not complete ${toolName.replace('_', ' ')}: ${e.message}"
+        }
+        val resultText = if (succeeded && !spokenSummary.isNullOrBlank()) {
+            "$spokenSummary$viaNote."
+        } else {
+            rawResult.ifBlank { "Completed ${toolName.replace('_', ' ')}$viaNote." }
         }
 
         permissionManager.logToolExecution(toolName, JSONObject(params).toString(), resultText, true)

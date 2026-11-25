@@ -1114,7 +1114,7 @@ html.beat-4 .w-onair.on .oa-sign { box-shadow: 0 0 34px rgba(239, 68, 68, .9); }
 .ap-custom .ap-btn { min-width: 0; padding: 12px 18px; font-size: 15px; }
 
 /* ---------- night ---------- */
-#night { position: fixed; top: 0; right: 0; bottom: 0; left: 0; z-index: 30; background: #000; display: none; flex-direction: column; align-items: center; justify-content: center; color: #4a3a33; }
+#night { position: fixed; top: 0; right: 0; bottom: 0; left: 0; z-index: 30; background: #000; display: none; flex-direction: column; align-items: center; justify-content: center; color: #f3e8ff; }
 body.night #night { display: flex; }
 
 /* OLED burn-in protection (Settings › Display): with pixel shift the panel steps a few pixels every 2 minutes and the
@@ -1124,8 +1124,8 @@ body.shifted #night > * { transform: translate(var(--night-x, 0), var(--night-y,
 body::after { content: ""; position: fixed; top: 0; right: 0; bottom: 0; left: 0; z-index: 85; background: #000; opacity: 0; pointer-events: none; transition: opacity 1.5s ease; }
 body.dimmed::after { opacity: .65; pointer-events: auto; }
 body.waking::after { opacity: 0; pointer-events: auto; transition: opacity .2s ease; }
-#nClock { font-size: 34vh; font-weight: 200; letter-spacing: -0.04em; line-height: 1; }
-#nDate { font-size: 16px; margin-top: 6px; text-transform: capitalize; }
+#nClock { font-size: 34vh; font-weight: 200; letter-spacing: -0.04em; line-height: 1; color: #ffffff; background: linear-gradient(180deg, #ffffff 28%, #e9d5ff 60%, #a855f7 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 18px rgba(168, 85, 247, .5)); }
+#nDate { font-size: 16px; margin-top: 8px; text-transform: capitalize; color: #d8b4fe; letter-spacing: .04em; text-shadow: 0 0 10px rgba(168, 85, 247, .35); }
 
 /* ---------- rules ---------- */
 .w-rules, .w-chargecare, .w-nextup, .w-moon { padding: 9px 12px; display: flex; flex-direction: column; gap: 6px; }

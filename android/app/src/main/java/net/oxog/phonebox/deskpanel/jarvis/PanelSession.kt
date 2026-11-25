@@ -68,7 +68,13 @@ internal object PanelSession {
         }
         val busy = agent.currentState.value.isBusy() || agent.pendingApprovalTool.value != null
         when (method) {
-            "previewVoice" -> if (!busy) agent.previewVoice(value.ifBlank { AssistantProfile.current().optString("voice", "slt") })
+            "previewVoice" -> if (!busy) agent.previewVoice(value.ifBlank { AssistantProfile.activeVoice() })
+            "setVoice" -> AssistantProfile.setLocalVoice(value)
+            "stopSpeech" -> speech.stop().also {
+                if (agent.currentState.value == JarvisState.SPEAKING || agent.currentState.value == JarvisState.LISTENING) {
+                    setState(JarvisState.STANDBY)
+                }
+            }
             "text", "voice" -> if (!busy && value.isNotBlank() && value.length <= 2000) {
                 user = value
                 agent.handleUserInput(value, method == "voice")
@@ -92,9 +98,9 @@ internal object PanelSession {
             lastSent = signature
             heartbeat = scope.launch { runCatching { adapter.call("session", mapOf("state" to state, "text" to reply.take(2000), "user" to user)) } }
         }
-        return JSONObject().put("name", AssistantProfile.name.value).put("state", state)
-            .put("thumbnail", thumbnail).put("user", user).put("text", reply).put("pending", pending())
-            .put("setup", PhoneRuntime.status.value).put("installing", install?.isActive == true).toString()
+        return JSONObject().put("name", AssistantProfile.name.value).put("voice", AssistantProfile.activeVoice())
+            .put("state", state).put("thumbnail", thumbnail).put("user", user).put("text", reply)
+            .put("pending", pending()).put("setup", PhoneRuntime.status.value).put("installing", install?.isActive == true).toString()
     }
 
     fun stopSpeech() {

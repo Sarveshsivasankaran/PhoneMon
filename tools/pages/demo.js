@@ -826,11 +826,11 @@
         const p = parse(body);
         if (typeof p?.assistantName !== 'string' || !p.assistantName.trim() || p.assistantName.length > 40 ||
             typeof p.personality !== 'string' || p.personality.length > 2000 ||
-            !['qwen2.5-0.5b', 'lfm2.5-vl-450m'].includes(p.model) || !['slt','rms','awb'].includes(p.voice))
+            !['qwen2.5-0.5b', 'lfm2.5-vl-450m'].includes(p.model) || !['natural','jarvis','emma','aria','ryan','aura','arjun','priya','slt','rms','awb'].includes(p.voice))
           return json({error:'Invalid assistant profile.'}, 400);
         store.set(key, {assistantName:p.assistantName.trim(), personality:p.personality.trim(), model:p.model, voice:p.voice});
       }
-      return json(store.get(key, {assistantName:'JARVIS', personality:'', model:'qwen2.5-0.5b', voice:'slt'}));
+      return json(store.get(key, {assistantName:'JARVIS', personality:'', model:'qwen2.5-0.5b', voice:'natural'}));
     }
     if (path === '/api/settings') {
       if (method === 'PUT') {

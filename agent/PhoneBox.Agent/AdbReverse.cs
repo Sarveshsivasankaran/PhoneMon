@@ -81,9 +81,58 @@ public sealed class AdbReverse(ConfigStore cfg, ILogger<AdbReverse> log, AgentEn
         if (adb is null) return;
         foreach (var d in _devices)
         {
-            await Adb(adb, $"-s {d} shell input keyevent KEYCODE_WAKEUP", CancellationToken.None);
-            await Adb(adb, $"-s {d} shell am start -n {PanelActivity}", CancellationToken.None);
+            await AdbArgs(adb, ["-s", d, "shell", "input", "keyevent", "KEYCODE_WAKEUP"], CancellationToken.None);
+            await AdbArgs(adb, ["-s", d, "shell", "am", "start", "-n", PanelActivity], CancellationToken.None);
         }
+    }
+
+    public async Task<(bool Ok, string Message)> RunDeviceActionAsync(string action, string? serial, CancellationToken ct)
+    {
+        var adb = FindAdb(cfg.Get().AdbPath);
+        if (adb is null) return (false, "ADB is not installed on the computer");
+        if (action == "reconnect")
+        {
+            await Ensure(ct);
+            return _devices.Length > 0
+                ? (true, $"ADB tunnel active for {string.Join(", ", _devices)}")
+                : (false, "No ADB devices connected");
+        }
+        if (action == "devices")
+        {
+            return _all.Length > 0
+                ? (true, $"Connected ADB devices: {string.Join(", ", _all)}")
+                : (true, "No ADB devices are attached");
+        }
+        var keycode = action switch
+        {
+            "wake_screen" => "KEYCODE_WAKEUP",
+            "sleep_screen" => "KEYCODE_SLEEP",
+            "volume_up" => "KEYCODE_VOLUME_UP",
+            "volume_down" => "KEYCODE_VOLUME_DOWN",
+            "mute" => "KEYCODE_VOLUME_MUTE",
+            "play_pause" => "KEYCODE_MEDIA_PLAY_PAUSE",
+            "home" => "KEYCODE_HOME",
+            "back" => "KEYCODE_BACK",
+            _ => null
+        };
+        if (action != "open_panel" && keycode is null) return (false, "Unsupported ADB action");
+        var targets = string.IsNullOrWhiteSpace(serial)
+            ? _devices
+            : _devices.Where(d => d == serial.Trim()).ToArray();
+        if (targets.Length == 0) return (false, "No matching connected ADB device");
+        foreach (var d in targets)
+        {
+            if (action == "open_panel")
+            {
+                await AdbArgs(adb, ["-s", d, "shell", "input", "keyevent", "KEYCODE_WAKEUP"], ct);
+                await AdbArgs(adb, ["-s", d, "shell", "am", "start", "-n", PanelActivity], ct);
+            }
+            else
+            {
+                await AdbArgs(adb, ["-s", d, "shell", "input", "keyevent", keycode!], ct);
+            }
+        }
+        return (true, $"Executed ADB {action.Replace('_', ' ')} on {string.Join(", ", targets)}");
     }
 
     private ScreenSynchronizer? _screenSync;
@@ -359,6 +408,20 @@ public sealed class AdbReverse(ConfigStore cfg, ILogger<AdbReverse> log, AgentEn
             RedirectStandardOutput = true, RedirectStandardError = true, UseShellExecute = false, CreateNoWindow = true,
             WorkingDirectory = AppPaths.NeutralCwd,
         };
+        var result = await ToolProcess.RunAsync(psi, TimeSpan.FromSeconds(8), ct);
+        if (result.ExitCode != 0 && !anyExit) throw new IOException($"ADB exited with code {result.ExitCode}");
+        return result.Output;
+    }
+
+    internal static async Task<string> AdbArgs(string adb, string[] args, CancellationToken ct, bool anyExit = false)
+    {
+        if (SessionEnding) throw new OperationCanceledException("the session is ending");
+        var psi = new ProcessStartInfo(adb)
+        {
+            RedirectStandardOutput = true, RedirectStandardError = true, UseShellExecute = false, CreateNoWindow = true,
+            WorkingDirectory = AppPaths.NeutralCwd,
+        };
+        foreach (var a in args) psi.ArgumentList.Add(a);
         var result = await ToolProcess.RunAsync(psi, TimeSpan.FromSeconds(8), ct);
         if (result.ExitCode != 0 && !anyExit) throw new IOException($"ADB exited with code {result.ExitCode}");
         return result.Output;

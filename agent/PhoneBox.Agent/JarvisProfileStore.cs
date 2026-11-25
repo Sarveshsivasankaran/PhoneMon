@@ -4,12 +4,17 @@ namespace PhoneBox.Agent;
 
 internal sealed record JarvisProfile(string AssistantName, string Personality, string Model, string Voice = "slt")
 {
-    public static readonly JarvisProfile Default = new("JARVIS", "", "qwen2.5-0.5b");
+    public static readonly HashSet<string> AllowedVoices =
+    [
+        "natural", "jarvis", "emma", "aria", "ryan", "aura", "arjun", "priya", "slt", "rms", "awb"
+    ];
+
+    public static readonly JarvisProfile Default = new("JARVIS", "", "qwen2.5-0.5b", "natural");
 
     [System.Text.Json.Serialization.JsonIgnore]
     public bool Valid => !string.IsNullOrWhiteSpace(AssistantName) && AssistantName.Length <= 40
         && Personality is { Length: <= 2000 }
-        && Model is ("qwen2.5-0.5b" or "lfm2.5-vl-450m") && Voice is ("slt" or "rms" or "awb");
+        && Model is ("qwen2.5-0.5b" or "lfm2.5-vl-450m") && AllowedVoices.Contains(Voice);
 }
 
 internal sealed class JarvisProfileStore(string directory)
