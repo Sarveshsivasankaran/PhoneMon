@@ -1,90 +1,87 @@
 # Contributing to PhoneMon
 
-Thanks for helping. PhoneMon runs on someone's computer all day, can start programs and talks to a phone over the
-network, so reviews focus on what a change lets the phone (or anyone else) do, and on what leaves the machine. This
-page lists what reviews keep asking for; following it gets a pull request merged much faster.
+Thank you for helping improve PhoneMon! Because PhoneMon runs persistently on a user's computer, launches configured actions, and communicates with an Android device over USB (`adb reverse`), Wi-Fi, or Tailscale, reviews focus carefully on security boundaries, privacy guarantees, and backward compatibility. Following the steps and rules below helps get your pull request reviewed and merged quickly.
 
-## Before you start
+## Before You Start
 
-- **Small fixes** (a bug, a wrong label, a missing check): open a pull request straight away.
-- **New widgets, integrations, providers or anything that changes how the phone and the agent talk**: open an issue
-  first and describe what it does for the user. It saves you from building something that has to be reshaped.
-- **One change per pull request.** Keep it reviewable: as a rough guide, under about 800 changed lines outside tests.
-  A large feature can be a series of pull requests, each one working and tested on its own. Unrelated changes (a new
-  widget plus a refactor plus a dependency bump) go in separate pull requests.
+- **Small fixes** (bug fixes, typos, missing tests, documentation improvements): you can open a pull request directly.
+- **New widgets, integrations, AI tools, or protocol changes**: open an issue first using the [feature request form](.github/ISSUE_TEMPLATE/feature_request.yml) so we can align on design, privacy, and UX before you invest time building something that may need major changes. For bugs, use the [bug report form](.github/ISSUE_TEMPLATE/bug_report.yml).
+- **Keep each pull request focused:** one logical change per PR (aim for under ~800 changed lines excluding tests). Split large work into smaller, self-contained PRs that each build and pass tests on their own. Never mix unrelated refactors or dependency bumps with a feature or fix.
 
-## The security model, in short
+---
 
-- The agent listens on `127.0.0.1`. The phone's `adb reverse` tunnel ends on a loopback port of its own
-  (`agent/PhoneBox.Agent/UsbLink.cs`): TLS pinned by the app, the app's USB key, and the same allow-list as Wi-Fi
-  plus the pairing data and the feed proxy. The optional Wi-Fi port serves only
-  the paths on the allow-list in `agent/PhoneBox.Agent/Lan.cs`, over TLS pinned to the paired certificate, with the
-  paired key. Settings, pairing and tests stay local. **Adding a path to that allow-list is a security decision**:
-  say in the pull request why the phone needs it.
-- **The phone sends ids, never commands, paths or URLs.** Shortcuts, command widgets, apps and calendars are defined
-  on the computer; the phone asks for one by id, and the agent looks it up in its own settings.
-- **Anything that controls the computer goes through a per-widget option** (like Docker's `control` or the processes
-  widget's `allowKill`) that the agent checks with `Widgets(enabledPagesOnly: true)`, so removing or hiding the
-  widget turns it off. New features that start programs, record or send data are off by default.
-- **Secrets never reach the phone.** `AgentConfig.ToPublic()` is what the phone gets; tokens, keys, calendar URLs
-  and commands stay out of it (including inside Smart Stack children). Don't log them either.
-- **Processes**: start them with `ProcessStartInfo.ArgumentList`, never through a shell and never with text from a
-  request. Kill them on timeout and cancel.
-- **Panel and settings UI**: build elements with `textContent`; no `innerHTML` with data from the agent, a widget
-  option or the network. Custom HTML widgets stay sandboxed.
-- Report vulnerabilities privately, see [SECURITY.md](SECURITY.md).
+## Contribution Steps
 
-## Privacy
+1. **Fork and create a branch**
+   - Fork [`Sarveshsivasankaran/PhoneMon`](https://github.com/Sarveshsivasankaran/PhoneMon) and clone your fork locally.
+   - Branch off `main` with a descriptive name (for example `fix/wake-loop` or `feat/gpu-fan-tile`).
+2. **Set up your development environment**
+   - Install `.NET 10 SDK` (desktop agent), `JDK 17` + `Android SDK Platform 35` (Android app), `Python 3` (release checks & demo server), and `Node.js 22` (Playwright UI tests).
+   - See the [Development guide](docs/DEVELOPMENT.md) for running `python tools/demo-server.py`, building debug APKs, or running an isolated development agent alongside an installed copy.
+3. **Implement your change following the rules below**
+   - Adhere to the Security, Privacy, Settings/Widget, JARVIS AI, and Android rules in the sections below.
+   - Add or update unit/UI tests that fail without your fix (where practical). Keep all tests deterministic and independent of the local machine (no hardcoded ports, real user config directories, or host wall clocks).
+   - If you change widget layouts or visual UI, capture updated screenshots (`tools/ui-tests/media.js` or at both small and large widget sizes).
+4. **Run local verification checks**
+   Run all suites that cover the areas you touched (matches CI in [build.yml](.github/workflows/build.yml)):
 
-- PhoneMon has no telemetry, accounts or servers of its own, and that stays so.
-- **Every new outbound connection** (a public API, a cloud provider, a download) needs a row in
-  [PRIVACY.md](PRIVACY.md): the host, what is sent, and how to turn it off. Sending the user's data (audio, text,
-  location, files) somewhere must be opt-in and say so where it is switched on.
-- "Local" means this computer or the local network. Don't label something local when it can reach the internet.
+   ```sh
+   # Metadata, catalog counts, locale placeholders, and WinGet manifests
+   python tools/check-release.py
+   python tools/test-winget-manifests.py
 
-## Settings, widgets and the phone app
+   # Desktop agent (.NET 10)
+   dotnet test agent/PhoneBox.Agent.Tests --nologo
 
-- **A new setting** goes in `Config.cs` (with a default and normalization of bad values), in all three
-  `config.default*.json` files, and in the settings page. Decide whether the phone needs it; if not, keep it out of
-  `ToPublic()`.
-- **A new widget** needs its entry in `agent/PhoneBox.Agent/widgets.json`, the widget in
-  `android/app/src/main/assets/www/widgets/`, an icon in `WIDGET_ICONS`, the README count (`tools/check-release.py`
-  checks it) and, if it calls the agent, a mock in `tools/pages/demo.js` so the web demo and the UI tests can render
-  it. Outside the app (no native bridge) it must show an empty state, not throw.
-- **The Android app** targets Android 5.0 (API 21) and later and runs the panel in the system WebView, which is
-  updated through the Play Store, so its version doesn't follow the Android version. The panel runs from Chromium 83
-  (`compat.js` fills in the newer DOM APIs) and scales widgets fully from Chrome 105 (container query units); below
-  that, `index.html` shows an update notice from a plain script that runs even when the panel's modules don't. The
-  last WebView for Android 6 is 106, so widgets scale fully on Android 6; for Android 5 it is 95, so widgets there don't
-  scale as well. Calls above API 21 need a version check (`./gradlew lintRelease` reports them as NewApi). Changing `minSdk` needs `./gradlew lintDebug` to pass and a note on the devices
-  and WebView versions you tried.
-- **Don't change behaviour users rely on** (removing a choice, renaming a setting, changing a default) without
-  migrating existing settings and saying so in the pull request.
+   # Browser panel & settings UI suite
+   cd tools/ui-tests
+   npm ci && npx playwright install chromium   # or chrome/msedge locally
+   npx playwright test
 
-## Tests
+   # Android app (run whenever android/ files change; requires JDK 17 + Android SDK 35)
+   cd android
+   ./gradlew lintDebug assembleDebug testDebugUnitTest --no-daemon
+   python ../tools/test-agent-stream.py
+   ```
 
-Run what CI runs, and say in the pull request what you ran and what you tried by hand:
+   If you modify installer or packaging scripts (`setup.ps1`, `setup.sh`, `scripts/`), also run:
+   - Windows: `./tools/test-setup-download.ps1`, `./tools/test-install-apk.ps1`, `./tools/test-build-staging.ps1`, and `./tools/test-windows-source-publish.ps1`
+   - Linux/macOS: `python3 tools/test-unix-installer.py --bash /bin/bash`, `python3 tools/test-unix-autostart.py /bin/bash`, and `python3 tools/test-unix-uninstall.py`
+5. **Commit and open a pull request**
+   - Keep code, comments, UI copy, and commit messages in **English**. Write comments to explain *why*, not *what*.
+   - **Do not** edit `VERSION` or add release entries to `CHANGELOG.md` in routine PRs (the maintainer bumps versions at release time; see [docs/RELEASING.md](docs/RELEASING.md)).
+   - Fill out every section of the [pull request template](.github/pull_request_template.md): what changes for the user, why, linked issue (`Fixes #...`), test commands executed, and devices/OS versions tested by hand.
+   - Address all reviewer feedback and resolve automated review threads (CodeRabbit) before merge.
 
-```sh
-dotnet test agent/PhoneBox.Agent.Tests
-cd tools/ui-tests && npm ci && npx playwright install chromium && npx playwright test
-python tools/check-release.py
-cd android && ./gradlew lintDebug assembleDebug     # when the Android app changes
-```
+---
 
-- A bug fix comes with a test that fails without the fix, where that's practical.
-- Tests must not depend on the machine they run on (ports, clocks, the user's real settings or install folder).
-- For UI changes, a screenshot at a small and a large widget size helps a lot.
+## Project Rules & Review Standards
 
-## Pull requests
+### 1. Security Model
+- **Network boundaries:** The desktop agent binds local settings to `127.0.0.1`. Phone traffic travels either over `adb reverse` (`agent/PhoneBox.Agent/UsbLink.cs` with pinned TLS + app USB key) or over optional Wi-Fi/Tailscale (`agent/PhoneBox.Agent/Lan.cs` with pinned TLS + paired key, limited strictly to `AllowedOverLan`). **Adding any route to `Lan.AllowedOverLan` is a security decision** — justify why the phone needs it in the PR description.
+- **ID-only actions from the phone:** Shortcuts, apps, custom commands, calendars, and JARVIS actions are configured on the computer or in vetted catalogs; the phone sends **IDs or enum action names**, never raw shell commands, file paths, or arbitrary URLs.
+- **Per-widget opt-in gating:** Any feature that controls the host computer (killing processes, Docker actions, mouse/keyboard/ADB control, OBS actions) must check its per-widget/settings toggle via `Widgets(enabledPagesOnly: true)` so removing or disabling the widget/option immediately revokes access. New capabilities that launch programs, capture media, or send data must default to **off**.
+- **Secrets isolation:** `AgentConfig.ToPublic()` defines what reaches the phone. Keep tokens, API keys, webhook keys, calendar URLs, and command strings out of `ToPublic()` (including inside Smart Stack child options), logs, and error responses returned to the phone. Write sensitive files owner-only (`AppPaths.WriteAllTextPrivate` / `CreatePrivate`). Keep external CLI tokens (such as Claude OAuth) read-only.
+- **Process execution safety:** Launch subprocesses exclusively via `ProcessStartInfo.ArgumentList` — never invoke a shell (`cmd.exe`, `/bin/sh -c`) and never interpolate untrusted request strings. Enforce timeouts and kill child processes on cancellation.
+- **DOM & native WebView bridge safety:** Build UI DOM elements using `textContent` or `h()`; never pass agent data, network responses, or widget options to `innerHTML`. Custom HTML widgets must stay sandboxed. Every `@JavascriptInterface` call exposed to WebView must validate the per-session key held in `main.js` so untrusted frames cannot invoke bridge methods.
+- **JARVIS Local AI & voice routing:** Keep tool execution validated through `ToolValidator` and `PhoneMonAdapter` allowlists. Route transport overrides (`adb`/`usb`/`tailscale`/`wifi`) cleanly without bypassing pairing or allowlists.
+- **Vulnerability disclosure:** Do **not** open public issues for security bugs; report them privately per [SECURITY.md](SECURITY.md).
 
-- Describe what changes for the user, why, and how you tested it. Link the issue.
-- Write code, comments, UI text and commit messages in English. Comments explain why, not what.
-- Leave `CHANGELOG.md` and the version numbers to the maintainer; they are updated when the change is merged and
-  released.
-- Contributions written with AI tools are welcome. You are still the author: read the diff, run the tests, and make
-  sure the description matches what the code does.
-- An automated reviewer (CodeRabbit) comments on every pull request. Fix what is right, reply where it is wrong;
-  conversations must be resolved before merging.
+### 2. Privacy & Telemetry
+- PhoneMon collects **zero telemetry**, requires **zero cloud accounts**, and sends no analytics. Keep it that way.
+- **Document every outbound request:** Any new external host contacted by the agent, panel, or setup script requires a row in [PRIVACY.md](PRIVACY.md) documenting the destination host, exact data sent, when it fires, and how to turn it off.
+- Any feature sending user data (audio, transcripts, camera frames, location, or files) off-device must be explicit opt-in and clearly labeled where enabled.
+- Never call an integration "local" if it can initiate internet requests.
 
-By contributing you agree that your contribution is licensed under the [MIT License](LICENSE).
+### 3. Settings, Widgets, Panel UI & Compatibility
+- **Adding a setting:** Define defaults and input normalization in `Config.cs`, add the matching key to all three default config files (`config.default.json`, `config.default.linux.json`, `config.default.macos.json`), and expose it in `agent/PhoneBox.Agent/settings.html` (preserving `X-Config-Version` optimistic locking). Keep computer-only secrets out of `ToPublic()`.
+- **Adding a widget:** Register it in `agent/PhoneBox.Agent/widgets.json`, implement it in `android/app/src/main/assets/www/widgets/`, add its icon to `WIDGET_ICONS` in `main.js`, update widget/template counts in `README.md` (verified by `tools/check-release.py`), and add demo data in `tools/pages/demo.js`. Outside the native Android app, every widget must show a clean empty state rather than throwing.
+- **Android & WebView compatibility:** The app supports Android 5.0+ (`minSdk = 21`). Any Android framework call above API 21 requires a `Build.VERSION.SDK_INT` guard (`./gradlew lintDebug` treats `NewApi` as fatal). The WebView UI maintains Chromium 83 compatibility via `compat.js`, with full container-query scaling from Chromium 105+. Test changes to `minSdk` or permissions carefully and list tested OS/WebView versions in your PR.
+- **Backward compatibility:** Do not remove existing user options, rename config keys, or alter saved defaults without automatic config migration and a note in the PR.
+- **Translations:** Use `t()`, `tc()`, and `tp()` from `i18n.js`; preserve placeholders (`{name}`, `%1$s`, `{0}`). When adding or updating locales, run `python tools/sync-locales.py` and verify with `python tools/check-release.py`.
+
+### 4. AI-Assisted Contributions
+Contributions created with AI coding assistants are welcome. You remain responsible for the entire diff: inspect every changed line, confirm comments/descriptions match actual code behavior, and verify all test suites pass locally before opening your pull request.
+
+## License
+By contributing, you agree that your contributions are licensed under the [MIT License](LICENSE).

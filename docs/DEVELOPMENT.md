@@ -50,7 +50,8 @@ The server stays running in this terminal. Open <http://127.0.0.1:8790/panel/> o
 
 ```sh
 python tools/check-release.py
-dotnet test agent/PhoneBox.Agent.Tests
+python tools/test-winget-manifests.py
+dotnet test agent/PhoneBox.Agent.Tests --nologo
 ```
 
 Browser tests need Node.js 22 and Chromium:
@@ -64,6 +65,18 @@ npx playwright test
 
 On Linux CI, use `npx playwright install --with-deps chromium`. Playwright starts its own demo on port 8781.
 
+For Android changes (requires JDK 17 and Android SDK Platform 35):
+
+```sh
+cd android
+./gradlew lintDebug assembleDebug testDebugUnitTest --no-daemon
+python ../tools/test-agent-stream.py
+```
+
+Installer checks:
+- Windows: `./tools/test-install-apk.ps1`, `./tools/test-setup-download.ps1`, `./tools/test-build-staging.ps1`, and `./tools/test-windows-source-publish.ps1`
+- Linux/macOS: `python3 tools/test-unix-installer.py --bash /bin/bash`, `python3 tools/test-unix-autostart.py /bin/bash`, and `python3 tools/test-unix-uninstall.py`
+
 ### Build and run
 
 On Windows, from the repository root:
@@ -72,11 +85,11 @@ On Windows, from the repository root:
 .\scripts\build.ps1 # release APK + five agent archives in dist/
 ```
 
-To build only the Android app with API compatibility lint:
+To lint, build, and unit-test only the Android app:
 
 ```powershell
 cd android
-.\gradlew.bat lintDebug assembleDebug
+.\gradlew.bat lintDebug assembleDebug testDebugUnitTest
 ```
 
 Run the Windows agent from the repository root:
@@ -98,11 +111,12 @@ changes. Size the browser window to 780 × 360 (the phone's screen in CSS pixels
 phone, including webhooks: `curl -X POST http://127.0.0.1:8790/api/notify -d hello` (also `/api/push/<key>`,
 `/api/goto/<page>` and `/api/ask` for a made-up permission prompt).
 
-With the demo server running, generate media from a second terminal:
+With the demo server running, generate media from a second terminal (uses Playwright Chromium, or system Chrome/Edge automatically):
 
 ```sh
 cd tools/ui-tests
-node media.js shots home system
+node media.js shots all             # refresh all 22 screenshots in docs/screenshots/
+node media.js shots home system     # or capture specific pages
 node media.js tour
 node media.js hero
 ```
@@ -117,6 +131,7 @@ from the agent) and the widgets in [`widgets/`](../android/app/src/main/assets/w
 `{ needs, create(box, ctx) → { update(kind) } }` entry in the `W` registry, plus its styles in `style.css` and its catalogue entry
 (name, size, options) in [`widgets.json`](../agent/PhoneBox.Agent/widgets.json), which drives the settings editor.
 Templates live in [`templates.json`](../agent/PhoneBox.Agent/templates.json).
+The unified JARVIS assistant (llama.cpp runtime, Android/Flite TTS, Vosk/SpeechRecognizer dictation, CameraX vision, and voice/tool routing) lives under [`jarvis/`](../android/app/src/main/java/net/oxog/phonebox/deskpanel/jarvis) and [`assets/www/jarvis.js`](../android/app/src/main/assets/www/jarvis.js).
 
 ### Isolated agent runs
 

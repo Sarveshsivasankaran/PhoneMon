@@ -1,19 +1,21 @@
 ## What changes for the user
 
-<!-- One or two sentences. Link the issue: Fixes #123 -->
+<!-- One or two sentences explaining the user-facing change. Link the issue: Fixes #123 -->
 
 ## How it works
 
-<!-- The approach, and anything a reviewer should look at first. -->
+<!-- Summarize the approach and anything a reviewer should inspect first. -->
 
 ## Checklist
 
-- [ ] One change; unrelated changes are in their own pull request
-- [ ] New outbound connections have a row in `PRIVACY.md` and can be turned off
-- [ ] New paths reachable over Wi-Fi (`Lan.cs` allow-list) or new ways to control the computer are explained above
-- [ ] Secrets stay out of `ToPublic()` and logs; processes start with `ArgumentList`, no shell
-- [ ] Tests: `dotnet test agent/PhoneBox.Agent.Tests`, `npx playwright test` (in `tools/ui-tests`), `python tools/check-release.py`
+- [ ] One focused change; unrelated changes are in separate pull requests
+- [ ] Follows the security & privacy rules in `CONTRIBUTING.md` (new outbound hosts documented in `PRIVACY.md` and toggleable; new `Lan.cs` paths or computer-control options explained above)
+- [ ] Secrets stay out of `ToPublic()` and logs; processes use `ArgumentList` (no shell); DOM avoids untrusted `innerHTML`
+- [ ] Config/settings changes cover `Config.cs`, all three `config.default*.json` files, and `settings.html` (with migration if defaults changed)
+- [ ] Android changes preserve `minSdk = 21` compatibility (`./gradlew lintDebug testDebugUnitTest` passes)
+- [ ] Checks run locally: `python tools/check-release.py`, `python tools/test-winget-manifests.py`, `dotnet test agent/PhoneBox.Agent.Tests --nologo`, and `npx playwright test` (in `tools/ui-tests`)
+- [ ] `VERSION` and `CHANGELOG.md` left untouched for routine PRs
 
 ## How I tested it
 
-<!-- Commands you ran, what you tried by hand, on which OS / phone / Android version. Screenshots for UI changes. -->
+<!-- Commands executed, OS / phone / Android / WebView versions tested by hand, and before/after screenshots for UI changes. -->
