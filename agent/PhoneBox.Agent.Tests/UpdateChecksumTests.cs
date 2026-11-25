@@ -157,6 +157,19 @@ b47da3d09583268d7bacef2d4375555313bf455af8a3ab16fd4d7ee95082826e  PhoneBoxAgent-
     }
 
     [Fact]
+    public void FutureStableReleaseUsesPublishedPackageVersion()
+    {
+        using var doc = JsonDocument.Parse("""
+            { "tag_name": "v1.2.4-stable", "html_url": "https://example.invalid", "assets": [
+              { "name": "SHA256SUMS-1.2.5.txt", "browser_download_url": "https://example.invalid/sums" },
+              { "name": "PhoneBoxAgent-1.2.5-win-x64.zip", "browser_download_url": "https://example.invalid/zip" } ] }
+            """);
+        var release = UpdateService.SelectAssets(doc.RootElement, "win-x64");
+        Assert.Equal("1.2.5", release.Version);
+        Assert.Equal("https://example.invalid/zip", release.AgentZip);
+    }
+
+    [Fact]
     public void AReleaseWithoutAChecksumFileHasNoSums()
     {
         using var doc = JsonDocument.Parse("""

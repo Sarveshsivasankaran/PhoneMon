@@ -452,13 +452,19 @@ public sealed class UpdateService(ConfigStore cfg, AdbReverse adb, IHostApplicat
             if (name.StartsWith("SHA256SUMS-", StringComparison.OrdinalIgnoreCase) && name.EndsWith(".txt", StringComparison.OrdinalIgnoreCase)) sums = url;
         }
         var tag = release.GetProperty("tag_name").GetString() ?? "";
-        var version = tag switch
+        var version = tag.TrimStart('v', 'V');
+        // Stable titles can differ from package versions. The release workflow names
+        // the checksum manifest with the same numeric version as the desktop binary.
+        if (tag.EndsWith("-stable", StringComparison.OrdinalIgnoreCase))
         {
-            "v1.2.1-stable" => "1.2.2",
-            "v1.2.2-stable" => "1.2.3",
-            "v1.2.3-stable" => "1.2.4",
-            _ => tag.TrimStart('v', 'V'),
-        };
+            var manifest = release.GetProperty("assets").EnumerateArray()
+                .Select(asset => asset.GetProperty("name").GetString())
+                .FirstOrDefault(name => name is not null && name.StartsWith("SHA256SUMS-", StringComparison.OrdinalIgnoreCase)
+                    && name.EndsWith(".txt", StringComparison.OrdinalIgnoreCase));
+            var package = manifest?["SHA256SUMS-".Length..^4];
+            version = Version.TryParse(package, out _) ? package!
+                : AppPaths.PackageVersion(version[..^"-stable".Length] + " (stable)");
+        }
         return new Release(version, release.GetProperty("html_url").GetString(), apk, zip, sums);
     }
 
