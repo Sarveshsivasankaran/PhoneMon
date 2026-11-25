@@ -58,13 +58,13 @@
 สำหรับ Windows 10/11 x64 ให้รันคำสั่งต่อไปนี้ใน PowerShell
 
 ```powershell
-irm https://raw.githubusercontent.com/Sarveshsivasankaran/PhoneMon/main/setup.ps1 | iex
+irm https://sarveshsivasankaran.github.io/PhoneMon/setup.ps1 | iex
 ```
 
 สำหรับ Linux หรือ macOS ให้รันคำสั่งต่อไปนี้ด้วยบัญชีผู้ใช้ปกติ
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/Sarveshsivasankaran/PhoneMon/main/setup.sh | bash
+curl -fsSL https://sarveshsivasankaran.github.io/PhoneMon/setup.sh | bash
 ```
 
 สคริปต์ติดตั้งตรวจสอบเช็กซัมของรุ่นที่ดาวน์โหลดแล้วเปิดหน้าการตั้งค่า คุณยังติดตั้งแอปบนโทรศัพท์ผ่าน USB ได้ด้วย รันสคริปต์ซ้ำเพื่ออัปเดตหรือซ่อมแซมโดยเก็บการตั้งค่าและการจับคู่ไว้

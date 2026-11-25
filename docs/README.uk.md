@@ -58,13 +58,13 @@
 У Windows 10/11 x64 виконайте цю команду в PowerShell.
 
 ```powershell
-irm https://raw.githubusercontent.com/Sarveshsivasankaran/PhoneMon/main/setup.ps1 | iex
+irm https://sarveshsivasankaran.github.io/PhoneMon/setup.ps1 | iex
 ```
 
 У Linux або macOS виконайте команду від імені свого користувача.
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/Sarveshsivasankaran/PhoneMon/main/setup.sh | bash
+curl -fsSL https://sarveshsivasankaran.github.io/PhoneMon/setup.sh | bash
 ```
 
 Сценарій встановлення перевіряє контрольну суму випуску та відкриває налаштування. Він також може встановити застосунок на телефон через USB. Запустіть його ще раз для оновлення або відновлення зі збереженням налаштувань і сполучень.

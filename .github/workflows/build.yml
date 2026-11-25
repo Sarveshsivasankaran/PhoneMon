@@ -94,6 +94,7 @@ jobs:
         run: |
           ./tools/test-install-apk.ps1
           ./tools/test-windows-source-publish.ps1
+          ./tools/test-setup-download.ps1
       - name: Unix installer regression checks with the system Bash
         if: matrix.rid != 'win-x64'
         run: |

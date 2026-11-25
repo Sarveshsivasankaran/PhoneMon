@@ -58,13 +58,13 @@
 في Windows 10 أو 11 بمعمارية x64، نفّذ الأمر التالي في PowerShell.
 
 ```powershell
-irm https://raw.githubusercontent.com/Sarveshsivasankaran/PhoneMon/main/setup.ps1 | iex
+irm https://sarveshsivasankaran.github.io/PhoneMon/setup.ps1 | iex
 ```
 
 في Linux أو macOS، نفّذ الأمر التالي من حسابك العادي.
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/Sarveshsivasankaran/PhoneMon/main/setup.sh | bash
+curl -fsSL https://sarveshsivasankaran.github.io/PhoneMon/setup.sh | bash
 ```
 
 يتحقّق برنامج الإعداد من المجموع الاختباري للإصدار ويفتح الإعدادات. يمكنه أيضًا تثبيت تطبيق الهاتف عبر USB. شغّله مجددًا للتحديث أو الإصلاح مع الاحتفاظ بالإعدادات والأجهزة المقترنة.

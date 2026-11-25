@@ -11,13 +11,19 @@
 **Windows 10/11**: open PowerShell (a normal window, not *Run as administrator*) and paste:
 
 ```powershell
-irm https://raw.githubusercontent.com/Sarveshsivasankaran/PhoneMon/main/setup.ps1 | iex
+irm https://sarveshsivasankaran.github.io/PhoneMon/setup.ps1 | iex
+```
+
+If your ISP/network blocks `github.io` or `raw.githubusercontent.com`:
+
+```powershell
+irm 'https://api.github.com/repos/Sarveshsivasankaran/PhoneMon/contents/setup.ps1' -Headers @{ Accept = 'application/vnd.github.raw' } | iex
 ```
 
 **Linux and macOS**: open a terminal and paste (run it as yourself, not with `sudo`):
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/Sarveshsivasankaran/PhoneMon/main/setup.sh | bash
+curl -fsSL https://sarveshsivasankaran.github.io/PhoneMon/setup.sh | bash
 ```
 
 Setup installs the [latest release](https://github.com/Sarveshsivasankaran/PhoneMon/releases/latest) and anything missing:
@@ -65,11 +71,11 @@ and changes nothing.
 To pass options:
 
 ```powershell
-& ([scriptblock]::Create((irm https://raw.githubusercontent.com/Sarveshsivasankaran/PhoneMon/main/setup.ps1))) -NoPhone
+& ([scriptblock]::Create((irm https://sarveshsivasankaran.github.io/PhoneMon/setup.ps1))) -NoPhone
 ```
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/Sarveshsivasankaran/PhoneMon/main/setup.sh | bash -s -- --no-phone
+curl -fsSL https://sarveshsivasankaran.github.io/PhoneMon/setup.sh | bash -s -- --no-phone
 ```
 
 </details>
@@ -174,11 +180,11 @@ itself once the agent runs again.
 ### Uninstall
 
 ```powershell
-& ([scriptblock]::Create((irm https://raw.githubusercontent.com/Sarveshsivasankaran/PhoneMon/main/scripts/uninstall.ps1))) # add -Purge -Apk
+& ([scriptblock]::Create((irm https://sarveshsivasankaran.github.io/PhoneMon/scripts/uninstall.ps1))) # add -Purge -Apk
 ```
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/Sarveshsivasankaran/PhoneMon/main/scripts/uninstall.sh | bash -s --   # add --purge --apk
+curl -fsSL https://sarveshsivasankaran.github.io/PhoneMon/scripts/uninstall.sh | bash -s --   # add --purge --apk
 ```
 
 Without options it removes the program and the start-at-login entry and keeps the settings. `-Purge` / `--purge` also

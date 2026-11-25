@@ -75,13 +75,13 @@ Bạn cần một chiếc **điện thoại Android 7+** và một máy tính đ
 **Windows 10/11 x64** — dán vào một cửa sổ PowerShell thông thường:
 
 ```powershell
-irm https://raw.githubusercontent.com/Sarveshsivasankaran/PhoneMon/main/setup.ps1 | iex
+irm https://sarveshsivasankaran.github.io/PhoneMon/setup.ps1 | iex
 ```
 
 **Linux hoặc macOS** — chạy bằng tài khoản người dùng của chính bạn:
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/Sarveshsivasankaran/PhoneMon/main/setup.sh | bash
+curl -fsSL https://sarveshsivasankaran.github.io/PhoneMon/setup.sh | bash
 ```
 
 Trình cài đặt sẽ tải bản phát hành mới nhất, kiểm tra mã băm SHA-256 của nó, đề xuất các thành phần phụ thuộc còn thiếu và tùy chọn khởi động cùng lúc đăng nhập, rồi mở trang cài đặt tại <http://127.0.0.1:8765>. Nó cũng có thể cài ứng dụng Android qua USB.

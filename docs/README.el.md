@@ -75,13 +75,13 @@ Windows, Linux και macOS. Χωρίς root, λογαριασμό PhoneMon ή �
 **Windows 10/11 x64** — επικολλήστε σε ένα κανονικό παράθυρο PowerShell:
 
 ```powershell
-irm https://raw.githubusercontent.com/Sarveshsivasankaran/PhoneMon/main/setup.ps1 | iex
+irm https://sarveshsivasankaran.github.io/PhoneMon/setup.ps1 | iex
 ```
 
 **Linux ή macOS** — εκτελέστε το με τον δικό σας χρήστη:
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/Sarveshsivasankaran/PhoneMon/main/setup.sh | bash
+curl -fsSL https://sarveshsivasankaran.github.io/PhoneMon/setup.sh | bash
 ```
 
 Το πρόγραμμα εγκατάστασης κατεβάζει την τελευταία έκδοση, ελέγχει το άθροισμα SHA-256, προτείνει τις εξαρτήσεις που λείπουν και την εκκίνηση κατά τη σύνδεση, και ανοίγει τις ρυθμίσεις στη διεύθυνση <http://127.0.0.1:8765>. Μπορεί επίσης να εγκαταστήσει την εφαρμογή Android μέσω USB.

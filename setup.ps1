@@ -5,11 +5,15 @@
 .DESCRIPTION
   Run it from a normal PowerShell window (not "Run as administrator"):
 
-    irm https://raw.githubusercontent.com/Sarveshsivasankaran/PhoneMon/main/setup.ps1 | iex
+    irm https://sarveshsivasankaran.github.io/PhoneMon/setup.ps1 | iex
 
   With options:
 
-    & ([scriptblock]::Create((irm https://raw.githubusercontent.com/Sarveshsivasankaran/PhoneMon/main/setup.ps1))) -NoPhone
+    & ([scriptblock]::Create((irm https://sarveshsivasankaran.github.io/PhoneMon/setup.ps1))) -NoPhone
+
+  Alternative (GitHub API, works if GitHub Pages or raw.githubusercontent.com is blocked):
+
+    irm 'https://api.github.com/repos/Sarveshsivasankaran/PhoneMon/contents/setup.ps1' -Headers @{ Accept = 'application/vnd.github.raw' } | iex
 
   What it does, asking first before anything outside the PhoneMon folders:
     1. Checks this PC (Windows 10/11, x64) and finds the latest PhoneMon release.
@@ -88,8 +92,106 @@ function Invoke-Native([string]$File, [string[]]$Arguments) {
     [pscustomobject]@{ Code = $code; Output = @($output) }
 }
 
-function Get-Download([string]$Url, [string]$Path) {
-    Invoke-WebRequest -UseBasicParsing -Uri $Url -OutFile $Path -Headers @{ 'User-Agent' = 'phonemon-setup' }
+$script:ReleaseAssetApiUrls = @{}
+
+function Initialize-ReleaseAssets([string]$Tag) {
+    $script:ReleaseAssetApiUrls = @{}
+    try {
+        $rel = Invoke-RestMethod -UseBasicParsing -Uri "https://api.github.com/repos/$Repo/releases/tags/$Tag" `
+            -Headers @{ 'User-Agent' = 'phonemon-setup'; 'Accept' = 'application/vnd.github+json' } -TimeoutSec 20
+        foreach ($asset in $rel.assets) {
+            if ($asset.name -and $asset.url) { $script:ReleaseAssetApiUrls[[string]$asset.name] = [string]$asset.url }
+        }
+    } catch { }
+}
+
+function Get-ExpectedChecksum([string]$File, [string]$SumsFile) {
+    $name = Split-Path $File -Leaf
+    $pattern = '^[0-9a-fA-F]{64}\s+\*?' + [regex]::Escape($name) + '\s*$'
+    $line = Get-Content -LiteralPath $SumsFile | Where-Object { $_ -match $pattern } | Select-Object -First 1
+    if (-not $line) { throw "$name is not listed in the release checksums; the download was not used." }
+    [regex]::Match($line, '^[0-9a-fA-F]{64}').Value.ToUpperInvariant()
+}
+
+function Invoke-WebDownload([string]$Url, [string]$Path, [string]$Accept = '') {
+    $headers = @{ 'User-Agent' = 'phonemon-setup' }
+    if ($Accept) { $headers['Accept'] = $Accept }
+    $response = Invoke-WebRequest -UseBasicParsing -Uri $Url -OutFile $Path -PassThru -TimeoutSec 60 -Headers $headers
+    $expectedLen = 0L
+    $rawLen = if ($response.Headers) { $response.Headers['Content-Length'] } else { $null }
+    if ($rawLen -is [array]) { $rawLen = $rawLen[0] }
+    if ($rawLen -and [int64]::TryParse("$rawLen", [ref]$expectedLen) -and $expectedLen -gt 0) {
+        $actualLen = (Get-Item -LiteralPath $Path).Length
+        if ($actualLen -ne $expectedLen) {
+            throw "Incomplete download ($actualLen of $expectedLen bytes)."
+        }
+    }
+}
+
+function Invoke-CurlDownload([string]$Url, [string]$Path, [string]$Accept = '') {
+    $curl = Get-Command curl.exe -ErrorAction SilentlyContinue | Select-Object -First 1
+    if (-not $curl) { return $false }
+    $curlArgs = @('-4', '--fail', '--silent', '--show-error', '--location', '--retry', '2', '--retry-delay', '2',
+        '--connect-timeout', '15', '--speed-limit', '4096', '--speed-time', '20', '--max-time', '300', '-A', 'phonemon-setup')
+    if ($Accept) { $curlArgs += @('-H', "Accept: $Accept") }
+    $curlArgs += @('-o', $Path, $Url)
+    $res = Invoke-Native $curl.Source $curlArgs
+    if ($res.Code -ne 0) {
+        throw "curl failed (exit $($res.Code)): $($res.Output -join ' ')"
+    }
+    return $true
+}
+
+function Get-Download([string]$Url, [string]$Path, [string]$SumsFile = '', [switch]$IsChecksums) {
+    $name = Split-Path $Path -Leaf
+    $hasCurl = [bool](Get-Command curl.exe -ErrorAction SilentlyContinue)
+    $routes = @()
+    if ($hasCurl) { $routes += @{ Method = 'curl'; Url = $Url; Accept = '' } }
+    $routes += @{ Method = 'web'; Url = $Url; Accept = '' }
+    $apiUrl = if ($script:ReleaseAssetApiUrls.ContainsKey($name)) { $script:ReleaseAssetApiUrls[$name] } else { '' }
+    if ($apiUrl) {
+        if ($hasCurl) { $routes += @{ Method = 'curl'; Url = $apiUrl; Accept = 'application/octet-stream' } }
+        $routes += @{ Method = 'web'; Url = $apiUrl; Accept = 'application/octet-stream' }
+    } elseif ($routes.Count -eq 1) {
+        $routes += @{ Method = 'web'; Url = $Url; Accept = '' }
+    }
+
+    $lastError = $null
+    for ($i = 0; $i -lt $routes.Count; $i++) {
+        $route = $routes[$i]
+        Remove-Item -LiteralPath $Path -Force -ErrorAction SilentlyContinue
+        try {
+            if ($route.Method -eq 'curl') {
+                [void](Invoke-CurlDownload $route.Url $Path $route.Accept)
+            } else {
+                Invoke-WebDownload $route.Url $Path $route.Accept
+            }
+            if (-not (Test-Path -LiteralPath $Path) -or (Get-Item -LiteralPath $Path).Length -le 0) {
+                throw "Downloaded file $name is empty."
+            }
+            if ($IsChecksums) {
+                $validLine = Get-Content -LiteralPath $Path -ErrorAction Stop |
+                    Where-Object { $_ -match '^[0-9a-fA-F]{64}\s+' } | Select-Object -First 1
+                if (-not $validLine) { throw "$name is not a valid checksum manifest." }
+            }
+            if ($SumsFile) {
+                $expected = Get-ExpectedChecksum $Path $SumsFile
+                $actual = (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToUpperInvariant()
+                if ($actual -ne $expected) {
+                    throw "Checksum mismatch for $name (expected $expected, got $actual)."
+                }
+            }
+            return
+        } catch {
+            $lastError = $_
+            Remove-Item -LiteralPath $Path -Force -ErrorAction SilentlyContinue
+            if ($i + 1 -lt $routes.Count) {
+                Write-Caution "Download of $name failed ($($_.Exception.Message)); retrying ($($i + 2)/$($routes.Count)) ..."
+                Start-Sleep -Seconds 1
+            }
+        }
+    }
+    throw $lastError.Exception
 }
 
 function Get-LatestVersion {
@@ -118,18 +220,15 @@ function Get-LatestVersion {
 
 function Assert-Checksum([string]$File, [string]$SumsFile) {
     $name = Split-Path $File -Leaf
-    $pattern = '^[0-9a-fA-F]{64}\s+\*?' + [regex]::Escape($name) + '\s*$'
-    $line = Get-Content -LiteralPath $SumsFile | Where-Object { $_ -match $pattern } | Select-Object -First 1
-    if (-not $line) { throw "$name is not listed in the release checksums; the download was not used." }
-    $expected = [regex]::Match($line, '^[0-9a-fA-F]{64}').Value
-    $actual = (Get-FileHash -LiteralPath $File -Algorithm SHA256).Hash
+    $expected = Get-ExpectedChecksum $File $SumsFile
+    $actual = (Get-FileHash -LiteralPath $File -Algorithm SHA256).Hash.ToUpperInvariant()
     if ($actual -ne $expected) {
         throw "$name does not match the release checksum (expected $expected, got $actual). The download was damaged or changed on the way; nothing was installed. Run setup again."
     }
     Write-Ok "$name matches the release checksum"
 }
 
-function Test-Provenance([string]$File) {
+function Test-Provenance([string]$File, [string]$BaseUrl = '', [string]$VersionNum = '', [string]$SumsFile = '', [string]$TempDir = '') {
     $gh = Get-Command gh -ErrorAction SilentlyContinue | Select-Object -First 1
     if (-not $gh -or (Invoke-Native $gh.Source @('auth', 'status')).Code -ne 0) {
         Write-Info "Build provenance not checked (needs the GitHub CLI, signed in): gh attestation verify $(Split-Path $File -Leaf) --repo $Repo"
@@ -143,9 +242,26 @@ function Test-Provenance([string]$File) {
         return
     }
     $result = Invoke-Native $gh.Source @('attestation', 'verify', $File, '--repo', $Repo)
-    if ($result.Code -eq 0) { Write-Ok "$(Split-Path $File -Leaf) was built by this repository's release workflow (GitHub attestation)" }
-    elseif (($result.Output -join ' ') -match 'unknown command') { Write-Info 'Build provenance not checked: this GitHub CLI is too old for "gh attestation".' }
-    else { throw "The build provenance of $(Split-Path $File -Leaf) could not be verified; nothing was installed.`n$($result.Output -join "`n")" }
+    if ($result.Code -ne 0 -and $BaseUrl -and $VersionNum -and $SumsFile -and $TempDir) {
+        $bundleName = "PhoneBox-$VersionNum.intoto.jsonl"
+        if (Get-Content -LiteralPath $SumsFile | Where-Object { $_ -match ('^[0-9a-fA-F]{64}\s+\*?' + [regex]::Escape($bundleName) + '\s*$') } | Select-Object -First 1) {
+            try {
+                $bundlePath = Join-Path $TempDir $bundleName
+                Get-Download "$BaseUrl/$bundleName" $bundlePath -SumsFile $SumsFile
+                $result = Invoke-Native $gh.Source @('attestation', 'verify', $File, '--bundle', $bundlePath, '--repo', $Repo)
+            } catch { }
+        }
+    }
+    $out = $result.Output -join "`n"
+    if ($result.Code -eq 0) {
+        Write-Ok "$(Split-Path $File -Leaf) was built by this repository's release workflow (GitHub attestation)"
+    } elseif ($out -match 'unknown command') {
+        Write-Info 'Build provenance not checked: this GitHub CLI is too old for "gh attestation".'
+    } elseif ($out -match 'no such host|dial tcp|lookup |timed out|timeout|connection reset|forcibly closed|tls|handshake|network is unreachable|temporary failure|failed to fetch bundle|tuf') {
+        Write-Caution "Build provenance check skipped (attestation server unreachable on this network); $(Split-Path $File -Leaf) matches the release SHA-256 checksum."
+    } else {
+        throw "The build provenance of $(Split-Path $File -Leaf) could not be verified; nothing was installed.`n$out"
+    }
 }
 
 function Find-Adb {
@@ -305,6 +421,7 @@ function Install-PhoneMon {
     $ErrorActionPreference = 'Stop'
     $ProgressPreference = 'SilentlyContinue'   # the progress bar makes downloads in Windows PowerShell 5.1 many times slower
     [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
+    [Net.ServicePointManager]::Expect100Continue = $false
 
     Write-Host ''
     Write-Host 'PhoneMon setup' -ForegroundColor Cyan
@@ -366,14 +483,15 @@ function Install-PhoneMon {
     New-Item -ItemType Directory -Force $temp | Out-Null
     try {
         Write-Step "Downloading PhoneMon $displayVersion"
+        Initialize-ReleaseAssets $tag
         $zipName = "PhoneBoxAgent-$ver-win-x64.zip"
         $sums = Join-Path $temp "SHA256SUMS-$ver.txt"
         $zip = Join-Path $temp $zipName
-        try { Get-Download "$base/SHA256SUMS-$ver.txt" $sums } catch { throw "Release $ver was not found ($base). $($_.Exception.Message)" }
+        try { Get-Download "$base/SHA256SUMS-$ver.txt" $sums -IsChecksums } catch { throw "Release $ver was not found ($base). $($_.Exception.Message)" }
         Write-Info "$zipName (about 65 MB) ..."
-        Get-Download "$base/$zipName" $zip
+        Get-Download "$base/$zipName" $zip -SumsFile $sums
         Assert-Checksum $zip $sums
-        Test-Provenance $zip
+        Test-Provenance $zip $base $ver $sums $temp
         Write-Info 'The agent is not code-signed yet (the SignPath Foundation application is pending). Windows SmartScreen'
         Write-Info 'or an antivirus can warn about new unsigned programs; the checksum above shows that this is the file'
         Write-Info "GitHub built from the public source. Details: https://github.com/$Repo/issues/69"
@@ -499,18 +617,14 @@ function Install-PhoneMon {
                     # The phone app is optional: a failed download or checksum skips it, and the agent (already
                     # installed and stopped for the update) still starts below.
                     try {
-                        $apk = Join-Path $temp "PhoneMon-$ver.apk"
-                        $downloaded = $false
-                        try {
-                            Get-Download "$base/PhoneMon-$ver.apk" $apk
-                            try { Assert-Checksum $apk $sums; $downloaded = $true } catch { }
-                        } catch { }
-
-                        if (-not $downloaded) {
-                            $apk = Join-Path $temp "PhoneBox-$ver.apk"
-                            Get-Download "$base/PhoneBox-$ver.apk" $apk
-                            Assert-Checksum $apk $sums
+                        $apkName = if (Get-Content -LiteralPath $sums | Where-Object { $_ -match ('^[0-9a-fA-F]{64}\s+\*?' + [regex]::Escape("PhoneMon-$ver.apk") + '\s*$') } | Select-Object -First 1) {
+                            "PhoneMon-$ver.apk"
+                        } else {
+                            "PhoneBox-$ver.apk"
                         }
+                        $apk = Join-Path $temp $apkName
+                        Get-Download "$base/$apkName" $apk -SumsFile $sums
+                        Assert-Checksum $apk $sums
                         $phoneDone = Install-PhoneApp $adb $apk $device
                     } catch {
                         Write-Caution "Phone app skipped: $($_.Exception.Message)"
@@ -575,7 +689,7 @@ function Install-PhoneMon {
         Write-Info 'When you turn Wi-Fi on, Windows asks to let PhoneMon through the firewall: allow Private networks only.'
         Write-Info "Until then PhoneMon only listens on this computer. Every connection it makes: https://github.com/$Repo/blob/main/PRIVACY.md"
         Write-Info 'Updates: PhoneMon updates itself from Settings. Run setup again any time to repair it.'
-        Write-Info "Uninstall: & ([scriptblock]::Create((irm https://raw.githubusercontent.com/$Repo/main/scripts/uninstall.ps1))) [-Purge] [-Apk]"
+        Write-Info "Uninstall: & ([scriptblock]::Create((irm https://sarveshsivasankaran.github.io/PhoneMon/scripts/uninstall.ps1))) [-Purge] [-Apk]"
     } finally {
         Remove-Item $temp -Recurse -Force -ErrorAction SilentlyContinue
     }

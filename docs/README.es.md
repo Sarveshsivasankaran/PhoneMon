@@ -68,13 +68,13 @@ PhoneMon combina una **aplicación Android** a pantalla completa con un ligero *
 **Windows 10/11 x64** (PowerShell):
 
 ```powershell
-irm https://raw.githubusercontent.com/Sarveshsivasankaran/PhoneMon/main/setup.ps1 | iex
+irm https://sarveshsivasankaran.github.io/PhoneMon/setup.ps1 | iex
 ```
 
 **Linux o macOS**:
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/Sarveshsivasankaran/PhoneMon/main/setup.sh | bash
+curl -fsSL https://sarveshsivasankaran.github.io/PhoneMon/setup.sh | bash
 ```
 
 La configuración se abre en <http://127.0.0.1:8765>. Consulta la [guía de instalación](SETUP.md).

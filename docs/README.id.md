@@ -58,13 +58,13 @@ Gunakan telepon Android 5.0 atau lebih baru (Android 6 atau lebih baru direkomen
 Di Windows 10/11 x64, jalankan perintah berikut di PowerShell.
 
 ```powershell
-irm https://raw.githubusercontent.com/Sarveshsivasankaran/PhoneMon/main/setup.ps1 | iex
+irm https://sarveshsivasankaran.github.io/PhoneMon/setup.ps1 | iex
 ```
 
 Di Linux atau macOS, jalankan perintah berikut sebagai pengguna biasa.
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/Sarveshsivasankaran/PhoneMon/main/setup.sh | bash
+curl -fsSL https://sarveshsivasankaran.github.io/PhoneMon/setup.sh | bash
 ```
 
 Skrip pemasangan memeriksa checksum rilis dan membuka halaman pengaturan. Skrip juga dapat memasang aplikasi ponsel melalui USB. Jalankan lagi untuk memperbarui atau memperbaiki pemasangan sambil mempertahankan pengaturan dan perangkat yang tersanding.

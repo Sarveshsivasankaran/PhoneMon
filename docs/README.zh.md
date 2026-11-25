@@ -68,13 +68,13 @@ PhoneMon 将全屏 **Android 应用**与轻量级**桌面代理**配对。通过
 **Windows 10/11 x64**（PowerShell）：
 
 ```powershell
-irm https://raw.githubusercontent.com/Sarveshsivasankaran/PhoneMon/main/setup.ps1 | iex
+irm https://sarveshsivasankaran.github.io/PhoneMon/setup.ps1 | iex
 ```
 
 **Linux 或 macOS**：
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/Sarveshsivasankaran/PhoneMon/main/setup.sh | bash
+curl -fsSL https://sarveshsivasankaran.github.io/PhoneMon/setup.sh | bash
 ```
 
 安装完成后会自动打开设置页面 <http://127.0.0.1:8765>。详见[安装指南](SETUP.md)。

@@ -58,13 +58,13 @@ Use um telefone Android 5.0 ou posterior (recomenda-se o Android 6 ou posterior)
 No Windows 10/11 x64, execute o comando abaixo no PowerShell.
 
 ```powershell
-irm https://raw.githubusercontent.com/Sarveshsivasankaran/PhoneMon/main/setup.ps1 | iex
+irm https://sarveshsivasankaran.github.io/PhoneMon/setup.ps1 | iex
 ```
 
 No Linux ou macOS, execute o comando abaixo com seu usuário normal.
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/Sarveshsivasankaran/PhoneMon/main/setup.sh | bash
+curl -fsSL https://sarveshsivasankaran.github.io/PhoneMon/setup.sh | bash
 ```
 
 O instalador verifica a soma de verificação da versão e abre a página de configurações. Ele também pode instalar o aplicativo do celular via USB. Execute-o novamente para atualizar ou reparar a instalação, mantendo configurações e pareamentos.

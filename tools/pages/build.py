@@ -60,6 +60,12 @@ def build(out):
     shutil.copytree(WWW, out / 'panel', dirs_exist_ok=True, ignore=shutil.ignore_patterns('index.html'))
     (out / 'panel' / 'index.html').write_text(panel_html(), encoding='utf-8')
     (out / 'settings' / 'index.html').write_text(settings_html(), encoding='utf-8')
+    # Expose the setup and uninstall scripts over GitHub Pages too, for networks where raw.githubusercontent.com is blocked.
+    for name in ('setup.ps1', 'setup.sh'):
+        shutil.copy(ROOT / name, out / name)
+    (out / 'scripts').mkdir(exist_ok=True)
+    for name in ('uninstall.ps1', 'uninstall.sh'):
+        shutil.copy(ROOT / 'scripts' / name, out / 'scripts' / name)
     # the target of the pairing QR code (Settings › Wi-Fi › Pair a phone over Wi-Fi): hands the link to the app
     (out / 'pair').mkdir()
     shutil.copy(PAGES / 'pair.html', out / 'pair' / 'index.html')

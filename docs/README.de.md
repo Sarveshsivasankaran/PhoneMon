@@ -70,13 +70,13 @@ Du benötigst ein **Android-5+-Smartphone** (Android 6 oder neuer empfohlen) und
 **Windows 10/11 x64** — in ein normales PowerShell-Fenster einfügen:
 
 ```powershell
-irm https://raw.githubusercontent.com/Sarveshsivasankaran/PhoneMon/main/setup.ps1 | iex
+irm https://sarveshsivasankaran.github.io/PhoneMon/setup.ps1 | iex
 ```
 
 **Linux oder macOS** — als eigener Benutzer ausführen:
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/Sarveshsivasankaran/PhoneMon/main/setup.sh | bash
+curl -fsSL https://sarveshsivasankaran.github.io/PhoneMon/setup.sh | bash
 ```
 
 Das Setup lädt das neueste Release herunter, prüft die SHA-256-Prüfsumme und öffnet die Einstellungen unter <http://127.0.0.1:8765>. Skripte vorab prüfen: [Windows](../setup.ps1) · [Linux/macOS](../setup.sh) · [Installationsanleitung](SETUP.md).

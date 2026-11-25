@@ -82,13 +82,19 @@ works without either. Release agents include .NET, so you do not need to install
 **Windows 10/11 x64** — paste into a normal PowerShell window:
 
 ```powershell
-irm https://raw.githubusercontent.com/Sarveshsivasankaran/PhoneMon/main/setup.ps1 | iex
+irm https://sarveshsivasankaran.github.io/PhoneMon/setup.ps1 | iex
+```
+
+*(If `github.io` or `raw.githubusercontent.com` is blocked on your network, use the GitHub API mirror:)*
+
+```powershell
+irm 'https://api.github.com/repos/Sarveshsivasankaran/PhoneMon/contents/setup.ps1' -Headers @{ Accept = 'application/vnd.github.raw' } | iex
 ```
 
 **Linux or macOS** — run as your own user:
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/Sarveshsivasankaran/PhoneMon/main/setup.sh | bash
+curl -fsSL https://sarveshsivasankaran.github.io/PhoneMon/setup.sh | bash
 ```
 
 Setup downloads the latest release, checks its SHA-256 checksum, offers missing dependencies and start-at-login,

@@ -58,13 +58,13 @@ Používejte telefon Android 5.0 nebo novější (doporučeno je Android 6 nebo 
 Ve Windows 10/11 x64 spusťte následující příkaz v PowerShellu.
 
 ```powershell
-irm https://raw.githubusercontent.com/Sarveshsivasankaran/PhoneMon/main/setup.ps1 | iex
+irm https://sarveshsivasankaran.github.io/PhoneMon/setup.ps1 | iex
 ```
 
 V Linuxu nebo macOS spusťte příkaz pod svým běžným uživatelským účtem.
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/Sarveshsivasankaran/PhoneMon/main/setup.sh | bash
+curl -fsSL https://sarveshsivasankaran.github.io/PhoneMon/setup.sh | bash
 ```
 
 Instalační skript ověří kontrolní součet vydání a otevře nastavení. Umí také nainstalovat mobilní aplikaci přes USB. Opětovným spuštěním aktualizujete nebo opravíte instalaci a zachováte nastavení i spárování.

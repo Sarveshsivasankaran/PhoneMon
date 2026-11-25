@@ -58,13 +58,13 @@ Android 5.0 以降のスマートフォン（Android 6 以降を推奨）と、�
 Windows 10/11 x64 では、PowerShell で次のコマンドを実行します。
 
 ```powershell
-irm https://raw.githubusercontent.com/Sarveshsivasankaran/PhoneMon/main/setup.ps1 | iex
+irm https://sarveshsivasankaran.github.io/PhoneMon/setup.ps1 | iex
 ```
 
 Linux または macOS では、自分のユーザーアカウントで次のコマンドを実行します。
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/Sarveshsivasankaran/PhoneMon/main/setup.sh | bash
+curl -fsSL https://sarveshsivasankaran.github.io/PhoneMon/setup.sh | bash
 ```
 
 セットアップは配布ファイルのチェックサムを検証して設定画面を開きます。USB 経由でスマートフォンアプリをインストールすることもできます。再実行すると、設定やペアリング情報を保持したまま更新や修復ができます。

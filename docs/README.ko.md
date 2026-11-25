@@ -58,13 +58,13 @@ Android 5.0 이상의 전화(Android 6 이상이 권장됨)와 지원되는 컴�
 Windows 10/11 x64에서는 PowerShell에서 다음 명령을 실행합니다.
 
 ```powershell
-irm https://raw.githubusercontent.com/Sarveshsivasankaran/PhoneMon/main/setup.ps1 | iex
+irm https://sarveshsivasankaran.github.io/PhoneMon/setup.ps1 | iex
 ```
 
 Linux 또는 macOS에서는 일반 사용자 계정에서 다음 명령을 실행합니다.
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/Sarveshsivasankaran/PhoneMon/main/setup.sh | bash
+curl -fsSL https://sarveshsivasankaran.github.io/PhoneMon/setup.sh | bash
 ```
 
 설치 스크립트는 릴리스 체크섬을 확인하고 설정 페이지를 엽니다. USB로 휴대전화 앱을 설치할 수도 있습니다. 설정과 페어링을 유지하면서 업데이트하거나 복구하려면 스크립트를 다시 실행하세요.

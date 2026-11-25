@@ -75,13 +75,13 @@ Model, zamanlama ve token ayrıntıları için bir yapay zekâ oturumuna dokunun
 **Windows 10/11 x64** — normal bir PowerShell penceresine yapıştırın:
 
 ```powershell
-irm https://raw.githubusercontent.com/Sarveshsivasankaran/PhoneMon/main/setup.ps1 | iex
+irm https://sarveshsivasankaran.github.io/PhoneMon/setup.ps1 | iex
 ```
 
 **Linux veya macOS** — kendi kullanıcınızla çalıştırın:
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/Sarveshsivasankaran/PhoneMon/main/setup.sh | bash
+curl -fsSL https://sarveshsivasankaran.github.io/PhoneMon/setup.sh | bash
 ```
 
 Kurulum en son sürümü indirir, SHA-256 sağlama toplamını doğrular, eksik bağımlılıkları ve oturum açılışında başlatmayı sunar ve <http://127.0.0.1:8765> adresinde ayarları açar. Android uygulamasını USB üzerinden de yükleyebilir. Ayarları ve eşleştirmeleri koruyarak güncellemek veya onarmak için kurulumu tekrar çalıştırabilirsiniz.

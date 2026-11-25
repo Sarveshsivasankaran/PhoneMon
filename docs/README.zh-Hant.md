@@ -58,13 +58,13 @@
 在 Windows 10/11 x64 上，請在 PowerShell 執行以下指令。
 
 ```powershell
-irm https://raw.githubusercontent.com/Sarveshsivasankaran/PhoneMon/main/setup.ps1 | iex
+irm https://sarveshsivasankaran.github.io/PhoneMon/setup.ps1 | iex
 ```
 
 在 Linux 或 macOS 上，請用一般使用者帳號執行以下指令。
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/Sarveshsivasankaran/PhoneMon/main/setup.sh | bash
+curl -fsSL https://sarveshsivasankaran.github.io/PhoneMon/setup.sh | bash
 ```
 
 安裝指令碼會驗證發行檔的總和檢查碼並開啟設定頁面，也能透過 USB 安裝手機應用程式。再次執行可更新或修復安裝，並保留設定與配對。

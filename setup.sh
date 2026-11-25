@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # PhoneMon setup for Linux and macOS: installs the latest release, everything it needs, and the phone app.
 #
-#   curl -fsSL https://raw.githubusercontent.com/Sarveshsivasankaran/PhoneMon/main/setup.sh | bash
-#   curl -fsSL https://raw.githubusercontent.com/Sarveshsivasankaran/PhoneMon/main/setup.sh | bash -s -- --no-phone
+#   curl -fsSL https://sarveshsivasankaran.github.io/PhoneMon/setup.sh | bash
+#   curl -fsSL https://sarveshsivasankaran.github.io/PhoneMon/setup.sh | bash -s -- --no-phone
 #
 # Run it as yourself, not with sudo: it asks for sudo only to install packages, and asks first.
 # Running it again updates PhoneMon or repairs the installation; settings are kept.
@@ -105,6 +105,17 @@ check_sum() { # check_sum file sums-file
   ok "$name matches the release checksum"
 }
 
+download_verified() { # download_verified url file sums-file
+  local url="$1" file="$2" sums="$3" attempt
+  for attempt in 1 2 3; do
+    rm -f "$file"
+    if download "$url" "$file" && check_sum "$file" "$sums"; then return 0; fi
+    [ "$attempt" -lt 3 ] && caution "Retrying download ($attempt/3) ..." >&2
+  done
+  rm -f "$file"
+  return 1
+}
+
 version_ge() { # version_ge 2.93.1 2.93.0 -> 0 when the first is at least the second
   local IFS=. i x y
   local -a a b
@@ -135,6 +146,8 @@ check_provenance() {
     ok "$(basename "$1") was built by this repository's release workflow (GitHub attestation)"
   elif printf '%s' "$out" | grep -qi 'unknown command'; then
     info 'Build provenance not checked: this GitHub CLI is too old for "gh attestation".'
+  elif printf '%s' "$out" | grep -Eqi 'no such host|dial tcp|lookup |timed out|timeout|connection reset|tls|handshake|network is unreachable|temporary failure|failed to fetch bundle|tuf'; then
+    caution "Build provenance check skipped (attestation server unreachable on this network); $(basename "$1") matches the release SHA-256 checksum."
   else
     die "the build provenance of $(basename "$1") could not be verified; nothing was installed. $out"
   fi
@@ -517,8 +530,7 @@ main() {
   sums="$tmp/SHA256SUMS-$ver.txt"
   download "$base/SHA256SUMS-$ver.txt" "$sums" || die "release $ver was not found ($base)."
   info "$zip_name (about 45 MB) ..."
-  download "$base/$zip_name" "$tmp/$zip_name" || die "the download failed: $base/$zip_name"
-  check_sum "$tmp/$zip_name" "$sums" || die "the agent download could not be verified. Nothing was installed."
+  download_verified "$base/$zip_name" "$tmp/$zip_name" "$sums" || die "the agent download could not be verified. Nothing was installed."
   check_provenance "$tmp/$zip_name"
   unzip_to "$tmp/$zip_name" "$tmp/agent"
   chmod +x "$tmp/agent/PhoneBoxAgent"
@@ -621,19 +633,15 @@ main() {
       info 'revoke them under Developer options > "Revoke USB debugging authorisations".'
       device="$(select_phone)"
       if [ -n "$device" ]; then
-        apk="$tmp/PhoneMon-$ver.apk"
-        if ! download "$base/PhoneMon-$ver.apk" "$apk" 2>/dev/null || ! check_sum "$apk" "$sums" 2>/dev/null; then
-          apk="$tmp/PhoneBox-$ver.apk"
-          if ! download "$base/PhoneBox-$ver.apk" "$apk"; then
-            caution "Phone app skipped: the download failed ($base/PhoneMon-$ver.apk)."
-          fi
+        local apk_name="PhoneBox-$ver.apk"
+        if grep -Eq "^[0-9a-fA-F]{64}[[:space:]]+\*?PhoneMon-$ver\.apk\$" "$sums"; then
+          apk_name="PhoneMon-$ver.apk"
         fi
-        if [ -f "$apk" ]; then
-          if ! check_sum "$apk" "$sums"; then
-            caution 'Phone app skipped: the APK could not be verified.'
-          elif install_phone_app "$apk" "$device"; then
-            phone_done=1
-          fi
+        apk="$tmp/$apk_name"
+        if ! download_verified "$base/$apk_name" "$apk" "$sums"; then
+          caution "Phone app skipped: the download could not be verified ($base/$apk_name)."
+        elif install_phone_app "$apk" "$device"; then
+          phone_done=1
         fi
       fi
     fi
@@ -668,7 +676,7 @@ main() {
   if [ "$os" = linux ]; then info 'With a firewall (ufw, firewalld), Wi-Fi also needs TCP port 8766 open on your local network.'; fi
   info "Until Wi-Fi is on, PhoneMon only listens on this computer. Every connection it makes: https://github.com/$repo/blob/main/PRIVACY.md"
   info 'Updates: PhoneMon updates itself from Settings. Run setup again any time to repair it.'
-  info "Uninstall: curl -fsSL https://raw.githubusercontent.com/$repo/main/scripts/uninstall.sh | bash -s -- [--purge] [--apk]"
+  info "Uninstall: curl -fsSL https://sarveshsivasankaran.github.io/PhoneMon/scripts/uninstall.sh | bash -s -- [--purge] [--apk]"
 }
 
 # Everything runs from here, so a download cut off half way cannot run half a script.

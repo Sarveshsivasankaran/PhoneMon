@@ -58,13 +58,13 @@ USB या Wi-Fi से जुड़कर PC की स्थिति, AI क�
 Windows 10/11 x64 पर यह कमांड PowerShell में चलाएँ।
 
 ```powershell
-irm https://raw.githubusercontent.com/Sarveshsivasankaran/PhoneMon/main/setup.ps1 | iex
+irm https://sarveshsivasankaran.github.io/PhoneMon/setup.ps1 | iex
 ```
 
 Linux या macOS पर यह कमांड अपने सामान्य उपयोगकर्ता खाते से चलाएँ।
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/Sarveshsivasankaran/PhoneMon/main/setup.sh | bash
+curl -fsSL https://sarveshsivasankaran.github.io/PhoneMon/setup.sh | bash
 ```
 
 सेटअप रिलीज़ का चेकसम जाँचता है और सेटिंग पेज खोलता है। यह फ़ोन ऐप को USB से इंस्टॉल भी कर सकता है। सेटिंग और पेयरिंग बनाए रखते हुए अपडेट या मरम्मत के लिए इसे फिर चलाएँ।
