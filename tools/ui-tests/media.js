@@ -1,9 +1,10 @@
-// Makes the README media from the demo (made-up data): page screenshots, the tour video (MP4 + GIF) and the hero image.
+// Makes the README & guide media from the live demo/project UI: page screenshots, special overlays, settings editor, tour video, and hero image.
 // Start the demo first (python tools/demo-server.py), then from tools/ui-tests:
 //
-//   node media.js shots nightstand planner overview   # docs/screenshots/<page>.png (780 x 360 at 2x; "overview" = all pages)
-//   node media.js tour                                 # docs/tour-<v>.mp4 and .gif (needs ffmpeg)
-//   node media.js hero                                 # docs/hero-<v>.png (1920 x 810; waits ~1.5 min so the charts fill)
+//   node media.js shots all                           # all 22 docs/screenshots/*.png from the current UI
+//   node media.js shots home work system settings-editor
+//   node media.js tour                                # docs/tour-<v>.mp4 and .gif (needs ffmpeg)
+//   node media.js hero                                # docs/hero-<v>.png (1920 x 810; waits ~1.5 min so the charts fill)
 //
 // Options: --base http://127.0.0.1:8790/  --out <dir>  --name <v> (the file name suffix, default "new")
 const { chromium } = require('@playwright/test');
@@ -18,25 +19,165 @@ const BASE = opt('base', 'http://127.0.0.1:8790/');
 const NAME = opt('name', 'new');
 const DOCS = path.resolve(__dirname, '..', '..', 'docs');
 const OUT = opt('out', DOCS);
-const [what, ...ids] = args;
+const [what, ...rawIds] = args;
 const PANEL = new URL('panel/', BASE).href;
+const SETTINGS = new URL('settings/#pages', BASE).href;
 const ORDER = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'pages', 'demo.js'), 'utf8').match(/const PAGES = (\[[^\]]*\])/)[1].replace(/'/g, '"'));
-const next = (frame, n) => frame.evaluate((n) => { for (let i = 0; i < n; i++) window.onAndroidKey('next'); }, n);
-const indexOf = (id) => { const i = ORDER.indexOf(id); if (i < 0) throw new Error(`unknown page "${id}" (pages: ${ORDER.join(', ')})`); return i; };
+const ALIAS = { deepwork: 'focuswork' };
+const ALL_SHOTS = [
+  'home', 'dashboard', 'ai', 'work', 'system', 'procs-sheet', 'status', 'ambient',
+  'markets', 'feeds', 'daily', 'world', 'music', 'deck', 'planner', 'automation',
+  'nightstand', 'deepwork', 'overview', 'settings-editor', 'session-details', 'smart-stack',
+];
+const ids = rawIds.length === 1 && rawIds[0] === 'all' ? ALL_SHOTS : rawIds;
+
+const next = (frame, n) => frame.evaluate((count) => { for (let i = 0; i < count; i++) window.onAndroidKey('next'); }, n);
+const indexOf = (id) => {
+  const canonical = ALIAS[id] || id;
+  const i = ORDER.indexOf(canonical);
+  if (i < 0) throw new Error(`unknown page "${id}" (pages: ${ORDER.join(', ')})`);
+  return i;
+};
+
+async function launchBrowser() {
+  try { return await chromium.launch(); } catch (_) {}
+  for (const channel of ['chrome', 'msedge']) {
+    try { return await chromium.launch({ channel }); } catch (_) {}
+  }
+  throw new Error('Could not launch Chromium, Chrome, or Edge for media generation.');
+}
+
+async function captureSettingsEditor(browser, file) {
+  const ctx = await browser.newContext({ viewport: { width: 1280, height: 960 }, deviceScaleFactor: 2, colorScheme: 'dark' });
+  const page = await ctx.newPage();
+  await page.goto(SETTINGS);
+  await page.locator('#pageTabs .ptab').nth(1).waitFor({ timeout: 10000 });
+  await page.locator('#pageTabs .ptab').nth(1).click();
+  const targetWidget = page.locator('#canvas .wb').filter({ hasText: /Now playing/i }).first();
+  if (await targetWidget.count()) {
+    await targetWidget.click();
+  } else {
+    await page.locator('#canvas .wb').first().click();
+  }
+  await page.waitForTimeout(600);
+  await page.screenshot({ path: file });
+  await ctx.close();
+  console.log(file);
+}
+
+async function captureSmartStack(browser, file) {
+  const prep = await browser.newContext({ viewport: { width: 780, height: 360 }, deviceScaleFactor: 2 });
+  const p0 = await prep.newPage();
+  await p0.goto(PANEL);
+  await p0.waitForTimeout(2500);
+  const storage = await p0.evaluate(() => {
+    const cfg = JSON.parse(localStorage.getItem('pb-demo-config'));
+    const home = cfg.pages.find((p) => p.id === 'home') || cfg.pages[0];
+    const clock = home.widgets.find((w) => w.type === 'clock') || { id: 'clock', type: 'clock', x: 0, y: 0, w: 6, h: 6, options: { status: true, weather: true } };
+    cfg.pages = [{
+      ...home,
+      widgets: [
+        { ...clock, x: 0, y: 0, w: 6, h: 6 },
+        { id: 'codex-top', type: 'quotas', x: 6, y: 0, w: 6, h: 3, options: { providers: ['codex'], pageSize: 1, rotate: false } },
+        {
+          id: 'stack-demo',
+          type: 'stack',
+          x: 6,
+          y: 3,
+          w: 6,
+          h: 3,
+          options: {
+            widgets: [
+              { id: 'c-sessions', type: 'sessions', enabled: true, options: {} },
+              { id: 'c-gh', type: 'github', enabled: true, options: {} },
+              { id: 'c-weather', type: 'weather', enabled: true, options: {} },
+            ],
+          },
+        },
+      ],
+    }];
+    localStorage.setItem('pb-demo-config', JSON.stringify(cfg));
+    return { ...localStorage };
+  });
+  await prep.close();
+
+  const ctx = await browser.newContext({ viewport: { width: 780, height: 360 }, deviceScaleFactor: 2 });
+  await ctx.addInitScript((s) => { for (const [k, v] of Object.entries(s)) localStorage.setItem(k, v); }, storage);
+  const page = await ctx.newPage();
+  await page.goto(PANEL);
+  await page.waitForTimeout(3500);
+  await page.screenshot({ path: file });
+  await ctx.close();
+  console.log(file);
+}
 
 async function shots(browser) {
-  const ctx = await browser.newContext({ viewport: { width: 780, height: 360 }, deviceScaleFactor: 2 });
-  for (const id of ids) {
+  const overlays = new Set(['overview', 'procs-sheet', 'session-details']);
+  const panelIds = [
+    ...ids.filter((id) => id !== 'settings-editor' && id !== 'smart-stack' && !overlays.has(id)),
+    ...ids.filter((id) => overlays.has(id)),
+  ];
+  if (panelIds.length) {
+    const ctx = await browser.newContext({ viewport: { width: 780, height: 360 }, deviceScaleFactor: 2 });
     const page = await ctx.newPage();
     await page.goto(PANEL);
-    await page.waitForTimeout(3000);
-    if (id === 'overview') await page.evaluate(() => window.openOverview());
-    else await next(page, indexOf(id));
-    await page.waitForTimeout(3500);
-    const file = path.join(OUT, 'screenshots', id + '.png');
-    await page.screenshot({ path: file });
-    await page.close();
-    console.log(file);
+    // Warm up live real-time sparklines/charts on home/system/dashboard when any chart page is requested.
+    const needsCharts = panelIds.some((id) => ['home', 'dashboard', 'system', 'status'].includes(id));
+    await page.waitForTimeout(needsCharts ? 95_000 : 3500);
+
+    let currentIdx = 0;
+    for (const id of panelIds) {
+      const file = path.join(OUT, 'screenshots', id + '.png');
+      if (id === 'overview') {
+        await page.evaluate(() => window.openOverview());
+        await page.waitForTimeout(800);
+        await page.screenshot({ path: file });
+        await page.evaluate(() => window.closeOverview?.() || document.querySelector('#ovClose')?.click());
+        await page.waitForTimeout(300);
+      } else if (id === 'procs-sheet') {
+        const target = indexOf('procs');
+        await next(page, (target - currentIdx + ORDER.length) % ORDER.length);
+        currentIdx = target;
+        await page.locator('.proc').first().waitFor({ timeout: 8000 });
+        await page.waitForTimeout(600);
+        await page.locator('.proc').first().click();
+        await page.locator('#pSheet:not([hidden])').waitFor({ timeout: 5000 });
+        await page.waitForTimeout(500);
+        await page.screenshot({ path: file });
+        await page.keyboard.press('Escape');
+        await page.waitForTimeout(300);
+      } else if (id === 'session-details') {
+        const target = indexOf('work');
+        await next(page, (target - currentIdx + ORDER.length) % ORDER.length);
+        currentIdx = target;
+        const sessRow = page.locator('.sess', { hasText: /mobile-app/i }).first();
+        await sessRow.waitFor({ timeout: 8000 });
+        await page.waitForTimeout(600);
+        await sessRow.click();
+        await page.locator('.session-panel-head').waitFor({ timeout: 5000 });
+        await page.waitForTimeout(400);
+        await page.screenshot({ path: file });
+        await page.keyboard.press('Escape');
+        await page.waitForTimeout(300);
+      } else {
+        const target = indexOf(id);
+        const step = (target - currentIdx + ORDER.length) % ORDER.length;
+        if (step > 0) {
+          await next(page, step);
+          currentIdx = target;
+        }
+        await page.waitForTimeout(2500);
+        await page.screenshot({ path: file });
+      }
+      console.log(file);
+    }
+    await ctx.close();
+  }
+  if (ids.includes('settings-editor')) {
+    await captureSettingsEditor(browser, path.join(OUT, 'screenshots', 'settings-editor.png'));
+  }
+  if (ids.includes('smart-stack')) {
+    await captureSmartStack(browser, path.join(OUT, 'screenshots', 'smart-stack.png'));
   }
 }
 
@@ -115,7 +256,7 @@ async function hero(browser) {
 
 (async () => {
   const run = { shots, tour, hero }[what];
-  if (!run) { console.error('usage: node media.js shots <page>… | tour | hero [left center right]'); process.exit(2); }
-  const browser = await chromium.launch();
+  if (!run) { console.error('usage: node media.js shots <page|all>… | tour | hero [left center right]'); process.exit(2); }
+  const browser = await launchBrowser();
   try { await run(browser); } finally { await browser.close(); }
 })().catch((e) => { console.error(e); process.exit(1); });

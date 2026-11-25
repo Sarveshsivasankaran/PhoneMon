@@ -220,22 +220,6 @@ python tools/demo-server.py
 
 - [anandyakshit](https://github.com/anandyakshit): υποστήριξη Android 7, σε τηλέφωνο με Android 7.1.1 ([#73](https://github.com/Sarveshsivasankaran/PhoneMon/issues/73)).
 
-## Χορηγός
-
-<!-- sponsor: WrongStack -->
-<p align="center">
-  <a href="https://wrongstack.com">
-    <img src="sponsors/wrongstack.svg" width="900" alt="Με χορηγία της WrongStack — προγραμματισμός με AI ανοιχτού κώδικα με διαρκή μνήμη και ροές εργασίας πολλών πρακτόρων. Εξερευνήστε το wrongstack.com.">
-  </a>
-</p>
-<p align="center">
-  <strong>Με την υποστήριξη της <a href="https://wrongstack.com">WrongStack</a></strong> ·
-  Ένας πράκτορας προγραμματισμού με AI ανοιχτού κώδικα που θυμάται τον κώδικά σας.<br>
-  <a href="https://wrongstack.com"><strong>Εξερευνήστε τη WrongStack →</strong></a> ·
-  <a href="https://github.com/wrongstack/wrongstack"><strong>Δείτε το στο GitHub &amp; δώστε ένα αστέρι ★</strong></a>
-</p>
-<!-- /sponsor: WrongStack -->
-
 ## Ιστορικό αστεριών
 
 <a href="https://www.star-history.com/#Sarveshsivasankaran/PhoneMon&Date">

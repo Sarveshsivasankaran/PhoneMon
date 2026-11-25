@@ -167,22 +167,6 @@ python tools/demo-server.py
 - **Ekip rolleri:** Commit, inceleme ve imzalama onaylayıcısı: [Sarveshsivasankaran](https://github.com/Sarveshsivasankaran).
 - **Gizlilik:** Bkz. [gizlilik politikası](../PRIVACY.md).
 
-## Sponsor
-
-<!-- sponsor: WrongStack -->
-<p align="center">
-  <a href="https://wrongstack.com">
-    <img src="sponsors/wrongstack.svg" width="900" alt="WrongStack tarafından desteklenmektedir">
-  </a>
-</p>
-<p align="center">
-  <strong><a href="https://wrongstack.com">WrongStack</a> tarafından desteklenmektedir</strong> ·
-  Kod tabanınızı hatırlayan açık kaynaklı yapay zekâ kodlama ajanı.<br>
-  <a href="https://wrongstack.com"><strong>WrongStack'i Keşfet →</strong></a> ·
-  <a href="https://github.com/wrongstack/wrongstack"><strong>GitHub'da görüntüle ve yıldız ver ★</strong></a>
-</p>
-<!-- /sponsor: WrongStack -->
-
 ## Star History
 
 <a href="https://www.star-history.com/#Sarveshsivasankaran/PhoneMon&Date">

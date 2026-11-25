@@ -217,22 +217,6 @@ Những người đã thử nghiệm PhoneMon trên phần cứng của chính h
 
 - [anandyakshit](https://github.com/anandyakshit): hỗ trợ Android 7, trên một chiếc điện thoại Android 7.1.1 ([#73](https://github.com/Sarveshsivasankaran/PhoneMon/issues/73)).
 
-## Nhà tài trợ
-
-<!-- sponsor: WrongStack -->
-<p align="center">
-  <a href="https://wrongstack.com">
-    <img src="sponsors/wrongstack.svg" width="900" alt="Được tài trợ bởi WrongStack — lập trình bằng AI mã nguồn mở với bộ nhớ bền vững và quy trình đa agent. Khám phá tại wrongstack.com.">
-  </a>
-</p>
-<p align="center">
-  <strong>Được hỗ trợ bởi <a href="https://wrongstack.com">WrongStack</a></strong> ·
-  Một agent lập trình bằng AI mã nguồn mở có khả năng ghi nhớ codebase của bạn.<br>
-  <a href="https://wrongstack.com"><strong>Khám phá WrongStack →</strong></a> ·
-  <a href="https://github.com/wrongstack/wrongstack"><strong>Xem trên GitHub &amp; tặng một ngôi sao ★</strong></a>
-</p>
-<!-- /sponsor: WrongStack -->
-
 ## Lịch sử ngôi sao
 
 <a href="https://www.star-history.com/#Sarveshsivasankaran/PhoneMon&Date">

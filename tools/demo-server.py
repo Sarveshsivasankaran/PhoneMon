@@ -70,6 +70,7 @@ def static(path):
     if path == '/demo.js': return 'text/javascript', (PAGES / 'demo.js').read_bytes()
     if path in ('/widgets.json', '/templates.json'): return 'application/json', (site.AGENT / path[1:]).read_bytes()
     if path == '/favicon.ico': return 'image/x-icon', (site.AGENT / 'phonebox.ico').read_bytes()
+    if path == '/logo.png' and (site.AGENT / 'logo.png').is_file(): return 'image/png', (site.AGENT / 'logo.png').read_bytes()
     if path in ('/panel/', '/panel/index.html'): return 'text/html', site.panel_html(relay=True).encode()
     if path in ('/settings/', '/settings/index.html'): return 'text/html', site.settings_html(relay=True).encode()
     if path.startswith('/panel/'):
