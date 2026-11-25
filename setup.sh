@@ -517,6 +517,7 @@ main() {
   case "$tag" in
     v1.2.1-stable|v1.2.2) tag=v1.2.1-stable; ver=1.2.2; display="1.2.1 (stable)" ;;
     v1.2.2-stable|v1.2.3) tag=v1.2.2-stable; ver=1.2.3; display="1.2.2 (stable)" ;;
+    v1.2.3-stable|v1.2.4) tag=v1.2.3-stable; ver=1.2.4; display="1.2.3 (stable)" ;;
   esac
   printf '%s' "$ver" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$' || die "unexpected version '$tag'."
   base="https://github.com/$repo/releases/download/$tag"

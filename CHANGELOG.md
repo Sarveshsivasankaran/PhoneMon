@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.2.3 (stable) — 2026-11-25
+
+- Say “Jarvis” to open the bottom-center conversation and keep asking follow-up questions through pauses. Say “stop listening” to return to wake-word mode.
+- Added speech recognition fallback, selectable Android voices, and voice controls for paired ADB and Tailscale connections. Clock-only night mode uses purple and white.
+
 ## 1.2.2 (stable) — 2026-11-25
 
 - Merged the local JARVIS AI engine (`llama.cpp` runtime, CameraX front-camera capture, Room memory database, tool approval flow, and CMU Flite 3-voice offline speech) directly into the single unified `PhoneMon` APK — removing the separate `JARVIS` companion APK requirement and eliminating `"Install the JARVIS APK"` errors.

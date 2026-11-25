@@ -456,6 +456,7 @@ public sealed class UpdateService(ConfigStore cfg, AdbReverse adb, IHostApplicat
         {
             "v1.2.1-stable" => "1.2.2",
             "v1.2.2-stable" => "1.2.3",
+            "v1.2.3-stable" => "1.2.4",
             _ => tag.TrimStart('v', 'V'),
         };
         return new Release(version, release.GetProperty("html_url").GetString(), apk, zip, sums);

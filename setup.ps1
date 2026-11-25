@@ -472,9 +472,10 @@ function Install-PhoneMon {
     $tag = "v$ver"
     if ($tag -in 'v1.2.1-stable', 'v1.2.2') { $tag = 'v1.2.1-stable'; $ver = '1.2.2' }
     elseif ($tag -in 'v1.2.2-stable', 'v1.2.3') { $tag = 'v1.2.2-stable'; $ver = '1.2.3' }
+    elseif ($tag -in 'v1.2.3-stable', 'v1.2.4') { $tag = 'v1.2.3-stable'; $ver = '1.2.4' }
     if ($ver -notmatch '^\d+\.\d+\.\d+$') { throw "Unexpected version '$tag'." }
     $base = "https://github.com/$Repo/releases/download/$tag"
-    $displayVersion = if ($tag -eq 'v1.2.1-stable') { '1.2.1 (stable)' } elseif ($tag -eq 'v1.2.2-stable') { '1.2.2 (stable)' } else { $ver }
+    $displayVersion = if ($tag -eq 'v1.2.1-stable') { '1.2.1 (stable)' } elseif ($tag -eq 'v1.2.2-stable') { '1.2.2 (stable)' } elseif ($tag -eq 'v1.2.3-stable') { '1.2.3 (stable)' } else { $ver }
     if ($installed -eq $ver) { Write-Ok "PhoneMon $displayVersion (already installed; it will be reinstalled, settings stay)" }
     elseif ($installed) { Write-Ok "PhoneMon $displayVersion (updating from $installed; settings stay)" }
     else { Write-Ok "PhoneMon $displayVersion" }

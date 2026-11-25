@@ -89,12 +89,15 @@ test.describe('JARVIS continuous wake, voice selector, and night clock', () => {
     await page.waitForFunction(() => (window.__jarvisTrace?.listenIds?.length || 0) === 2, null, { timeout: 5000 });
     const cmdId2 = await page.evaluate(() => window.__jarvisTrace.listenIds.at(-1));
 
+    await page.evaluate((id) => window.onAndroidSpeech('final', '', id), cmdId2);
+    await page.waitForFunction(() => window.__jarvisTrace.listenIds.length === 3);
+    const cmdId3 = await page.evaluate(() => window.__jarvisTrace.listenIds.at(-1));
     // Only stops conversing when the user tells it to stop
-    await page.evaluate((id) => window.onAndroidSpeech('final', 'stop listening', id), cmdId2);
+    await page.evaluate((id) => window.onAndroidSpeech('final', 'stop listening', id), cmdId3);
     await expect.poll(() => page.evaluate(() => window.__jarvisTrace.stopSpeech)).toBe(1);
     await expect(page.locator('#jState')).toHaveText('Ready');
     await page.waitForTimeout(900);
-    expect(await page.evaluate(() => window.__jarvisTrace.listenIds.length)).toBe(2);
+    expect(await page.evaluate(() => window.__jarvisTrace.listenIds.length)).toBe(3);
   });
 
   test('exposes multi-voice selector and purple/white night clock styling', async ({ page }) => {

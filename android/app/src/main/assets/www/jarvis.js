@@ -43,7 +43,7 @@ export function initPanelAssistant(bridge) {
       .replace(/^(?:hey|ok|okay|please)\s+/i, '')
       .replace(/^(?:jarvis|jar\s+vis|jervis)\s+/i, '')
       .replace(/\s+(?:jarvis|please|now)$/i, '').trim();
-    return /^(?:stop(?:\s+listening)?|quiet|silence|stand\s*down|go\s+to\s+sleep|sleep|never\s*mind|nevermind|that'?s\s+all|i'?m\s+done|nothing(?:\s+else)?|no\s+thanks?|cancel|close|dismiss|bye|goodbye|thank\s*you|thanks)$/.test(clean);
+    return /^(?:stop(?:\s+listening)?|quiet|silence|stand\s*down|go\s+to\s+sleep|sleep|never\s*mind|nevermind|that'?s\s+all|i'?m\s+done|nothing(?:\s+else)?|no\s+thanks?|cancel|close|dismiss|bye|goodbye)$/.test(clean);
   }
   function stopConversation(shouldClose = false, note = 'Standing by. Say “Jarvis” when you need me.') {
     clearTimeout(followUpTimer);
@@ -225,9 +225,12 @@ export function initPanelAssistant(bridge) {
         wake.checked = true; localStorage.setItem('phoneMonAssistantWake', 'on');
       }
       if (!clean) {
-        conversing = false;
-        fault = 'No speech heard. Say “Jarvis” or tap Speak.';
-        send('');
+        render(call('idle'));
+        if (conversing) {
+          followUpTimer = setTimeout(() => {
+            if (conversing && !mode && !overlay.hidden) listen('command');
+          }, 550);
+        }
       } else if (isStopPhrase(clean)) {
         const closeWords = /^(?:(?:jarvis|hey\s+jarvis|ok\s+jarvis)[,\s]*)?(?:close|dismiss|hide)(?:\s+jarvis)?[.!?]*$/i.test(clean);
         stopConversation(closeWords);

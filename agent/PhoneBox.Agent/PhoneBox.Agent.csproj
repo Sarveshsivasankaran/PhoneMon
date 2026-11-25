@@ -15,7 +15,7 @@
     <Authors>Solo-P-Leveller</Authors>
     <Copyright>Copyright (c) 2026 Solo-P-Leveller</Copyright>
     <Description>PhoneMon desktop agent: feeds the PhoneMon Android desk panel over USB or Wi-Fi.</Description>
-    <Version>1.2.3</Version>
+    <Version>1.2.4</Version>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
   </PropertyGroup>
 

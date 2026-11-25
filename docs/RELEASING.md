@@ -2,7 +2,7 @@
 
 Pushing a change to the root `VERSION` file on `main` starts the release workflow and publishes after checks and signing succeed. For a release update, bump the Android version name and code, the agent version, and the dated changelog together with `VERSION`. Routine changes leave `VERSION` alone. Manual dispatch remains available for retries before publication.
 
-The release titled **1.2.2 (stable)** uses the distinct Git tag `v1.2.2-stable` and numeric package version `1.2.3`. Filenames, desktop binary versions, Scoop and WinGet all use the numeric package version. The Android app shows the release title and uses an increasing version code. The next ordinary release can use `1.2.4` or higher with its normal numeric title and tag.
+The release titled **1.2.3 (stable)** uses the distinct Git tag `v1.2.3-stable` and numeric package version `1.2.4`. Filenames, desktop binary versions, Scoop and WinGet all use the numeric package version. The Android app shows the release title and uses an increasing version code. The next ordinary release can use `1.2.5` or higher with its normal numeric title and tag.
 
 1. Update `agent/PhoneBox.Agent/PhoneBox.Agent.csproj`, Android `versionName` and its increasing `versionCode`.
 2. Add dated release notes to `CHANGELOG.md`; update README and demo catalog counts when widgets/templates change.

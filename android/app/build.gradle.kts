@@ -30,8 +30,8 @@ android {
         applicationId = "net.oxog.phonebox.deskpanel"
         minSdk = 21 // Android 5.0; see CONTRIBUTING.md before changing it
         targetSdk = 35
-        versionCode = 9
-        versionName = "1.2.2 (stable)"
+        versionCode = 10
+        versionName = "1.2.3 (stable)"
         buildConfigField("String", "PUBLISHER_NAME", "\"Solo-P-Leveller\"")
 
         ndk {

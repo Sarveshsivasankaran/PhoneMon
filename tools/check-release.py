@@ -4,8 +4,8 @@ root=pathlib.Path(__file__).resolve().parents[1]
 version=ET.parse(root/'agent/PhoneBox.Agent/PhoneBox.Agent.csproj').find('.//Version').text
 assert (root/'VERSION').read_text().strip()==version,'VERSION differs from agent'
 assert re.fullmatch(r'\d+\.\d+\.\d+',version),version
-display = '1.2.2 (stable)' if version == '1.2.3' else '1.2.1 (stable)' if version == '1.2.2' else version
-tag = 'v1.2.2-stable' if version == '1.2.3' else 'v1.2.1-stable' if version == '1.2.2' else f'v{version}'
+display = '1.2.3 (stable)' if version == '1.2.4' else '1.2.2 (stable)' if version == '1.2.3' else '1.2.1 (stable)' if version == '1.2.2' else version
+tag = 'v1.2.3-stable' if version == '1.2.4' else 'v1.2.2-stable' if version == '1.2.3' else 'v1.2.1-stable' if version == '1.2.2' else f'v{version}'
 android_gradle = (root / 'android/app/build.gradle.kts').read_text(encoding='utf-8')
 assert f'versionName = "{display}"' in android_gradle, 'android version differs'
 assert int(re.search(r'versionCode = (\d+)', android_gradle)[1]) > 8, 'android versionCode must increase'

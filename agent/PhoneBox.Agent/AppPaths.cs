@@ -54,25 +54,28 @@ public static class AppPaths
         Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion.Split('+')[0]
         ?? "0.0.0";
 
-    internal const string StablePackageVersion = "1.2.3";
-    internal const string StableTag = "v1.2.2-stable";
-    internal const string StableDisplay = "1.2.2 (stable)";
+    internal const string StablePackageVersion = "1.2.4";
+    internal const string StableTag = "v1.2.3-stable";
+    internal const string StableDisplay = "1.2.3 (stable)";
     internal static string? Display(string? version) => version switch
     {
         "1.2.2" => "1.2.1 (stable)",
         "1.2.3" => "1.2.2 (stable)",
+        "1.2.4" => "1.2.3 (stable)",
         _ => version,
     };
     internal static string PackageVersion(string name) => name switch
     {
         "1.2.1 (stable)" => "1.2.2",
         "1.2.2 (stable)" => "1.2.3",
+        "1.2.3 (stable)" => "1.2.4",
         _ => name,
     };
     public static string ReleaseTag => Version switch
     {
         "1.2.2" => "v1.2.1-stable",
         "1.2.3" => "v1.2.2-stable",
+        "1.2.4" => "v1.2.3-stable",
         _ => "v" + Version,
     };
 
